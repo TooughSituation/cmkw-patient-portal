@@ -2,16 +2,19 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { CalendarPlus, Users } from "lucide-react";
+import { CalendarPlus, Users, UserRound } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { siteConfig } from "@/lib/site-config";
 import { Button } from "@/components/ui/button";
 
 export function Hero() {
   const router = useRouter();
+  const { data: session, status } = useSession();
+  const isAuthed = status === "authenticated" && !!session?.user;
 
   return (
     <section
-      className="relative flex min-h-[520px] items-end overflow-hidden md:min-h-[640px]"
+      className="relative flex min-h-[560px] items-end overflow-hidden md:min-h-[680px]"
       aria-labelledby="hero-heading"
     >
       <Image
@@ -22,19 +25,19 @@ export function Hero() {
         className="object-cover object-center"
         sizes="100vw"
       />
-      {/* Overlay matching original: gradient from brand-deep */}
+      {/* Overlay jak oryginał: gradient z #2b2d81 */}
       <div
-        className="absolute inset-0 bg-gradient-to-t from-[rgba(43,45,129,0.85)] via-[rgba(43,45,129,0.35)] to-transparent"
+        className="absolute inset-0 bg-gradient-to-t from-[rgba(43,45,129,0.88)] via-[rgba(43,45,129,0.4)] to-transparent"
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-32 text-center md:px-6 md:pb-24 md:pt-48">
+      <div className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-36 text-center md:px-6 md:pb-24 md:pt-52">
         <h1
           id="hero-heading"
-          className="text-3xl font-extrabold uppercase tracking-wide text-white drop-shadow-[0_0_40px_#000] sm:text-4xl md:text-5xl"
+          className="text-[28px] font-extrabold uppercase leading-tight tracking-wide text-white drop-shadow-[0_0_40px_#000] sm:text-4xl md:text-[50px]"
         >
           {siteConfig.hero.title}
-          <span className="mt-1 block text-2xl font-normal sm:text-3xl md:text-4xl">
+          <span className="mt-1 block text-[22px] font-normal sm:text-3xl md:text-[40px]">
             {siteConfig.hero.subtitle}
           </span>
         </h1>
@@ -47,18 +50,27 @@ export function Hero() {
           {siteConfig.hero.lead}
         </p>
 
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+          {/* CTA portalu — dodatek */}
           <Button
             size="lg"
-            onClick={() => router.push("/login")}
-            className="h-12 min-w-[200px] gap-2 bg-brand-deep px-6 text-base font-semibold text-white hover:bg-black"
+            onClick={() => router.push(isAuthed ? "/portal" : "/login")}
+            className="h-12 min-w-[220px] gap-2 bg-brand px-6 text-base font-semibold text-white hover:bg-black"
           >
-            <CalendarPlus className="size-5" />
-            Portal / Rejestracja
+            <UserRound className="size-5" />
+            Rejestracja / Portal Pacjenta
           </Button>
           <Button
             size="lg"
-            onClick={() => router.push("/#o-nas")}
+            onClick={() => router.push("/kontakt")}
+            className="h-12 min-w-[200px] gap-2 bg-brand-deep px-6 text-base font-semibold text-white hover:bg-black"
+          >
+            <CalendarPlus className="size-5" />
+            Umów wizytę
+          </Button>
+          <Button
+            size="lg"
+            onClick={() => router.push("/nasz-zespol")}
             className="h-12 min-w-[200px] gap-2 bg-brand-deep px-6 text-base font-semibold text-white hover:bg-black"
           >
             <Users className="size-5" />

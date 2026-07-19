@@ -24,58 +24,64 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   const isAuthed = status === "authenticated" && !!session?.user;
-
-  const goToPortalCta = () => {
-    setOpen(false);
-    router.push(isAuthed ? "/portal" : "/login");
-  };
-
+  const ctaHref = isAuthed ? "/portal" : "/login";
   const ctaLabel = isAuthed
     ? `Portal · ${session.user.firstName}`
     : "Rejestracja / Portal Pacjenta";
 
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
-      <div className="border-b border-gray-100">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-6">
+    <header className="sticky top-0 z-50 w-full bg-white shadow-[0_1px_0_0_#eee]">
+      {/* Top bar — logo + telefony (jak oryginał) */}
+      <div className="border-b border-[#eee]">
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-3 md:px-6">
           <a
             href={siteConfig.mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden items-center gap-2 text-sm text-foreground/80 hover:text-brand md:flex"
+            className="hidden max-w-[220px] items-start gap-2 text-[13px] leading-snug text-[#333] hover:text-brand lg:flex"
           >
-            <MapPin className="size-4 shrink-0 text-brand" aria-hidden />
+            <MapPin className="mt-0.5 size-4 shrink-0 text-brand" />
             <span>{siteConfig.address.full}</span>
           </a>
 
-          <Link href="/" className="mx-auto shrink-0 md:mx-0">
+          <Link href="/" className="mx-auto shrink-0 lg:mx-0">
             <Image
               src="/images/logo.webp"
-              alt={siteConfig.name}
-              width={220}
-              height={64}
-              className="h-12 w-auto object-contain md:h-16"
+              alt="Centrum Medyczne Kiryluk & Wenta"
+              width={240}
+              height={72}
+              className="h-[52px] w-auto object-contain md:h-[72px]"
               priority
             />
           </Link>
 
-          <div className="hidden items-center gap-3 text-sm font-medium md:flex">
+          <div className="hidden flex-col items-end gap-1 text-[14px] font-medium lg:flex">
             {siteConfig.phones.map((phone) => (
               <a
                 key={phone.href}
                 href={phone.href}
-                className="inline-flex items-center gap-1.5 text-brand hover:text-foreground"
+                className="inline-flex items-center gap-1.5 text-brand hover:text-black"
               >
-                <Phone className="size-3.5" aria-hidden />
+                <Phone className="size-3.5" />
                 {phone.label}
               </a>
             ))}
           </div>
 
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Otwórz menu">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  aria-label="Otwórz menu"
+                  className="border-[#ddd]"
+                >
                   <Menu className="size-5" />
                 </Button>
               </SheetTrigger>
@@ -85,20 +91,28 @@ export function SiteHeader() {
                     Menu
                   </SheetTitle>
                 </SheetHeader>
-                <nav className="mt-6 flex flex-col gap-1">
+                <nav className="mt-4 flex flex-col">
                   {siteConfig.nav.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
                       onClick={() => setOpen(false)}
-                      className="rounded-md px-3 py-2.5 text-base font-semibold text-foreground hover:bg-accent hover:text-brand"
+                      className={cn(
+                        "border-b border-[#eee] px-1 py-3 text-[15px] font-bold",
+                        isActive(item.href)
+                          ? "text-brand"
+                          : "text-[#000] hover:text-brand"
+                      )}
                     >
                       {item.title}
                     </Link>
                   ))}
                   <Button
-                    onClick={goToPortalCta}
-                    className="mt-4 h-11 bg-brand text-white hover:bg-brand-deep"
+                    onClick={() => {
+                      setOpen(false);
+                      router.push(ctaHref);
+                    }}
+                    className="mt-5 h-11 bg-brand font-semibold text-white hover:bg-brand-deep"
                   >
                     <UserRound className="size-4" />
                     {ctaLabel}
@@ -107,9 +121,9 @@ export function SiteHeader() {
                     <Link
                       href="/rejestracja"
                       onClick={() => setOpen(false)}
-                      className="mt-2 text-center text-sm font-medium text-brand"
+                      className="mt-3 text-center text-sm font-semibold text-brand"
                     >
-                      Załóż konto
+                      Załóż konto pacjenta
                     </Link>
                   )}
                   <div className="mt-6 space-y-2 border-t pt-4 text-sm">
@@ -131,53 +145,43 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className="border-b border-gray-100 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col items-stretch gap-2 px-4 py-2 md:flex-row md:items-center md:justify-between md:px-6">
-          <nav className="hidden items-center md:flex" aria-label="Główne menu">
-            <ul className="flex flex-wrap items-center">
-              {siteConfig.nav.map((item, index) => {
-                const isActive =
-                  pathname === item.href ||
-                  (item.href.startsWith("/#") && pathname === "/");
-
-                return (
-                  <li key={item.href} className="relative flex items-center">
-                    {index > 0 && (
-                      <span
-                        className="mx-0.5 h-5 w-px bg-gray-200"
-                        aria-hidden
-                      />
+      {/* Główne menu — bold, separators jak oryginał */}
+      <div className="border-b border-[#eee] bg-white">
+        <div className="mx-auto flex max-w-[1200px] flex-col items-stretch gap-2 px-2 py-1.5 md:px-4 lg:flex-row lg:items-center lg:justify-between">
+          <nav
+            className="hidden flex-1 justify-center lg:flex"
+            aria-label="Główne menu"
+          >
+            <ul className="flex flex-wrap items-center justify-center">
+              {siteConfig.nav.map((item, index) => (
+                <li key={item.href} className="relative flex items-center">
+                  {index > 0 && (
+                    <span
+                      className="mx-0 h-5 w-px bg-[#eee]"
+                      aria-hidden
+                    />
+                  )}
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "px-2.5 py-2.5 text-[13px] font-bold tracking-wide transition-colors xl:px-3.5 xl:text-[14px]",
+                      isActive(item.href)
+                        ? "text-brand"
+                        : "text-[#000] hover:text-brand"
                     )}
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "px-3 py-2 text-sm font-bold tracking-wide transition-colors",
-                        isActive
-                          ? "text-brand"
-                          : "text-foreground hover:text-brand"
-                      )}
-                    >
-                      {item.title}
-                    </Link>
-                  </li>
-                );
-              })}
+                  >
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 
-          <div className="flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:justify-end">
-            {!isAuthed && (
-              <Button
-                variant="outline"
-                onClick={() => router.push("/rejestracja")}
-                className="h-10 border-brand/30 text-brand hover:bg-secondary md:w-auto"
-              >
-                Rejestracja
-              </Button>
-            )}
+          {/* Prominent CTA — dodatek do klona */}
+          <div className="flex shrink-0 justify-center px-2 pb-1.5 lg:justify-end lg:pb-0">
             <Button
-              onClick={() => router.push(isAuthed ? "/portal" : "/login")}
-              className="h-10 w-full max-w-sm gap-2 bg-brand px-4 text-sm font-semibold text-white shadow-sm hover:bg-brand-deep md:w-auto"
+              onClick={() => router.push(ctaHref)}
+              className="h-10 w-full max-w-xs gap-2 bg-brand px-4 text-[13px] font-bold text-white shadow-sm hover:bg-brand-deep lg:w-auto"
             >
               <UserRound className="size-4" />
               {status === "loading" ? "…" : ctaLabel}

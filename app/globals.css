@@ -106,6 +106,7 @@
     @apply bg-background text-foreground antialiased;
     font-size: 17px;
     line-height: 1.6;
+    color: #333;
   }
 
   html {

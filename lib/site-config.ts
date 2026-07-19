@@ -8,34 +8,33 @@ export const siteConfig = {
   company: "Centrum Medyczne Kiryluk & Wenta Spółka Z.O.O.",
   address: {
     street: "Wisławy Szymborskiej 2/U4",
+    streetAlt: "Wisławy Szymborskiej 2-u4",
     city: "15-424 Białystok",
-    full: "Wisławy Szymborskiej 2/U4, 15-424 Białystok",
+    full: "Wisławy Szymborskiej 2, Białystok",
   },
   phones: [
     { label: "+48 660 281 212", href: "tel:+48660281212" },
     { label: "+48 539 999 105", href: "tel:+48539999105" },
   ],
   email: "cmkirylukwenta@gmail.com",
-  hours: "Rejestracja telefoniczna jest czynna od poniedziałku do piątku w godzinach 8:00 – 18:00",
+  hours:
+    "Rejestracja telefoniczna jest czynna od poniedziałku do piątku w godzinach 8:00 – 18:00",
   mapsUrl:
     "https://www.google.pl/maps/dir//Wisławy+Szymborskiej+2,+15-424+Białystok",
+  /** Menu jak na cmkirylukwenta.pl + CTA portalu w UI */
   nav: [
+    { title: "Strona Główna", href: "/" },
+    { title: "Nasz Zespół", href: "/nasz-zespol" },
+    { title: "Leczenie ortopedyczne", href: "/leczenie-ortopedyczne" },
     {
-      title: "Leczenie ortopedyczne",
-      href: "/#leczenie-ortopedyczne",
+      title: "Fizjoterapia i rehabilitacja",
+      href: "/fizjoterapia-i-rehabilitacja",
     },
     {
-      title: "Fizjoterapia",
-      href: "/#fizjoterapia",
+      title: "Aktualności i Baza Wiedzy",
+      href: "/aktualnosci-i-baza-wiedzy",
     },
-    {
-      title: "Aktualności",
-      href: "/#aktualnosci",
-    },
-    {
-      title: "Kontakt",
-      href: "/#kontakt",
-    },
+    { title: "Kontakt", href: "/kontakt" },
   ],
   hero: {
     title: "Centrum Medyczne",
