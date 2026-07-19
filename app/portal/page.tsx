@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-  Calendar,
+  CalendarPlus,
   FileText,
   Lock,
   UserRound,
@@ -16,30 +17,13 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { MyAppointments } from "@/components/booking/my-appointments";
 
 export const metadata: Metadata = {
   title: "Portal Pacjenta",
   description: "Panel pacjenta – wizyty, dokumenty i profil.",
   robots: { index: false, follow: false },
 };
-
-const modules = [
-  {
-    title: "Moje wizyty",
-    description: "Lista zaplanowanych i historycznych wizyt.",
-    icon: Calendar,
-  },
-  {
-    title: "Dokumenty",
-    description: "Wyniki badań, skierowania i zalecenia.",
-    icon: FileText,
-  },
-  {
-    title: "Profil",
-    description: "Dane kontaktowe i preferencje powiadomień.",
-    icon: UserRound,
-  },
-] as const;
 
 export default async function PortalPage() {
   const session = await auth();
@@ -57,10 +41,21 @@ export default async function PortalPage() {
             <Lock className="size-3.5" />
             Sesja aktywna · strefa chroniona
           </div>
-          <LogoutButton
-            className="border-brand/30 text-brand hover:bg-secondary"
-            label="Wyloguj"
-          />
+          <div className="flex flex-wrap gap-2">
+            <Button
+              asChild
+              className="gap-2 bg-brand text-white hover:bg-brand-deep"
+            >
+              <Link href="/portal/umow-wizyte">
+                <CalendarPlus className="size-4" />
+                Umów wizytę
+              </Link>
+            </Button>
+            <LogoutButton
+              className="border-brand/30 text-brand hover:bg-secondary"
+              label="Wyloguj"
+            />
+          </div>
         </div>
 
         <div className="mb-8">
@@ -69,9 +64,13 @@ export default async function PortalPage() {
           </h1>
           <div className="section-divider mt-3 mb-4 ml-0" />
           <p className="max-w-2xl text-muted-foreground">
-            To Twój panel pacjenta w Centrum Medycznym Kiryluk i Wenta. Poniżej
-            znajdziesz skrót danych konta oraz placeholdery przyszłych modułów.
+            Panel pacjenta CMKW — umawiaj wizyty online, przeglądaj rezerwacje
+            i zarządzaj danymi konta.
           </p>
+        </div>
+
+        <div className="mb-8">
+          <MyAppointments />
         </div>
 
         <Card className="mb-8 border-gray-100 shadow-sm">
@@ -115,31 +114,39 @@ export default async function PortalPage() {
           </CardContent>
         </Card>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {modules.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Card
-                key={item.title}
-                className="border-gray-100 shadow-sm transition-shadow hover:shadow-md"
-              >
-                <CardHeader>
-                  <div className="mb-2 flex size-12 items-center justify-center rounded-full bg-secondary text-brand">
-                    <Icon className="size-6" />
-                  </div>
-                  <CardTitle className="text-brand-heading">
-                    {item.title}
-                  </CardTitle>
-                  <CardDescription>{item.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full" disabled>
-                    Wkrótce
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Card className="border-gray-100 shadow-sm">
+            <CardHeader>
+              <div className="mb-2 flex size-12 items-center justify-center rounded-full bg-secondary text-brand">
+                <FileText className="size-6" />
+              </div>
+              <CardTitle className="text-brand-heading">Dokumenty</CardTitle>
+              <CardDescription>
+                Wyniki badań, skierowania i zalecenia.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full" disabled>
+                Wkrótce
+              </Button>
+            </CardContent>
+          </Card>
+          <Card className="border-gray-100 shadow-sm">
+            <CardHeader>
+              <div className="mb-2 flex size-12 items-center justify-center rounded-full bg-secondary text-brand">
+                <UserRound className="size-6" />
+              </div>
+              <CardTitle className="text-brand-heading">Profil</CardTitle>
+              <CardDescription>
+                Dane kontaktowe i preferencje powiadomień.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full" disabled>
+                Wkrótce
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

@@ -1,17 +1,17 @@
 # Podsumowanie projektu — CMKW Patient Portal (dla GrokWeb)
 
-**Data:** 2026-07-19  
-**Status:** szkielet UI + deploy produkcyjny (bez auth)  
-**Właściciel konta:** TooughSituation
+**Data aktualizacji:** 2026-07-19  
+**Status:** UI + **Auth.js v5 (JWT)** + deploy produkcyjny  
+**Konto GitHub / Vercel:** TooughSituation / toough-situation
 
 ---
 
 ## 1. Cel
 
-Oddzielna aplikacja **portalu pacjenta** dla **Centrum Medycznego Kiryluk i Wenta** (Białystok).  
-Wizualnie ma oddawać stronę [cmkirylukwenta.pl](https://cmkirylukwenta.pl/) (biało-niebieska kolorystyka, układ sekcji, treści), a jednocześnie wprowadza nowy CTA **„Rejestracja / Portal Pacjenta”** i routing pod przyszłą autoryzację.
+Portal pacjenta **Centrum Medycznego Kiryluk i Wenta** (Białystok).  
+Wizualnie w stylu [cmkirylukwenta.pl](https://cmkirylukwenta.pl/) (biało-niebieska kolorystyka, sekcje, treści) + **Rejestracja / logowanie / chroniony portal**.
 
-**Nie mylić z:** `akwen-web` (portal B2B Akwen) — to osobny produkt, osobne repo.
+**Nie mylić z:** `akwen-web` (B2B Akwen) — osobny produkt, osobne repo.
 
 ---
 
@@ -19,147 +19,168 @@ Wizualnie ma oddawać stronę [cmkirylukwenta.pl](https://cmkirylukwenta.pl/) (b
 
 | Zasób | URL |
 |--------|-----|
-| **Production (Vercel)** | https://cmkw-patient-portal.vercel.app |
+| **Production** | https://cmkw-patient-portal.vercel.app |
 | **GitHub** | https://github.com/TooughSituation/cmkw-patient-portal |
 | **Vercel dashboard** | https://vercel.com/toough-situation/cmkw-patient-portal |
-| **Oryginał (referencja UI)** | https://cmkirylukwenta.pl/ |
+| **Referencja UI** | https://cmkirylukwenta.pl/ |
 | **Lokalnie** | `C:\Users\user\akwen-web\cmkw-patient-portal` |
 
-> Folder leży fizycznie obok/wewnątrz `akwen-web`, ale ma **własne `.git`**. Parent `akwen-web` ignoruje `cmkw-patient-portal/` w `.gitignore`.
+Folder leży przy `akwen-web`, ma **własne `.git`**. Parent ignoruje `cmkw-patient-portal/`.
 
 ---
 
 ## 3. Stack
 
-- **Next.js 15.5** (App Router) + **React 19** + **TypeScript**
-- **Tailwind CSS v4** + **shadcn/ui** (radix-nova: Button, Card, Sheet, Separator)
-- **lucide-react** (ikony)
-- Przekierowania: `next/navigation` (`useRouter`)
-- **Bez** logiki auth, bazy, API (celowo — tylko szkielet)
+- Next.js **15.5** App Router · React 19 · TypeScript  
+- Tailwind CSS **v4** · shadcn/ui (Button, Card, Input, Label, Checkbox, Sheet, Separator, Sonner)  
+- **Auth.js v5** (`next-auth@5.0.0-beta.31`) — Credentials + **JWT**  
+- Zod (walidacja, PESEL) · bcryptjs · sonner  
+
+### Dlaczego Auth.js, nie Clerk?
+
+| | Auth.js (wybrane) | Clerk |
+|--|-------------------|-------|
+| PESEL / PII | U nas (store + JWT bez pełnego PESEL) | U zewnętrznego SaaS |
+| RODO | Prostszy model (placówka = administrator) | DPA + transfery |
+| Bez bazy | Credentials + JWT + file/memory | Wymaga konta Clerk |
 
 ---
 
-## 4. Routing (aktualny)
+## 4. Routing
 
-| Ścieżka | Co robi | Auth |
-|---------|---------|------|
-| `/` | Strona główna: Hero, O nas, Oferta (3 karty), Kontakt | public |
-| `/rejestracja` | Szkielet rejestracji / wejścia do portalu | public |
-| `/portal` | Szkielet „chronionej” strefy pacjenta (wizyty, dokumenty, profil — placeholdery) | **brak** (do zrobienia) |
-| `/robots.txt`, `/sitemap.xml` | SEO | public; `/portal` w disallow |
+| Ścieżka | Opis | Auth |
+|---------|------|------|
+| `/` | Home: hero, o nas, oferta, kontakt | public |
+| `/login` | Logowanie | public; zalogowany → `/portal` |
+| `/rejestracja` | Rejestracja (imię, nazwisko, PESEL, email, telefon, hasło, RODO) | public; zalogowany → `/portal` |
+| `/portal` | Dashboard pacjenta | **wymaga sesji** → redirect `/login?callbackUrl=…` |
+| `/api/auth/[...nextauth]` | Auth.js handlers | — |
+| `/api/auth/register` | API rejestracji | — |
 
-CTA „Rejestracja / Portal Pacjenta” → `router.push("/rejestracja")`.  
-Z rejestracji „Przejdź do portalu” → `/portal`.
+**Middleware** (`middleware.ts` + `auth.config.ts` edge-safe): chroni `/portal`, przekierowuje zalogowanych z `/login` i `/rejestracja`.
 
 ---
 
-## 5. Brand / design tokens
+## 5. Auth — jak działa
 
-Z oryginalnej strony:
+1. **Rejestracja** → `POST /api/auth/register` → user w store (bcrypt) → `signIn("credentials")` → JWT cookie → `/portal`  
+2. **Logowanie** → Auth.js Credentials → JWT (maxAge **8 h**)  
+3. **Sesja JWT** zawiera: id, email, firstName, lastName, phone, **peselMasked** (nie pełny PESEL)  
+4. **Wylogowanie** → `signOut` → `/`  
+
+### Magazyn użytkowników (tymczasowy — NIE baza)
+
+- Lokalnie: `.data/users.json` (w `.gitignore`, zawiera PII)  
+- Vercel serverless: **pamięć procesu (ephemeral)** — cold start czyści konta  
+- Docelowo: Postgres w EOG + szyfrowanie PII  
+
+### Env (Vercel + lokalnie)
+
+| Zmienna | Środowiska |
+|---------|------------|
+| `AUTH_SECRET` | Production · Preview · Development |
+| `AUTH_URL` | Production = `https://cmkw-patient-portal.vercel.app` |
+
+Lokalnie: `.env.local` (nie w git). Wzór: `.env.example`.
+
+---
+
+## 6. Brand / design
 
 | Token | Hex | Użycie |
 |-------|-----|--------|
-| Brand | `#0849b0` | linki, CTA, akcenty |
-| Brand deep | `#2b2d81` | przyciski hero, overlay |
+| Brand | `#0849b0` | linki, CTA |
+| Brand deep | `#2b2d81` | hero buttons, overlay |
 | Brand heading | `#384480` | nagłówki |
 | Footer | `#222222` | stopka |
-| Body | `#333` | tekst |
 
-- Font: **Segoe UI** / system stack (jak oryginał)
-- Assety w `public/images/`: `logo.webp`, `hero.webp`, `bg-pattern.webp` (pobrane z cmkirylukwenta.pl)
-- Treści i kontakt: `lib/site-config.ts`
-
-**Kontakt placówki (z oryginału):**  
-Wisławy Szymborskiej 2/U4, 15-424 Białystok · +48 660 281 212 · +48 539 999 105 · cmkirylukwenta@gmail.com
+Font: Segoe UI / system. Treści: `lib/site-config.ts`. Assety: `public/images/`.
 
 ---
 
-## 6. Struktura kodu
+## 7. Kluczowa struktura plików
 
 ```
-cmkw-patient-portal/
-├── app/
-│   ├── layout.tsx          # SEO metadata, SiteHeader, SiteFooter, lang=pl
-│   ├── page.tsx            # home
-│   ├── globals.css         # tokeny brand + shadcn
-│   ├── rejestracja/        # skeleton rejestracji
-│   ├── portal/             # skeleton portalu (noindex)
-│   ├── robots.ts
-│   └── sitemap.ts
-├── components/
-│   ├── site-header.tsx     # navbar + mobile Sheet + CTA
-│   ├── hero.tsx
-│   ├── about-section.tsx
-│   ├── services-section.tsx
-│   ├── contact-section.tsx
-│   ├── site-footer.tsx
-│   └── ui/                 # shadcn
-├── lib/
-│   ├── site-config.ts      # single source of truth dla treści
-│   └── utils.ts            # cn()
-├── public/images/
-├── next.config.ts          # turbopack.root = ten folder (izolacja od parenta)
-└── README.md
+auth.ts                 # NextAuth + Credentials (Node: bcrypt, store)
+auth.config.ts          # edge-safe (middleware) — bez Node APIs
+middleware.ts           # ochrona /portal
+app/api/auth/[...nextauth]/route.ts
+app/api/auth/register/route.ts
+app/login/page.tsx
+app/rejestracja/page.tsx
+app/portal/page.tsx     # dashboard (server: auth())
+lib/users-store.ts
+lib/pesel.ts            # walidacja sumy kontrolnej PESEL
+lib/validations/auth.ts # Zod
+components/auth/login-form.tsx
+components/auth/register-form.tsx
+components/auth/logout-button.tsx
+components/providers.tsx  # SessionProvider
+types/next-auth.d.ts
 ```
-
-**Ważne:** `next.config.ts` ustawia `turbopack.root` na katalog projektu — bez tego Next.js łapał middleware z parenta `akwen-web`.
 
 ---
 
-## 7. Git / deploy (stan)
+## 8. Git / deploy (stan)
 
-**Branch:** `main` (tracking `origin/main`)
+**Branch:** `main` = `origin/main`
 
 | Commit | Opis |
 |--------|------|
-| `c975981` | `feat: initial CMKW patient portal scaffold` |
-| `f65bfe2` | `chore: ignore .vercel and env files from local link` |
+| `c975981` | initial scaffold |
+| `f65bfe2` | ignore .vercel / env |
+| `e807c55` | **feat(auth): Auth.js JWT, PESEL registration, protected portal** |
 
-- Vercel team: **toough-situation** (`team_ndhDPoJZDsVja8WiJjqE2puZ`)
-- GitHub ↔ Vercel: **połączone** — push na `main` powinien triggerować production deploy
-- Production alias: **https://cmkw-patient-portal.vercel.app** (HTTP 200 potwierdzone)
+- Vercel Git connected — push `main` → production deploy  
+- Smoke (po deploy auth): `/login` 200 · `/portal` **307** (redirect na login)
 
 ```bash
 cd cmkw-patient-portal
-npm install && npm run dev    # localhost:3000
-git push origin main          # deploy via Vercel Git
+npm install
+cp .env.example .env.local   # AUTH_SECRET=...
+npm run dev
+git push origin main         # deploy
 ```
 
 ---
 
-## 8. Co NIE jest zrobione (kolejka)
+## 9. Test lokalny (quick)
 
-1. **Autoryzacja** — Auth.js / Clerk; sesja; middleware chroniący `/portal`
-2. **Formularze** rejestracji i logowania (Zod + shadcn Form)
-3. **Portal** — prawdziwe wizyty, dokumenty, profil + integracja API/HIS
-4. **Powiadomienia** — e-mail/SMS o wizytach
-5. **RODO** — polityka, zgody, usuwanie danych
-6. **Podstrony treści** — obecnie menu to anchory `#leczenie-ortopedyczne`, `#fizjoterapia`, `#aktualnosci`, `#kontakt` (nie pełne trasy jak na oryginale)
-7. **Testy** — Playwright E2E (rejestracja → portal)
-8. **Domena własna** — opcjonalnie podpiąć pod CMKW
+1. `npm run dev`  
+2. `/portal` bez sesji → `/login?callbackUrl=/portal`  
+3. `/rejestracja`: PESEL np. **`44051401359`**, hasło `Haslo1234`, telefon `500600700`, RODO ✓  
+4. Auto-login → `/portal` (powitanie + dane + placeholdery)  
+5. Wyloguj → `/portal` znowu chronione  
 
 ---
 
-## 9. Kontekst dla kontynuacji w GrokWeb / CLI
+## 10. Co NIE jest zrobione (kolejka)
 
-Przy kolejnej sesji:
+1. **Baza** (Postgres EU) zamiast file/memory store  
+2. Polityka prywatności / regulamin (osobne strony RODO)  
+3. Moduły: wizyty, dokumenty, profil (dziś placeholdery)  
+4. Rate limiting logowania, ewent. 2FA  
+5. Pełne podstrony treści (dziś anchory `#…` na home)  
+6. E2E Playwright  
+7. Szyfrowanie PESEL at-rest  
 
-- Pracuj w **`cmkw-patient-portal`**, nie w `akwen-web` (chyba że użytkownik prosi o Akwen).
-- Nie wdrażaj auth „na pół gwizdka” — middleware + provider + strona logowania razem.
-- Zachowaj kolory/tokeny z `globals.css` i treści z `site-config.ts`.
-- Deploy: push `main` albo `npx vercel --prod --scope toough-situation`.
-- Nie commituj `.vercel/`, `.env*`, `node_modules/`.
+---
 
-**Prompt startowy (wklejka):**
+## 11. Prompt startowy (wklejka do GrokWeb)
 
 > Kontynuuj projekt **cmkw-patient-portal** (Next.js 15, CM Kiryluk i Wenta).  
 > Repo: https://github.com/TooughSituation/cmkw-patient-portal  
 > Prod: https://cmkw-patient-portal.vercel.app  
 > Lokalnie: `C:\Users\user\akwen-web\cmkw-patient-portal`  
-> Szkielet UI gotowy; brak auth. Następny krok: [tu wstaw zadanie].
+>  
+> Auth.js v5 (Credentials + JWT) działa; middleware chroni `/portal`.  
+> Rejestracja: imię, nazwisko, PESEL, email, telefon, hasło, RODO.  
+> Magazyn użytkowników tymczasowy (`.data/` lokalnie / memory na Vercel) — **bez prawdziwej bazy**.  
+> Brand: `#0849b0`, `#2b2d81`, `#384480`.  
+> Następny krok: [tu wstaw zadanie, np. Postgres / wizyty / RODO pages].
 
 ---
 
-## 10. Jednozdaniowe TL;DR
+## 12. TL;DR
 
-Szkielet portalu pacjenta CMKW w Next.js 15 z UI w stylu cmkirylukwenta.pl, routingiem `/` · `/rejestracja` · `/portal`, osobnym repo GitHub i live deploy na Vercel — bez autoryzacji, gotowy pod kolejne etapy (auth → wizyty → API).
+Portal CMKW na Next.js 15 z UI w stylu cmkirylukwenta.pl, **Auth.js JWT**, chronionym `/portal`, formularzami login/rejestracja (PESEL + RODO), live na Vercel z `AUTH_SECRET`. Brak trwałej bazy — gotowe pod kolejny etap (Postgres + wizyty).
