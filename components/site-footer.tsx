@@ -34,11 +34,21 @@ export function SiteFooter() {
               </li>
             ))}
             <li>
+              <Link href="/login" className="text-gray-400 hover:text-white">
+                Logowanie
+              </Link>
+            </li>
+            <li>
               <Link
                 href="/rejestracja"
                 className="text-gray-400 hover:text-white"
               >
-                Rejestracja / Portal Pacjenta
+                Rejestracja
+              </Link>
+            </li>
+            <li>
+              <Link href="/portal" className="text-gray-400 hover:text-white">
+                Portal Pacjenta
               </Link>
             </li>
           </ul>

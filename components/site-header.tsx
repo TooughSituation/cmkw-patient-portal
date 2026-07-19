@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { MapPin, Menu, Phone, UserRound } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 import { Button } from "@/components/ui/button";
@@ -19,16 +20,22 @@ import { cn } from "@/lib/utils";
 export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [open, setOpen] = useState(false);
 
-  const goToPortal = () => {
+  const isAuthed = status === "authenticated" && !!session?.user;
+
+  const goToPortalCta = () => {
     setOpen(false);
-    router.push("/rejestracja");
+    router.push(isAuthed ? "/portal" : "/login");
   };
+
+  const ctaLabel = isAuthed
+    ? `Portal · ${session.user.firstName}`
+    : "Rejestracja / Portal Pacjenta";
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
-      {/* Top bar: address + logo + phones */}
       <div className="border-b border-gray-100">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-6">
           <a
@@ -65,7 +72,6 @@ export function SiteHeader() {
             ))}
           </div>
 
-          {/* Mobile menu trigger */}
           <div className="md:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
@@ -91,12 +97,21 @@ export function SiteHeader() {
                     </Link>
                   ))}
                   <Button
-                    onClick={goToPortal}
+                    onClick={goToPortalCta}
                     className="mt-4 h-11 bg-brand text-white hover:bg-brand-deep"
                   >
                     <UserRound className="size-4" />
-                    Rejestracja / Portal Pacjenta
+                    {ctaLabel}
                   </Button>
+                  {!isAuthed && (
+                    <Link
+                      href="/rejestracja"
+                      onClick={() => setOpen(false)}
+                      className="mt-2 text-center text-sm font-medium text-brand"
+                    >
+                      Załóż konto
+                    </Link>
+                  )}
                   <div className="mt-6 space-y-2 border-t pt-4 text-sm">
                     {siteConfig.phones.map((phone) => (
                       <a
@@ -116,7 +131,6 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* Main navigation */}
       <div className="border-b border-gray-100 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col items-stretch gap-2 px-4 py-2 md:flex-row md:items-center md:justify-between md:px-6">
           <nav className="hidden items-center md:flex" aria-label="Główne menu">
@@ -151,13 +165,22 @@ export function SiteHeader() {
             </ul>
           </nav>
 
-          <div className="flex justify-center md:justify-end">
+          <div className="flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:justify-end">
+            {!isAuthed && (
+              <Button
+                variant="outline"
+                onClick={() => router.push("/rejestracja")}
+                className="h-10 border-brand/30 text-brand hover:bg-secondary md:w-auto"
+              >
+                Rejestracja
+              </Button>
+            )}
             <Button
-              onClick={() => router.push("/rejestracja")}
+              onClick={() => router.push(isAuthed ? "/portal" : "/login")}
               className="h-10 w-full max-w-sm gap-2 bg-brand px-4 text-sm font-semibold text-white shadow-sm hover:bg-brand-deep md:w-auto"
             >
               <UserRound className="size-4" />
-              Rejestracja / Portal Pacjenta
+              {status === "loading" ? "…" : ctaLabel}
             </Button>
           </div>
         </div>

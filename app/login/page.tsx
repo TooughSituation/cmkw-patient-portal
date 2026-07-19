@@ -1,6 +1,7 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Shield } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -8,19 +9,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { RegisterForm } from "@/components/auth/register-form";
+import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = {
-  title: "Rejestracja",
+  title: "Logowanie",
   description:
-    "Załóż konto w Portalu Pacjenta Centrum Medycznego Kiryluk i Wenta.",
-  robots: { index: true, follow: true },
+    "Zaloguj się do Portalu Pacjenta Centrum Medycznego Kiryluk i Wenta.",
+  robots: { index: false, follow: false },
 };
 
-export default function RejestracjaPage() {
+export default function LoginPage() {
   return (
     <div className="bg-muted/40 py-12 md:py-16">
-      <div className="mx-auto max-w-xl px-4 md:px-6">
+      <div className="mx-auto max-w-md px-4 md:px-6">
         <Link
           href="/"
           className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-brand hover:text-brand-deep"
@@ -31,37 +32,33 @@ export default function RejestracjaPage() {
 
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold uppercase tracking-wide text-brand-heading md:text-3xl">
-            Rejestracja
+            Logowanie
           </h1>
           <div className="section-divider mt-3 mb-4" />
           <p className="text-muted-foreground">
-            Utwórz konto pacjenta, aby korzystać z portalu online.
+            Zaloguj się do Portalu Pacjenta
           </p>
         </div>
 
         <Card className="border-gray-100 shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg text-brand-heading">
-              Nowe konto pacjenta
+              Witamy ponownie
             </CardTitle>
             <CardDescription>
-              Dane są przetwarzane wyłącznie w celu obsługi wizyt i kontaktu z
-              placówką.
+              Podaj e-mail i hasło użyte przy rejestracji.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <RegisterForm />
+            <Suspense
+              fallback={
+                <p className="text-sm text-muted-foreground">Ładowanie…</p>
+              }
+            >
+              <LoginForm />
+            </Suspense>
           </CardContent>
         </Card>
-
-        <div className="mt-6 flex items-start gap-3 rounded-lg border border-blue-100 bg-secondary/60 p-4 text-sm text-brand-deep">
-          <Shield className="mt-0.5 size-5 shrink-0" aria-hidden />
-          <p>
-            <strong>Bezpieczeństwo:</strong> hasło jest przechowywane w postaci
-            skrótu (bcrypt). PESEL nie trafia do tokena sesji JWT – w portalu
-            widoczna jest wyłącznie forma zmaskowana.
-          </p>
-        </div>
       </div>
     </div>
   );

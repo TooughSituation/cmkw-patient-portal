@@ -50,11 +50,11 @@ export function Hero() {
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button
             size="lg"
-            onClick={() => router.push("/rejestracja")}
+            onClick={() => router.push("/login")}
             className="h-12 min-w-[200px] gap-2 bg-brand-deep px-6 text-base font-semibold text-white hover:bg-black"
           >
             <CalendarPlus className="size-5" />
-            Rejestracja online
+            Portal / Rejestracja
           </Button>
           <Button
             size="lg"
