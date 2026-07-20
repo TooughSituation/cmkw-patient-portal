@@ -130,14 +130,22 @@ export function QuickVisitDialog({
   function handleSave(openCard: boolean) {
     const visit = buildVisit();
     if (!visit) return;
-    addVisit(visit);
-    toast.success("Wizyta dodana.", {
-      description: `${visit.patientLastName} ${visit.patientFirstName} · ${visit.date} ${visit.time}`,
-    });
-    setOpen(false);
-    resetForm();
-    if (openCard) {
-      router.push(`/doctor/wizyty/${visit.id}`);
+    try {
+      addVisit(visit);
+      toast.success("Wizyta dodana.", {
+        description: `${visit.patientLastName} ${visit.patientFirstName} · ${visit.date} ${visit.time}`,
+      });
+      setOpen(false);
+      resetForm();
+      if (openCard) {
+        router.push(`/doctor/wizyty/${visit.id}`);
+      }
+    } catch (e) {
+      toast.error(
+        e instanceof Error
+          ? e.message
+          : "Nie można dodać wizyty poza grafikiem pracy."
+      );
     }
   }
 

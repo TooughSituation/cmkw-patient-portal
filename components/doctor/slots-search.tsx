@@ -52,9 +52,10 @@ const SPECIALTIES = [
 
 export function SlotsSearch() {
   const router = useRouter();
-  const { branchFilter, staff, visitTypes, adminLoading } = useDoctorData();
+  const { branchFilter, staff, visitTypes, schedules, adminLoading } =
+    useDoctorData();
   const { patients } = useDoctorPatients();
-  const { addVisit } = useDoctorVisits();
+  const { addVisit, allVisits } = useDoctorVisits();
 
   const [doctorId, setDoctorId] = useState("all");
   const [specialty, setSpecialty] = useState("all");
@@ -82,6 +83,8 @@ export function SlotsSearch() {
     return generateFreeSlots({
       staff,
       visitTypes,
+      schedules,
+      occupiedVisits: allVisits,
       days: 40,
       branchFilter,
       doctorId,
@@ -98,6 +101,8 @@ export function SlotsSearch() {
     adminLoading,
     staff,
     visitTypes,
+    schedules,
+    allVisits,
     branchFilter,
     doctorId,
     specialty,
@@ -154,11 +159,15 @@ export function SlotsSearch() {
       createdAt: now,
       updatedAt: now,
     };
-    addVisit(visit);
-    toast.success("Termin zarezerwowany", {
-      description: `${slot.date} ${slot.time} · ${slot.doctorName}`,
-    });
-    router.push(`/doctor/wizyty/${visit.id}`);
+    try {
+      addVisit(visit);
+      toast.success("Termin zarezerwowany", {
+        description: `${slot.date} ${slot.time} · ${slot.doctorName}`,
+      });
+      router.push(`/doctor/wizyty/${visit.id}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Nie można zarezerwować");
+    }
   }
 
   if (adminLoading) {

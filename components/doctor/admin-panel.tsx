@@ -12,7 +12,9 @@ import {
   Users,
   BarChart3,
   Save,
+  CalendarClock,
 } from "lucide-react";
+import { SchedulesManager } from "@/components/doctor/schedules-manager";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,6 +53,7 @@ type AdminSection =
   | "facility"
   | "settings"
   | "staff"
+  | "schedules"
   | "rooms"
   | "visitTypes";
 
@@ -59,6 +62,7 @@ const MENU: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
   { id: "facility", label: "Dane placówki", icon: <Building2 className="size-4" /> },
   { id: "settings", label: "Ustawienia", icon: <Settings2 className="size-4" /> },
   { id: "staff", label: "Pracownicy / Lekarze", icon: <Users className="size-4" /> },
+  { id: "schedules", label: "Grafiki pracy", icon: <CalendarClock className="size-4" /> },
   { id: "rooms", label: "Gabinety", icon: <DoorOpen className="size-4" /> },
   { id: "visitTypes", label: "Typy wizyt", icon: <Stethoscope className="size-4" /> },
 ];
@@ -387,6 +391,8 @@ export function AdminPanel() {
             ) : null}
           </div>
         )}
+
+        {section === "schedules" && <SchedulesManager />}
 
         {section === "rooms" && (
           <RoomsSection

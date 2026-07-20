@@ -39,6 +39,11 @@ import {
   saveVisitTypes,
 } from "@/lib/doctor/admin-client";
 import {
+  loadSchedulesFromLocalStorage,
+  saveSchedulesToLocalStorage,
+  resetSchedulesLocalStorage,
+} from "@/lib/doctor/schedules-client";
+import {
   ALL_BRANCHES_ID,
   BRANCH_STORAGE_KEY,
   isValidBranchFilter,
@@ -50,6 +55,12 @@ import type {
   StaffMember,
   VisitTypeConfig,
 } from "@/lib/doctor/admin-types";
+import type { DoctorSchedule } from "@/lib/doctor/schedule-types";
+import {
+  findSchedule,
+  isWithinSchedule,
+  isVisitOccupying,
+} from "@/lib/doctor/schedule-utils";
 import type {
   DoctorDocument,
   DoctorPatient,
@@ -101,6 +112,16 @@ type DoctorDataContextValue = {
   saveStaffData: (data: StaffMember[]) => void;
   saveRoomsData: (data: Room[]) => void;
   saveVisitTypesData: (data: VisitTypeConfig[]) => void;
+  schedules: DoctorSchedule[];
+  saveSchedulesData: (data: DoctorSchedule[]) => void;
+  resetSchedules: () => void;
+  validateVisitSlot: (input: {
+    doctorId: string;
+    branchId: string;
+    date: string;
+    time: string;
+    excludeVisitId?: string;
+  }) => { ok: boolean; reason?: string };
 };
 
 const DoctorDataContext = createContext<DoctorDataContextValue | null>(null);
@@ -119,6 +140,7 @@ export function DoctorDataProvider({
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [visitTypes, setVisitTypes] = useState<VisitTypeConfig[]>([]);
+  const [schedules, setSchedules] = useState<DoctorSchedule[]>([]);
   const [patientsLoading, setPatientsLoading] = useState(true);
   const [visitsLoading, setVisitsLoading] = useState(true);
   const [documentsLoading, setDocumentsLoading] = useState(true);
@@ -139,6 +161,7 @@ export function DoctorDataProvider({
     setStaff(loadStaff());
     setRooms(loadRooms());
     setVisitTypes(loadVisitTypes());
+    setSchedules(loadSchedulesFromLocalStorage());
     setPatientsLoading(false);
     setVisitsLoading(false);
     setDocumentsLoading(false);
@@ -284,6 +307,34 @@ export function DoctorDataProvider({
     [visits, persistVisits]
   );
 
+  const validateVisitSlot = useCallback(
+    (input: {
+      doctorId: string;
+      branchId: string;
+      date: string;
+      time: string;
+      excludeVisitId?: string;
+    }) => {
+      const sch = findSchedule(schedules, input.doctorId, input.branchId);
+      const within = isWithinSchedule(sch, input.date, input.time);
+      if (!within.ok) return within;
+      const occupied = isVisitOccupying(
+        input.excludeVisitId
+          ? visits.filter((v) => v.id !== input.excludeVisitId)
+          : visits,
+        input.doctorId,
+        input.branchId,
+        input.date,
+        input.time
+      );
+      if (occupied) {
+        return { ok: false, reason: "Termin jest już zajęty." };
+      }
+      return { ok: true };
+    },
+    [schedules, visits]
+  );
+
   const addVisit = useCallback(
     (visit: DoctorVisit) => {
       const withBranch: DoctorVisit = {
@@ -292,10 +343,19 @@ export function DoctorDataProvider({
           visit.branchId ||
           (branchFilter !== ALL_BRANCHES_ID ? branchFilter : "bialystok"),
       };
+      const check = validateVisitSlot({
+        doctorId: withBranch.doctorId,
+        branchId: withBranch.branchId,
+        date: withBranch.date,
+        time: withBranch.time,
+      });
+      if (!check.ok) {
+        throw new Error(check.reason ?? "Termin poza grafikiem");
+      }
       persistVisits([withBranch, ...visits]);
       return withBranch;
     },
-    [visits, persistVisits, branchFilter]
+    [visits, persistVisits, branchFilter, validateVisitSlot]
   );
 
   const resetVisits = useCallback(() => {
@@ -396,6 +456,15 @@ export function DoctorDataProvider({
     saveVisitTypes(data);
   }, []);
 
+  const saveSchedulesData = useCallback((data: DoctorSchedule[]) => {
+    setSchedules(data);
+    saveSchedulesToLocalStorage(data);
+  }, []);
+
+  const resetSchedules = useCallback(() => {
+    setSchedules(resetSchedulesLocalStorage());
+  }, []);
+
   const value = useMemo<DoctorDataContextValue>(
     () => ({
       branchFilter,
@@ -436,6 +505,10 @@ export function DoctorDataProvider({
       saveStaffData,
       saveRoomsData,
       saveVisitTypesData,
+      schedules,
+      saveSchedulesData,
+      resetSchedules,
+      validateVisitSlot,
     }),
     [
       branchFilter,
@@ -476,6 +549,10 @@ export function DoctorDataProvider({
       saveStaffData,
       saveRoomsData,
       saveVisitTypesData,
+      schedules,
+      saveSchedulesData,
+      resetSchedules,
+      validateVisitSlot,
     ]
   );
 

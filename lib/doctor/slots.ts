@@ -1,7 +1,13 @@
-import { addDays, format, getDay, isBefore, startOfDay } from "date-fns";
-import type { StaffMember } from "@/lib/doctor/admin-types";
-import type { VisitTypeConfig } from "@/lib/doctor/admin-types";
+import { addDays, format, isBefore, parseISO, startOfDay } from "date-fns";
+import type { StaffMember, VisitTypeConfig } from "@/lib/doctor/admin-types";
 import { getBranchById } from "@/lib/doctor/branches";
+import type { DoctorSchedule } from "@/lib/doctor/schedule-types";
+import {
+  generateTimesForDay,
+  getDayAvailability,
+  isVisitOccupying,
+} from "@/lib/doctor/schedule-utils";
+import type { DoctorVisit } from "@/lib/doctor/types";
 
 export type FreeSlot = {
   id: string;
@@ -19,39 +25,34 @@ export type FreeSlot = {
   mode: VisitTypeConfig["mode"];
 };
 
-/** Deterministic pseudo-random 0–1 from string seed */
-function hash01(s: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return (h >>> 0) / 4294967295;
-}
-
-const DAY_START = 8; // 08:00
-const DAY_END = 16; // last slot start 15:40 for 20min
+export type CalendarCellKind =
+  | "available"
+  | "occupied"
+  | "outside"
+  | "leave"
+  | "off";
 
 /**
- * Generuje wolne sloty na `days` dni naprzód.
- * Kiryluk (niski availabilityFactor) ma najmniej wolnych terminów.
+ * Generuje wolne sloty na podstawie grafików + zajętych wizyt.
  */
 export function generateFreeSlots(options: {
   staff: StaffMember[];
   visitTypes: VisitTypeConfig[];
+  schedules: DoctorSchedule[];
+  occupiedVisits: DoctorVisit[];
   days?: number;
-  branchFilter?: string; // all | branch id
+  branchFilter?: string;
   doctorId?: string;
   specialty?: string;
   dateFrom?: string;
   dateTo?: string;
-  timeFrom?: string; // HH:mm
+  timeFrom?: string;
   timeTo?: string;
   durationMin?: number;
   visitTypeId?: string;
   mode?: string;
 }): FreeSlot[] {
-  const days = options.days ?? 35;
+  const days = options.days ?? 40;
   const today = startOfDay(new Date());
   const doctors = options.staff.filter(
     (s) => s.role === "doctor" && s.active && s.doctorId
@@ -63,10 +64,6 @@ export function generateFreeSlots(options: {
 
   for (let d = 0; d < days; d++) {
     const date = addDays(today, d);
-    const dow = getDay(date); // 0 Sun
-    if (dow === 0) continue; // no Sunday
-    if (dow === 6 && d % 2 === 1) continue; // sparse Saturdays
-
     const dateStr = format(date, "yyyy-MM-dd");
     if (options.dateFrom && dateStr < options.dateFrom) continue;
     if (options.dateTo && dateStr > options.dateTo) continue;
@@ -94,6 +91,17 @@ export function generateFreeSlots(options: {
         const branch = getBranchById(branchId);
         if (!branch) continue;
 
+        const schedule = options.schedules.find(
+          (s) => s.doctorId === (doc.doctorId ?? doc.id) && s.branchId === branchId
+        );
+        if (!schedule) continue;
+
+        const av = getDayAvailability(schedule, dateStr);
+        if (av.kind !== "open" && av.kind !== "dyzur") {
+          continue;
+        }
+        const openHours = av;
+
         for (const vt of types) {
           if (options.visitTypeId && options.visitTypeId !== "all") {
             if (vt.id !== options.visitTypeId) continue;
@@ -105,62 +113,75 @@ export function generateFreeSlots(options: {
             if (vt.durationMin < options.durationMin) continue;
           }
 
-          const step = Math.max(15, Math.min(vt.durationMin, 30));
-          for (let hour = DAY_START; hour < DAY_END; hour++) {
-            for (let min = 0; min < 60; min += step) {
-              if (hour === DAY_END - 1 && min > 30) continue;
-              const time = `${String(hour).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
-              if (options.timeFrom && time < options.timeFrom) continue;
-              if (options.timeTo && time > options.timeTo) continue;
+          const step = Math.max(openHours.slotMinutes, vt.durationMin);
+          const stepTimes = generateTimesForDay(
+            openHours.startTime,
+            openHours.endTime,
+            step
+          );
 
-              // Skip past times for today
-              if (d === 0) {
-                const now = new Date();
-                const [hh, mm] = time.split(":").map(Number);
-                const slotDt = new Date(date);
-                slotDt.setHours(hh!, mm!, 0, 0);
-                if (isBefore(slotDt, now)) continue;
-              }
+          for (const time of stepTimes) {
+            if (options.timeFrom && time < options.timeFrom) continue;
+            if (options.timeTo && time > options.timeTo) continue;
 
-              const key = `${doc.id}|${branchId}|${dateStr}|${time}|${vt.id}`;
-              const roll = hash01(key);
-              // lower availabilityFactor => fewer free slots
-              const threshold = 0.12 + doc.availabilityFactor * 0.55;
-              // Kiryluk ~0.22 → threshold ~0.24, Sammoudi 0.68 → ~0.49
-              if (roll > threshold) continue;
-
-              // weekday bias: fewer afternoon for busy doctors
-              if (doc.availabilityFactor < 0.3 && hour >= 13 && roll > 0.15)
-                continue;
-
-              slots.push({
-                id: key,
-                doctorId: doc.doctorId ?? doc.id,
-                staffId: doc.id,
-                doctorName: `${doc.title} ${doc.firstName} ${doc.lastName}`.trim(),
-                specialty: doc.specialty,
-                branchId,
-                branchName: branch.shortName,
-                date: dateStr,
-                time,
-                durationMin: vt.durationMin,
-                visitTypeId: vt.id,
-                visitTypeName: vt.name,
-                mode: vt.mode,
-              });
+            if (d === 0) {
+              const now = new Date();
+              const [hh, mm] = time.split(":").map(Number);
+              const slotDt = parseISO(dateStr);
+              slotDt.setHours(hh!, mm!, 0, 0);
+              if (isBefore(slotDt, now)) continue;
             }
+
+            const doctorId = doc.doctorId ?? doc.id;
+            if (
+              isVisitOccupying(
+                options.occupiedVisits,
+                doctorId,
+                branchId,
+                dateStr,
+                time
+              )
+            ) {
+              continue;
+            }
+
+            slots.push({
+              id: `${doctorId}|${branchId}|${dateStr}|${time}|${vt.id}`,
+              doctorId,
+              staffId: doc.id,
+              doctorName:
+                `${doc.title} ${doc.firstName} ${doc.lastName}`.trim(),
+              specialty: doc.specialty,
+              branchId,
+              branchName: branch.shortName,
+              date: dateStr,
+              time,
+              durationMin: Math.max(vt.durationMin, openHours.slotMinutes),
+              visitTypeId: vt.id,
+              visitTypeName: vt.name,
+              mode: vt.mode,
+            });
           }
         }
       }
     }
   }
 
-  return slots.sort((a, b) =>
+  // Deduplicate by doctor|branch|date|time (prefer first visit type)
+  const seen = new Set<string>();
+  const unique: FreeSlot[] = [];
+  for (const s of slots) {
+    const k = `${s.doctorId}|${s.branchId}|${s.date}|${s.time}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    unique.push(s);
+  }
+
+  return unique.sort((a, b) =>
     `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`)
   );
 }
 
-/** Grupuje sloty po lekarzu + typie + oddziale */
 export function groupSlotsByDoctor(
   slots: FreeSlot[]
 ): Array<{
@@ -215,4 +236,26 @@ export function groupSlotsByDoctor(
   return Array.from(map.values()).sort((a, b) =>
     a.doctorName.localeCompare(b.doctorName, "pl")
   );
+}
+
+/** Status komórki kalendarza dla lekarza w danym dniu */
+export function dayCellStatus(
+  schedule: DoctorSchedule | undefined,
+  dateStr: string,
+  visitsThatDay: DoctorVisit[]
+): CalendarCellKind {
+  if (!schedule) return "outside";
+  const av = getDayAvailability(schedule, dateStr);
+  if (av.kind === "urlop" || av.kind === "wolne") return "leave";
+  if (av.kind === "off") return "outside";
+  if (av.kind !== "open" && av.kind !== "dyzur") return "outside";
+  const openCount = generateTimesForDay(
+    av.startTime,
+    av.endTime,
+    av.slotMinutes
+  ).length;
+  const occupied = visitsThatDay.filter((v) => v.status !== "cancelled").length;
+  if (occupied >= openCount) return "occupied";
+  if (occupied > 0) return "occupied";
+  return "available";
 }

@@ -1,7 +1,7 @@
 # Podsumowanie projektu — CMKW Patient Portal (dla GrokWeb)
 
 **Data aktualizacji:** 2026-07-20  
-**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–5A: + oddziały, terminy, admin)**  
+**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–6B: + grafiki pracy, kalendarz D/T/M)**  
 **Konto:** TooughSituation / toough-situation
 
 ---
@@ -85,10 +85,13 @@ Własne `.git`; parent `akwen-web` ignoruje ten folder.
 | `/doctor/wizyty/[id]` | **Karta wizyty EDM** — wywiad, ICD, leki, dokumenty, historia |
 | `/doctor/terminy` | Wyszukiwarka wolnych terminów + rezerwacja |
 | `/doctor/admin` | Statystyki, placówka, ustawienia, pracownicy, gabinety |
+| `/doctor/admin/grafiki` | **Grafiki pracy** (tyg. + wyjątki + podgląd) |
 
 **Styl EDM:** jasny layout CMKW (white navbar, `#0849b0`) — **nie** dark MyDr.
 
 **Oddziały:** Białystok (Szymborskiej 2/U4) · Hajnówka · Wszystkie — filtr globalny w topbarze.  
+**Grafiki:** doctor×branch, sloty z grafiku − zajęte wizyty; Kiryluk Pn/Śr/Pt 9–14.  
+**Kalendarz:** Dzień | Tydzień | Miesiąc + filtr lekarza + legenda dostępności.  
 **Etap 4 statusy:** Zaplanowana → Potwierdzona → Telepotwierdzona → W trakcie → Zakończona / Odwołana.
 
 **Middleware:**
@@ -252,10 +255,10 @@ npm install && npm run dev   # http://localhost:3000
 
 ## 12. Backlog
 
-### EDM Etap 6
+### EDM Etap 7
 
 1. E-recepta / e-skierowanie (P1)  
-2. Grafiki pracy lekarzy  
+2. Drag & drop w kalendarzu  
 3. Historia farmakoterapii  
 4. Prisma + API REST  
 5. Realne SMS/IVR  
@@ -284,16 +287,16 @@ npm install && npm run dev   # http://localhost:3000
 > **Gotowe:**  
 > - Pełny klon publicznej strony cmkirylukwenta.pl  
 > - Portal pacjenta: auth (PESEL+RODO), booking + mock płatność  
-> - **Portal Lekarza EDM Etap 0–5A:** kalendarz, wizyty, pacjenci, leki, ICD-10, kalkulatory, karta wizyty, dokumenty, telepotwierdzenia, **oddziały (Białystok/Hajnówka), wyszukiwarka terminów, admin**  
+> - **Portal Lekarza EDM Etap 0–6B:** … + oddziałyły, terminy, admin, **grafiki pracy (lekarz×oddział), kalendarz Dzień/Tydzień/Miesiąc, sloty z grafiku, walidacja poza godzinami**  
 > - Brand: `#0849b0`, white EDM shell  
 > - Docs: `docs/GROKWEB_SUMMARY.md`, `docs/DOCTOR_PORTAL.md`  
 >  
 > **Demo EDM:** `jan.kiryluk@cmkw.pl` / `Lekarz123!`  
-> **Brak (Etap 6):** Prisma, e-recepta P1, grafiki pracy, realne SMS.  
+> **Brak (Etap 7):** Prisma, e-recepta P1, drag&drop, realne SMS.  
 > Następny krok: [tu wstaw zadanie].
 
 ---
 
 ## 14. TL;DR
 
-CMKW = **klon strony** + **portal pacjenta** + **Portal Lekarza EDM** (Etap 0–5A: oddziały, terminy, admin, karta wizyty…). Store: localStorage + `data/*.json`. Kolejny etap: Prisma / grafiki / e-recepta.
+CMKW = **klon strony** + **portal pacjenta** + **Portal Lekarza EDM** (Etap 0–6B: grafiki pracy, kalendarz D/T/M, terminy z grafiku…). Store: localStorage + `data/*.json`. Kolejny etap: Prisma / e-recepta / drag&drop.

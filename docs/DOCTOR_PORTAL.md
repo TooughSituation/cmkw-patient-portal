@@ -1,6 +1,6 @@
 # Portal Lekarza / CMKW EDM
 
-**Status:** Etap 0–4 + **Etap 5A (Oddziały + Terminy + Admin)**  
+**Status:** Etap 0–5A + **Etap 6B (Grafiki pracy + kalendarz D/T/M)**  
 **Prefix:** `/doctor/*`  
 **Role:** `doctor` | `admin` | `reception`  
 **Styl:** jasny brand CMKW (`#0849b0`, white / slate-50) — spójny z patient portalem
@@ -68,6 +68,18 @@ Usuń klucze i odśwież → seed od nowa.
 | `/doctor/wizyty/[id]` | **Karta wizyty EDM** (Etap 4) |
 | `/doctor/terminy` | Wyszukiwarka wolnych terminów (Etap 5A) |
 | `/doctor/admin` | Administracja placówki (Etap 5A) |
+| `/doctor/admin/grafiki` | Grafiki pracy lekarzy (Etap 6B) |
+
+### Etap 6B — grafiki + kalendarz
+
+1. Admin → **Grafiki pracy** (lub `/doctor/admin/grafiki`)
+2. Wybierz Kiryluk / Białystok — Pn, Śr, Pt 9–14 (krótki grafik)
+3. Dodaj wyjątek urlop → podgląd 5 tyg. pokazuje amber
+4. Kalendarz: przełącznik **Dzień | Tydzień | Miesiąc**, filtr lekarza, legenda dostępności
+5. `/doctor/terminy` — sloty tylko z grafiku minus zajęte wizyty
+6. Szybka wizyta w niedzielę / poza godzinami → toast błędu walidacji
+
+**localStorage:** `cmkw-doctor-schedules-v1` · **JSON:** `data/schedules.json`
 
 ### Etap 5A — oddziały / terminy / admin
 
@@ -137,10 +149,10 @@ lib/pesel.ts                 # buildPesel, parsePesel, isValidPesel
 
 ---
 
-## Etap 6 — propozycje
+## Etap 7 — propozycje
 
 1. **E-recepta / e-skierowanie** (P1)  
-2. **Harmonogramy pracy** lekarzy (grafik tygodniowy)  
+2. **Drag & drop** wizyt w kalendarzu tygodniowym  
 3. **Historia farmakoterapii**  
 4. **Prisma + Postgres** + API REST  
 5. Realne SMS/IVR  
