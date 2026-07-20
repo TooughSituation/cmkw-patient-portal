@@ -1,0 +1,44 @@
+[
+  {
+    "id": "vt-konsultacja",
+    "name": "Konsultacja",
+    "durationMin": 20,
+    "mode": "stacjonarna",
+    "active": true
+  },
+  {
+    "id": "vt-kontrolna",
+    "name": "Wizyta kontrolna",
+    "durationMin": 15,
+    "mode": "stacjonarna",
+    "active": true
+  },
+  {
+    "id": "vt-zabieg",
+    "name": "Zabieg / iniekcja",
+    "durationMin": 30,
+    "mode": "stacjonarna",
+    "active": true
+  },
+  {
+    "id": "vt-rehab",
+    "name": "Rehabilitacja",
+    "durationMin": 45,
+    "mode": "stacjonarna",
+    "active": true
+  },
+  {
+    "id": "vt-pilna",
+    "name": "Wizyta pilna",
+    "durationMin": 20,
+    "mode": "stacjonarna",
+    "active": true
+  },
+  {
+    "id": "vt-tele",
+    "name": "Teleporada",
+    "durationMin": 15,
+    "mode": "teleporada",
+    "active": true
+  }
+]

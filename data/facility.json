@@ -1,0 +1,18 @@
+{
+  "name": "Centrum Medyczne Kiryluk & Wenta",
+  "shortName": "CMKW",
+  "regon": "200123456",
+  "nip": "5421234567",
+  "address": "ul. Szymborskiej 2/U4",
+  "city": "Białystok",
+  "postalCode": "15-698",
+  "phone": "+48 85 652 20 20",
+  "email": "kontakt@cmkirylukwenta.pl",
+  "website": "https://cmkirylukwenta.pl",
+  "workingHours": "Pn–Pt 8:00–18:00, Sob 9:00–13:00",
+  "nfzCode": "000000000000",
+  "teryt": "2061011",
+  "bankAccount": "12 1240 0000 0000 0000 0000 0000",
+  "rodConsentText": "Wyrażam zgodę na przetwarzanie moich danych osobowych w celu świadczenia usług medycznych zgodnie z RODO oraz ustawą o prawach pacjenta.",
+  "logoUrl": "/images/logo.webp"
+}

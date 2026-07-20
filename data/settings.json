@@ -1,0 +1,14 @@
+{
+  "blockDoubleBooking": true,
+  "requireTeleconfirm": false,
+  "showPeselMaskedOnly": true,
+  "autoEndDayReminder": true,
+  "allowReceptionEditNotes": false,
+  "smsRemindersEnabled": true,
+  "onlineBookingSync": true,
+  "strictRoomAssignment": false,
+  "showPricesInCalendar": false,
+  "requireIcdOnComplete": false,
+  "auditLogEnabled": true,
+  "weekendSlotsEnabled": false
+}

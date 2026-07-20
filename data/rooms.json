@@ -1,0 +1,50 @@
+[
+  {
+    "id": "room-b1",
+    "name": "Gabinet 1 – Ortopedia",
+    "branchId": "bialystok",
+    "floor": "parter",
+    "notes": "Konsultacje + drobne zabiegi",
+    "active": true
+  },
+  {
+    "id": "room-b2",
+    "name": "Gabinet 2 – Ortopedia",
+    "branchId": "bialystok",
+    "floor": "parter",
+    "notes": "",
+    "active": true
+  },
+  {
+    "id": "room-b3",
+    "name": "Gabinet 3 – Rehabilitacja",
+    "branchId": "bialystok",
+    "floor": "I piętro",
+    "notes": "CPM / fizjoterapia",
+    "active": true
+  },
+  {
+    "id": "room-b4",
+    "name": "Sala zabiegowa",
+    "branchId": "bialystok",
+    "floor": "parter",
+    "notes": "Iniekcje, opatrunki",
+    "active": true
+  },
+  {
+    "id": "room-h1",
+    "name": "Gabinet A – Ortopedia",
+    "branchId": "hajnowka",
+    "floor": "parter",
+    "notes": "",
+    "active": true
+  },
+  {
+    "id": "room-h2",
+    "name": "Gabinet B – Konsultacje",
+    "branchId": "hajnowka",
+    "floor": "parter",
+    "notes": "",
+    "active": true
+  }
+]

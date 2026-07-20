@@ -1,0 +1,156 @@
+[
+  {
+    "id": "st-kiryluk",
+    "firstName": "Jan",
+    "lastName": "Kiryluk",
+    "title": "Dr n. med.",
+    "specialty": "Ortopedia i traumatologia narządu ruchu",
+    "pwz": "1234567",
+    "role": "doctor",
+    "branchIds": [
+      "bialystok"
+    ],
+    "active": true,
+    "email": "jan.kiryluk@cmkw.pl",
+    "phone": "+48 85 123 45 01",
+    "doctorId": "kiryluk",
+    "availabilityFactor": 0.22
+  },
+  {
+    "id": "st-wenta",
+    "firstName": "Tomas",
+    "lastName": "Wenta",
+    "title": "Lek.",
+    "specialty": "Ortopedia i traumatologia",
+    "pwz": "2345678",
+    "role": "doctor",
+    "branchIds": [
+      "bialystok",
+      "hajnowka"
+    ],
+    "active": true,
+    "email": "tomas.wenta@cmkw.pl",
+    "phone": "+48 85 123 45 02",
+    "doctorId": "wenta",
+    "availabilityFactor": 0.48
+  },
+  {
+    "id": "st-frankowski",
+    "firstName": "Paweł",
+    "lastName": "Frankowski",
+    "title": "Lek.",
+    "specialty": "Ortopedia",
+    "pwz": "3456789",
+    "role": "doctor",
+    "branchIds": [
+      "bialystok"
+    ],
+    "active": true,
+    "email": "p.frankowski@cmkw.pl",
+    "phone": "+48 85 123 45 03",
+    "doctorId": "frankowski",
+    "availabilityFactor": 0.55
+  },
+  {
+    "id": "st-zawadzki",
+    "firstName": "Andrzej",
+    "lastName": "Zawadzki",
+    "title": "Lek.",
+    "specialty": "Ortopedia",
+    "pwz": "4567890",
+    "role": "doctor",
+    "branchIds": [
+      "bialystok",
+      "hajnowka"
+    ],
+    "active": true,
+    "email": "a.zawadzki@cmkw.pl",
+    "phone": "+48 85 123 45 04",
+    "doctorId": "zawadzki",
+    "availabilityFactor": 0.58
+  },
+  {
+    "id": "st-torba",
+    "firstName": "Grzegorz",
+    "lastName": "Torba",
+    "title": "Lek.",
+    "specialty": "Ortopedia / rehabilitacja",
+    "pwz": "5678901",
+    "role": "doctor",
+    "branchIds": [
+      "bialystok"
+    ],
+    "active": true,
+    "email": "g.torba@cmkw.pl",
+    "phone": "+48 85 123 45 05",
+    "doctorId": "torba",
+    "availabilityFactor": 0.62
+  },
+  {
+    "id": "st-sammoudi",
+    "firstName": "Saddam",
+    "lastName": "Sammoudi",
+    "title": "Lek.",
+    "specialty": "Ortopedia",
+    "pwz": "6789012",
+    "role": "doctor",
+    "branchIds": [
+      "hajnowka",
+      "bialystok"
+    ],
+    "active": true,
+    "email": "s.sammoudi@cmkw.pl",
+    "phone": "+48 85 123 45 06",
+    "doctorId": "sammoudi",
+    "availabilityFactor": 0.68
+  },
+  {
+    "id": "st-recep1",
+    "firstName": "Anna",
+    "lastName": "Nowak",
+    "title": "",
+    "specialty": "Rejestracja",
+    "pwz": "",
+    "role": "reception",
+    "branchIds": [
+      "bialystok"
+    ],
+    "active": true,
+    "email": "recepcja@cmkw.pl",
+    "phone": "+48 85 123 45 00",
+    "availabilityFactor": 1
+  },
+  {
+    "id": "st-recep2",
+    "firstName": "Maria",
+    "lastName": "Wiśniewska",
+    "title": "",
+    "specialty": "Rejestracja",
+    "pwz": "",
+    "role": "reception",
+    "branchIds": [
+      "hajnowka"
+    ],
+    "active": true,
+    "email": "recepcja.hajnowka@cmkw.pl",
+    "phone": "+48 85 682 11 01",
+    "availabilityFactor": 1
+  },
+  {
+    "id": "st-admin",
+    "firstName": "Admin",
+    "lastName": "CMKW",
+    "title": "",
+    "specialty": "Administracja",
+    "pwz": "",
+    "role": "admin",
+    "branchIds": [
+      "bialystok",
+      "hajnowka"
+    ],
+    "active": true,
+    "email": "admin@cmkw.pl",
+    "phone": "+48 85 123 45 99",
+    "availabilityFactor": 1
+  }
+]
