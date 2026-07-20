@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { siteConfig } from "@/lib/site-config";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
+import { AppChrome } from "@/components/layout/app-chrome";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -69,9 +68,7 @@ export default function RootLayout({
     <html lang="pl">
       <body className="min-h-screen flex flex-col font-sans">
         <Providers>
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
+          <AppChrome>{children}</AppChrome>
           <Toaster />
         </Providers>
       </body>

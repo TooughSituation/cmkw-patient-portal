@@ -1,4 +1,5 @@
 import { DefaultSession } from "next-auth";
+import type { UserRole } from "@/lib/auth/roles";
 
 declare module "next-auth" {
   interface Session {
@@ -8,6 +9,7 @@ declare module "next-auth" {
       lastName: string;
       phone: string;
       peselMasked: string;
+      role: UserRole;
     } & DefaultSession["user"];
   }
 
@@ -18,6 +20,7 @@ declare module "next-auth" {
     phone: string;
     peselMasked: string;
     email: string;
+    role: UserRole;
   }
 }
 
@@ -28,5 +31,6 @@ declare module "next-auth/jwt" {
     lastName: string;
     phone: string;
     peselMasked: string;
+    role: UserRole;
   }
 }

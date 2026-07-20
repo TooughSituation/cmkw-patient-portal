@@ -3,18 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { Loader2, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginSchema } from "@/lib/validations/auth";
+import { defaultHomeForRole } from "@/lib/auth/roles";
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/portal";
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,8 +51,21 @@ export function LoginForm() {
         return;
       }
 
+      const session = await getSession();
+      const roleHome = defaultHomeForRole(session?.user?.role);
+      // Honor callbackUrl only if it matches the user's portal area
+      let target = roleHome;
+      if (callbackUrl) {
+        const isDoctorCb = callbackUrl.startsWith("/doctor");
+        const isPortalCb = callbackUrl.startsWith("/portal");
+        if (roleHome === "/doctor" && isDoctorCb) target = callbackUrl;
+        else if (roleHome === "/portal" && isPortalCb) target = callbackUrl;
+        else if (!isDoctorCb && !isPortalCb) target = callbackUrl;
+        else target = roleHome;
+      }
+
       toast.success("Zalogowano pomyślnie.");
-      router.push(callbackUrl);
+      router.push(target);
       router.refresh();
     } catch {
       toast.error("Wystąpił błąd. Spróbuj ponownie.");

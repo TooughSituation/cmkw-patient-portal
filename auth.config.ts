@@ -1,4 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
+import type { UserRole } from "@/lib/auth/roles";
 
 /**
  * Konfiguracja edge-compatible (bez Node APIs / bcrypt).
@@ -22,6 +23,7 @@ export const authConfig = {
         token.phone = user.phone;
         token.peselMasked = user.peselMasked;
         token.email = user.email;
+        token.role = (user.role ?? "patient") as UserRole;
       }
       return token;
     },
@@ -33,6 +35,7 @@ export const authConfig = {
         session.user.phone = token.phone as string;
         session.user.peselMasked = token.peselMasked as string;
         session.user.email = token.email as string;
+        session.user.role = (token.role as UserRole) ?? "patient";
       }
       return session;
     },
