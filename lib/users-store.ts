@@ -3,30 +3,33 @@ import { promises as fs } from "fs";
 import path from "path";
 import bcrypt from "bcryptjs";
 import type { UserRole } from "@/lib/auth/roles";
+import {
+  ALL_DEMO_ACCOUNTS,
+  DEMO_SEED_VERSION,
+  LEGACY_DEMO_EMAILS,
+  type DemoAccountSeed,
+} from "@/lib/demo-accounts";
 
 /**
  * Tymczasowy magazyn użytkowników (bez bazy).
- * - Lokalnie: plik `.data/users.json` (persist między restartami).
- * - Serverless (Vercel): pamięć procesu (ephemeral – po cold starcie puste).
- *
- * Produkcja medyczna wymaga docelowo bazy (np. Postgres) + szyfrowania PII.
+ * - Lokalnie: plik `.data/users.json`
+ * - Serverless: pamięć procesu + re-seed demo przy starcie
  */
 
 export type StoredUser = {
   id: string;
   firstName: string;
   lastName: string;
-  /** PESEL przechowywany tylko lokalnie w pliku – nie w JWT w całości */
   pesel: string;
   email: string;
   phone: string;
   passwordHash: string;
   role: UserRole;
-  /** Opcjonalnie powiązanie z lib/booking/doctors.ts */
   doctorId?: string;
   rodConsent: boolean;
   rodConsentAt: string;
   createdAt: string;
+  seedVersion?: number;
 };
 
 export type PublicUser = {
@@ -35,7 +38,6 @@ export type PublicUser = {
   lastName: string;
   email: string;
   phone: string;
-  /** Zmaskowany PESEL do wyświetlenia */
   peselMasked: string;
   role: UserRole;
   doctorId?: string;
@@ -84,79 +86,39 @@ async function ensureLoaded(): Promise<void> {
       ])
     );
   } catch {
-    // Brak pliku / brak zapisu – start z pustą mapą
+    // empty
   }
   store.loaded = true;
-  await ensureStaffSeeded();
+  await ensureDemoSeeded();
 }
 
 /**
- * Konta demo personelu (Portal Lekarza).
- * Hasła tylko do środowiska deweloperskiego.
+ * Upsert kont demo (zawsze aktualizuje hasła/role do wersji seeda).
  */
-const STAFF_SEEDS: Array<{
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  pesel: string;
-  role: UserRole;
-  doctorId?: string;
-}> = [
-  {
-    email: "jan.kiryluk@cmkw.pl",
-    password: "Lekarz123!",
-    firstName: "Jan",
-    lastName: "Kiryluk",
-    phone: "+48 85 123 45 01",
-    pesel: "70010112345",
-    role: "doctor",
-    doctorId: "kiryluk",
-  },
-  {
-    email: "tomas.wenta@cmkw.pl",
-    password: "Lekarz123!",
-    firstName: "Tomas",
-    lastName: "Wenta",
-    phone: "+48 85 123 45 02",
-    pesel: "75021512345",
-    role: "doctor",
-    doctorId: "wenta",
-  },
-  {
-    email: "recepcja@cmkw.pl",
-    password: "Recep123!",
-    firstName: "Anna",
-    lastName: "Nowak",
-    phone: "+48 85 123 45 00",
-    pesel: "90031012345",
-    role: "reception",
-  },
-  {
-    email: "admin@cmkw.pl",
-    password: "Admin123!",
-    firstName: "Admin",
-    lastName: "CMKW",
-    phone: "+48 85 123 45 99",
-    pesel: "80010112345",
-    role: "admin",
-  },
-];
-
-async function ensureStaffSeeded(): Promise<void> {
+async function ensureDemoSeeded(): Promise<void> {
   const store = getStore();
   if (store.seeded) return;
 
-  let added = false;
-  for (const seed of STAFF_SEEDS) {
-    const key = seed.email.toLowerCase();
-    if (store.users.has(key)) continue;
+  let changed = false;
 
+  // Usuń stare e-maile demo
+  for (const legacy of LEGACY_DEMO_EMAILS) {
+    if (store.users.has(legacy)) {
+      store.users.delete(legacy);
+      changed = true;
+    }
+  }
+
+  for (const seed of ALL_DEMO_ACCOUNTS) {
+    const key = seed.email.toLowerCase();
+    const existing = store.users.get(key);
+    if (existing && existing.seedVersion === DEMO_SEED_VERSION) {
+      continue;
+    }
     const passwordHash = await bcrypt.hash(seed.password, 12);
     const now = new Date().toISOString();
     const stored: StoredUser = {
-      id: randomUUID(),
+      id: existing?.id ?? seed.id,
       firstName: seed.firstName,
       lastName: seed.lastName,
       pesel: seed.pesel,
@@ -166,15 +128,16 @@ async function ensureStaffSeeded(): Promise<void> {
       role: seed.role,
       doctorId: seed.doctorId,
       rodConsent: true,
-      rodConsentAt: now,
-      createdAt: now,
+      rodConsentAt: existing?.rodConsentAt ?? now,
+      createdAt: existing?.createdAt ?? now,
+      seedVersion: DEMO_SEED_VERSION,
     };
     store.users.set(key, stored);
-    added = true;
+    changed = true;
   }
 
   store.seeded = true;
-  if (added) await persist();
+  if (changed) await persist();
 }
 
 async function persist(): Promise<void> {
@@ -184,7 +147,7 @@ async function persist(): Promise<void> {
     const list = Array.from(store.users.values());
     await fs.writeFile(DATA_FILE, JSON.stringify(list, null, 2), "utf8");
   } catch {
-    // Na Vercel FS jest read-only – ignorujemy, zostaje memory
+    // Vercel RO
   }
 }
 
@@ -232,7 +195,6 @@ export async function createUser(
     return { error: "Konto z tym adresem e-mail już istnieje." };
   }
 
-  // Unikalność PESEL (lokalny magazyn)
   for (const u of store.users.values()) {
     if (u.pesel === input.pesel) {
       return { error: "Konto z tym numerem PESEL już istnieje." };
@@ -272,10 +234,19 @@ export async function getPublicUserById(
   return null;
 }
 
-/** Konta demo do dokumentacji / dev login */
-export const DEMO_STAFF_ACCOUNTS = STAFF_SEEDS.map((s) => ({
-  email: s.email,
-  password: s.password,
-  role: s.role,
-  name: `${s.firstName} ${s.lastName}`,
-}));
+export function formatDemoList(accounts: DemoAccountSeed[]) {
+  return accounts.map((s) => ({
+    email: s.email,
+    password: s.password,
+    role: s.role,
+    name: `${s.firstName} ${s.lastName}`,
+  }));
+}
+
+export const DEMO_STAFF_ACCOUNTS = formatDemoList([
+  ...ALL_DEMO_ACCOUNTS.filter((a) => a.role !== "patient"),
+]);
+
+export const DEMO_PATIENT_LIST = formatDemoList(
+  ALL_DEMO_ACCOUNTS.filter((a) => a.role === "patient")
+);

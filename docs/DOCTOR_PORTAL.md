@@ -18,7 +18,8 @@ npm run dev
 - EDM: http://localhost:3000/doctor  
 - Pacjenci: http://localhost:3000/doctor/pacjenci  
 
-**Demo:** `jan.kiryluk@cmkw.pl` / `Lekarz123!`
+**Demo lekarz:** `jan.kiryluk@cmkw.pl` / `jankiryluk123` (admin)  
+**Logowanie EDM:** `/doctor/login` · **Pacjent:** `/login`
 
 ---
 
@@ -161,11 +162,24 @@ lib/pesel.ts                 # buildPesel, parsePesel, isValidPesel
 
 ---
 
-## Konta demo
+## Konta demo (Etap 7)
+
+### Lekarze (`/doctor/login`) — hasło: `imienazwisko123`
 
 | E-mail | Hasło | Rola |
 |--------|-------|------|
-| `jan.kiryluk@cmkw.pl` | `Lekarz123!` | doctor |
-| `tomas.wenta@cmkw.pl` | `Lekarz123!` | doctor |
-| `recepcja@cmkw.pl` | `Recep123!` | reception |
-| `admin@cmkw.pl` | `Admin123!` | admin |
+| `jan.kiryluk@cmkw.pl` | `jankiryluk123` | admin |
+| `tomasz.wenta@cmkw.pl` | `tomaszwenta123` | doctor |
+| `pawel.frankowski@cmkw.pl` | `pawelfrankowski123` | doctor |
+| `andrzej.zawadzki@cmkw.pl` | `andrzejzawadzki123` | doctor |
+| `grzegorz.torba@cmkw.pl` | `grzegorztorba123` | doctor |
+| `saddam.sammoudi@cmkw.pl` | `saddamsammoudi123` | doctor |
+| `recepcja@cmkw.pl` | `recepcja123` | reception |
+
+### Pacjenci (`/login`)
+
+| E-mail | Hasło |
+|--------|-------|
+| `jan.kowalski@email.pl` | `jankowalski123` |
+| `tomasz.nowak@email.pl` | `tomasznowak123` |
+| `anna.nowicka@email.pl` | `annanowicka123` |

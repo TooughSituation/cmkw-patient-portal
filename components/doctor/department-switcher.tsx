@@ -42,7 +42,7 @@ export function DepartmentSwitcher({ className }: { className?: string }) {
         <Button
           variant="outline"
           className={cn(
-            "h-9 max-w-[220px] gap-2 border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 hover:bg-secondary hover:text-brand-heading",
+            "h-9 max-w-[240px] gap-2 border-brand/20 bg-secondary/60 px-3 text-sm font-medium text-brand-heading shadow-sm hover:bg-secondary hover:text-brand",
             className
           )}
         >

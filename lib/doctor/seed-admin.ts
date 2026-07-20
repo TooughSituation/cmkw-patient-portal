@@ -59,7 +59,7 @@ export const SEED_STAFF: StaffMember[] = [
   },
   {
     id: "st-wenta",
-    firstName: "Tomas",
+    firstName: "Tomasz",
     lastName: "Wenta",
     title: "Lek.",
     specialty: "Ortopedia i traumatologia",
@@ -67,7 +67,7 @@ export const SEED_STAFF: StaffMember[] = [
     role: "doctor",
     branchIds: ["bialystok", "hajnowka"],
     active: true,
-    email: "tomas.wenta@cmkw.pl",
+    email: "tomasz.wenta@cmkw.pl",
     phone: "+48 85 123 45 02",
     doctorId: "wenta",
     availabilityFactor: 0.48,

@@ -32,7 +32,7 @@ export const SEED_PATIENTS: DoctorPatient[] = [
     birthDate: "1985-03-12",
     sex: "K",
     phone: "500111001",
-    email: "anna.kowalska@email.pl",
+    email: "anna.nowicka@email.pl",
     street: "Lipowa",
     buildingNo: "12",
     apartmentNo: "4",

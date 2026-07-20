@@ -2,15 +2,17 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { CalendarPlus, Users, UserRound } from "lucide-react";
+import { CalendarPlus, Stethoscope, Users, UserRound } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { siteConfig } from "@/lib/site-config";
 import { Button } from "@/components/ui/button";
+import { isDoctorPortalRole } from "@/lib/auth/roles";
 
 export function Hero() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const isAuthed = status === "authenticated" && !!session?.user;
+  const isStaff = isAuthed && isDoctorPortalRole(session?.user?.role);
 
   return (
     <section
@@ -51,19 +53,30 @@ export function Hero() {
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
-          {/* CTA portalu — dodatek */}
           <Button
             size="lg"
-            onClick={() => router.push(isAuthed ? "/portal" : "/login")}
-            className="h-12 min-w-[220px] gap-2 bg-brand px-6 text-base font-semibold text-white hover:bg-black"
+            onClick={() =>
+              router.push(isAuthed && !isStaff ? "/portal" : "/login")
+            }
+            className="h-12 min-w-[200px] gap-2 bg-brand px-6 text-base font-semibold text-white shadow-lg hover:bg-black"
           >
             <UserRound className="size-5" />
-            Rejestracja / Portal Pacjenta
+            Portal Pacjenta
+          </Button>
+          <Button
+            size="lg"
+            onClick={() =>
+              router.push(isStaff ? "/doctor" : "/doctor/login")
+            }
+            className="h-12 min-w-[200px] gap-2 border-2 border-white/40 bg-brand-deep px-6 text-base font-semibold text-white shadow-lg hover:bg-black"
+          >
+            <Stethoscope className="size-5" />
+            Dla Lekarza
           </Button>
           <Button
             size="lg"
             onClick={() => router.push("/kontakt")}
-            className="h-12 min-w-[200px] gap-2 bg-brand-deep px-6 text-base font-semibold text-white hover:bg-black"
+            className="h-12 min-w-[180px] gap-2 bg-white/15 px-6 text-base font-semibold text-white ring-1 ring-white/40 hover:bg-white/25"
           >
             <CalendarPlus className="size-5" />
             Umów wizytę
@@ -71,10 +84,10 @@ export function Hero() {
           <Button
             size="lg"
             onClick={() => router.push("/nasz-zespol")}
-            className="h-12 min-w-[200px] gap-2 bg-brand-deep px-6 text-base font-semibold text-white hover:bg-black"
+            className="h-12 min-w-[180px] gap-2 bg-white/15 px-6 text-base font-semibold text-white ring-1 ring-white/40 hover:bg-white/25"
           >
             <Users className="size-5" />
-            Zobacz nasz zespół
+            Nasz zespół
           </Button>
         </div>
       </div>

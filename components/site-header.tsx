@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { MapPin, Menu, Phone, UserRound } from "lucide-react";
+import { MapPin, Menu, Phone, Stethoscope, UserRound } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { isDoctorPortalRole } from "@/lib/auth/roles";
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -24,10 +25,18 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   const isAuthed = status === "authenticated" && !!session?.user;
-  const ctaHref = isAuthed ? "/portal" : "/login";
-  const ctaLabel = isAuthed
-    ? `Portal · ${session.user.firstName}`
-    : "Rejestracja / Portal Pacjenta";
+  const isStaff = isAuthed && isDoctorPortalRole(session?.user?.role);
+
+  const patientHref = isAuthed && !isStaff ? "/portal" : "/login";
+  const patientLabel =
+    isAuthed && !isStaff
+      ? `Portal · ${session!.user.firstName}`
+      : "Portal Pacjenta";
+
+  const doctorHref = isStaff ? "/doctor" : "/doctor/login";
+  const doctorLabel = isStaff
+    ? `EDM · ${session!.user.firstName}`
+    : "Dla Lekarza";
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -36,7 +45,6 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-[0_1px_0_0_#eee]">
-      {/* Top bar — logo + telefony (jak oryginał) */}
       <div className="border-b border-[#eee]">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-3 md:px-6">
           <a
@@ -110,12 +118,23 @@ export function SiteHeader() {
                   <Button
                     onClick={() => {
                       setOpen(false);
-                      router.push(ctaHref);
+                      router.push(patientHref);
                     }}
-                    className="mt-5 h-11 bg-brand font-semibold text-white hover:bg-brand-deep"
+                    className="mt-5 h-11 gap-2 bg-brand font-semibold text-white hover:bg-brand-deep"
                   >
                     <UserRound className="size-4" />
-                    {ctaLabel}
+                    {patientLabel}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setOpen(false);
+                      router.push(doctorHref);
+                    }}
+                    variant="outline"
+                    className="mt-2 h-11 gap-2 border-brand-deep/30 font-semibold text-brand-deep hover:bg-secondary"
+                  >
+                    <Stethoscope className="size-4" />
+                    {doctorLabel}
                   </Button>
                   {!isAuthed && (
                     <Link
@@ -145,7 +164,6 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* Główne menu — bold, separators jak oryginał */}
       <div className="border-b border-[#eee] bg-white">
         <div className="mx-auto flex max-w-[1200px] flex-col items-stretch gap-2 px-2 py-1.5 md:px-4 lg:flex-row lg:items-center lg:justify-between">
           <nav
@@ -177,14 +195,21 @@ export function SiteHeader() {
             </ul>
           </nav>
 
-          {/* Prominent CTA — dodatek do klona */}
-          <div className="flex shrink-0 justify-center px-2 pb-1.5 lg:justify-end lg:pb-0">
+          <div className="flex shrink-0 flex-col justify-center gap-2 px-2 pb-1.5 sm:flex-row sm:items-center lg:justify-end lg:pb-0">
             <Button
-              onClick={() => router.push(ctaHref)}
-              className="h-10 w-full max-w-xs gap-2 bg-brand px-4 text-[13px] font-bold text-white shadow-sm hover:bg-brand-deep lg:w-auto"
+              onClick={() => router.push(patientHref)}
+              className="h-10 gap-2 bg-brand px-4 text-[13px] font-bold text-white shadow-sm hover:bg-brand-deep"
             >
               <UserRound className="size-4" />
-              {status === "loading" ? "…" : ctaLabel}
+              {status === "loading" ? "…" : patientLabel}
+            </Button>
+            <Button
+              onClick={() => router.push(doctorHref)}
+              variant="outline"
+              className="h-10 gap-2 border-brand-deep/40 bg-white px-4 text-[13px] font-bold text-brand-deep shadow-sm hover:bg-secondary"
+            >
+              <Stethoscope className="size-4" />
+              {status === "loading" ? "…" : doctorLabel}
             </Button>
           </div>
         </div>

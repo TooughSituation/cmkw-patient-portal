@@ -60,6 +60,80 @@ async function ensureLoaded(): Promise<void> {
     // empty
   }
   store.loaded = true;
+  await ensureDemoAppointments();
+}
+
+/** Wizyty demo powiązane z kontami pacjentów (stałe userId). */
+async function ensureDemoAppointments(): Promise<void> {
+  const store = getStore();
+  if (store.items.has("demo-apt-jan-1")) return;
+
+  const now = new Date().toISOString();
+  const today = now.slice(0, 10);
+  const demos: Appointment[] = [
+    {
+      id: "demo-apt-jan-1",
+      userId: "user-patient-jan",
+      patientFirstName: "Jan",
+      patientLastName: "Kowalski",
+      patientEmail: "jan.kowalski@email.pl",
+      patientPhone: "500111001",
+      doctorId: "kiryluk",
+      doctorName: "Dr n. med. Jan Kiryluk",
+      serviceId: "konsultacja-ortopedyczna",
+      serviceName: "Konsultacja ortopedyczna",
+      pricePln: 250,
+      date: today,
+      time: "10:00",
+      note: "Ból kolana — wizyta demo",
+      status: "confirmed",
+      createdAt: now,
+      paidAt: now,
+    },
+    {
+      id: "demo-apt-tomasz-1",
+      userId: "user-patient-tomasz",
+      patientFirstName: "Tomasz",
+      patientLastName: "Nowak",
+      patientEmail: "tomasz.nowak@email.pl",
+      patientPhone: "501222003",
+      doctorId: "wenta",
+      doctorName: "Lek. Tomasz Wenta",
+      serviceId: "konsultacja-ortopedyczna",
+      serviceName: "Konsultacja ortopedyczna",
+      pricePln: 250,
+      date: today,
+      time: "11:30",
+      note: "Kontrola po urazie — demo",
+      status: "confirmed",
+      createdAt: now,
+      paidAt: now,
+    },
+    {
+      id: "demo-apt-anna-1",
+      userId: "user-patient-anna",
+      patientFirstName: "Anna",
+      patientLastName: "Nowicka",
+      patientEmail: "anna.nowicka@email.pl",
+      patientPhone: "502333004",
+      doctorId: "frankowski",
+      doctorName: "Lek. Paweł Frankowski",
+      serviceId: "usg",
+      serviceName: "USG stawu",
+      pricePln: 180,
+      date: today,
+      time: "14:00",
+      note: "USG barku — demo",
+      status: "confirmed",
+      createdAt: now,
+      paidAt: now,
+    },
+  ];
+
+  for (const a of demos) {
+    store.items.set(a.id, a);
+  }
+  await persist();
 }
 
 async function persist(): Promise<void> {

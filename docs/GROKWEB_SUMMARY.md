@@ -1,7 +1,7 @@
 # Podsumowanie projektu — CMKW Patient Portal (dla GrokWeb)
 
 **Data aktualizacji:** 2026-07-20  
-**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–6B: + grafiki pracy, kalendarz D/T/M)**  
+**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–7: separacja loginów, seed demo, UX polish)**  
 **Konto:** TooughSituation / toough-situation
 
 ---
@@ -140,14 +140,12 @@ Na `/doctor/*` marketingowy header/footer jest ukryty (`AppChrome`).
 - **Seed personelu** przy starcie (jeśli brak w store)  
 - Env: `AUTH_SECRET` (prod/preview/dev), `AUTH_URL` (prod)
 
-### Konta demo EDM
+### Konta demo (Etap 7)
 
-| E-mail | Hasło | Rola |
-|--------|-------|------|
-| `jan.kiryluk@cmkw.pl` | `Lekarz123!` | doctor |
-| `tomas.wenta@cmkw.pl` | `Lekarz123!` | doctor |
-| `recepcja@cmkw.pl` | `Recep123!` | reception |
-| `admin@cmkw.pl` | `Admin123!` | admin |
+**Lekarz (EDM):** `/doctor/login` — `jan.kiryluk@cmkw.pl` / `jankiryluk123`  
+**Pacjent:** `/login` — `jan.kowalski@email.pl` / `jankowalski123`  
+
+Pozostali lekarze: `imie.nazwisko@cmkw.pl` / `imienazwisko123` (lista w `lib/demo-accounts.ts`).
 
 ---
 
@@ -287,16 +285,17 @@ npm install && npm run dev   # http://localhost:3000
 > **Gotowe:**  
 > - Pełny klon publicznej strony cmkirylukwenta.pl  
 > - Portal pacjenta: auth (PESEL+RODO), booking + mock płatność  
-> - **Portal Lekarza EDM Etap 0–6B:** … + oddziałyły, terminy, admin, **grafiki pracy (lekarz×oddział), kalendarz Dzień/Tydzień/Miesiąc, sloty z grafiku, walidacja poza godzinami**  
+> - **Portal Lekarza EDM Etap 0–7:** pełny EDM + **osobne loginy** (`/login` pacjent, `/doctor/login` lekarz), CTA na stronie, seed 6 lekarzy + 3 pacjentów, dashboard insights, UX polish  
 > - Brand: `#0849b0`, white EDM shell  
+> - **Demo EDM:** `jan.kiryluk@cmkw.pl` / `jankiryluk123`  
+> - **Demo pacjent:** `jan.kowalski@email.pl` / `jankowalski123`  
 > - Docs: `docs/GROKWEB_SUMMARY.md`, `docs/DOCTOR_PORTAL.md`  
 >  
-> **Demo EDM:** `jan.kiryluk@cmkw.pl` / `Lekarz123!`  
-> **Brak (Etap 7):** Prisma, e-recepta P1, drag&drop, realne SMS.  
+> **Brak (Etap 8):** Prisma, e-recepta P1, drag&drop, realne SMS.  
 > Następny krok: [tu wstaw zadanie].
 
 ---
 
 ## 14. TL;DR
 
-CMKW = **klon strony** + **portal pacjenta** + **Portal Lekarza EDM** (Etap 0–6B: grafiki pracy, kalendarz D/T/M, terminy z grafiku…). Store: localStorage + `data/*.json`. Kolejny etap: Prisma / e-recepta / drag&drop.
+CMKW = **klon strony** + **portal pacjenta** + **Portal Lekarza EDM** (Etap 0–7: osobne loginy, seed demo, grafiki, karta wizyty…). Demo: `jan.kiryluk@cmkw.pl` / `jankiryluk123`. Kolejny etap: Prisma / e-recepta.

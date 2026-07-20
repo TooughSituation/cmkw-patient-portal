@@ -54,6 +54,7 @@ import { EmptyState } from "@/components/doctor/empty-state";
 import { PatientNameLink } from "@/components/doctor/patient-name-link";
 import { QuickVisitDialog } from "@/components/doctor/quick-visit-dialog";
 import { TeleconfirmPanel } from "@/components/doctor/teleconfirm-panel";
+import { DoctorDashboardInsights } from "@/components/doctor/doctor-dashboard-insights";
 import { VISIT_TYPE_LABELS } from "@/lib/doctor/types";
 import {
   findSchedule,
@@ -201,6 +202,8 @@ export function CalendarView() {
 
   return (
     <div className="p-3 md:p-4 lg:p-5">
+      <DoctorDashboardInsights />
+
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-lg font-semibold text-brand-heading md:text-xl">
@@ -212,7 +215,7 @@ export function CalendarView() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5">
+          <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-sm">
             {(["day", "week", "month"] as CalMode[]).map((m) => (
               <button
                 key={m}
@@ -221,7 +224,7 @@ export function CalendarView() {
                 className={cn(
                   "rounded-md px-3 py-1.5 text-xs font-medium transition",
                   mode === m
-                    ? "bg-brand text-white"
+                    ? "bg-brand text-white shadow-sm"
                     : "text-slate-600 hover:bg-secondary"
                 )}
               >
@@ -230,7 +233,7 @@ export function CalendarView() {
             ))}
           </div>
           <Select value={doctorFilter} onValueChange={setDoctorFilter}>
-            <SelectTrigger className="h-9 w-[180px] bg-white">
+            <SelectTrigger className="h-9 w-[180px] bg-white shadow-sm">
               <SelectValue placeholder="Lekarz" />
             </SelectTrigger>
             <SelectContent>
@@ -245,7 +248,7 @@ export function CalendarView() {
           <QuickVisitDialog
             defaultDate={dateKey}
             trigger={
-              <Button className="h-9 gap-1.5 bg-brand text-white hover:bg-brand-deep">
+              <Button className="h-10 gap-2 bg-brand px-5 text-sm font-semibold text-white shadow-md hover:bg-brand-deep">
                 <Plus className="size-4" />
                 Szybka wizyta
               </Button>
@@ -633,8 +636,10 @@ function DayVisitsTable({
       <CardContent className="p-0">
         {dayVisits.length === 0 ? (
           <EmptyState
-            title="Brak elementów do wyświetlenia"
-            description="Brak wizyt w wybranym dniu lub filtrach."
+            title="Brak wizyt w tym dniu"
+            description="Wybierz inny dzień, zmień filtr lekarza albo dodaj szybką wizytę."
+            actionHref="/doctor/terminy"
+            actionLabel="Szukaj wolnych terminów"
           />
         ) : (
           <div className="overflow-x-auto">
