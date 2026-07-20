@@ -4,12 +4,14 @@ import type { DoctorPatient } from "@/lib/doctor/types";
 const now = new Date().toISOString();
 
 function p(
-  partial: Omit<DoctorPatient, "createdAt" | "updatedAt"> & {
+  partial: Omit<DoctorPatient, "createdAt" | "updatedAt" | "primaryBranchId"> & {
+    primaryBranchId?: string;
     createdAt?: string;
     updatedAt?: string;
   }
 ): DoctorPatient {
   return {
+    primaryBranchId: partial.primaryBranchId ?? "bialystok",
     ...partial,
     createdAt: partial.createdAt ?? now,
     updatedAt: partial.updatedAt ?? now,
@@ -273,6 +275,7 @@ export const SEED_PATIENTS: DoctorPatient[] = [
     rodConsent: true,
     rodConsentAt: now,
     status: "active",
+    primaryBranchId: "hajnowka",
   }),
   p({
     id: "p-013",
@@ -336,6 +339,7 @@ export const SEED_PATIENTS: DoctorPatient[] = [
     rodConsent: true,
     rodConsentAt: now,
     status: "active",
+    primaryBranchId: "hajnowka",
   }),
   p({
     id: "p-016",
@@ -441,6 +445,7 @@ export const SEED_PATIENTS: DoctorPatient[] = [
     rodConsent: true,
     rodConsentAt: now,
     status: "active",
+    primaryBranchId: "hajnowka",
   }),
 ];
 

@@ -26,6 +26,30 @@ import {
   resetDocumentsLocalStorage,
   saveDocumentsToLocalStorage,
 } from "@/lib/doctor/documents-client";
+import {
+  loadFacility,
+  loadRooms,
+  loadSettings,
+  loadStaff,
+  loadVisitTypes,
+  saveFacility,
+  saveRooms,
+  saveSettings,
+  saveStaff,
+  saveVisitTypes,
+} from "@/lib/doctor/admin-client";
+import {
+  ALL_BRANCHES_ID,
+  BRANCH_STORAGE_KEY,
+  isValidBranchFilter,
+} from "@/lib/doctor/branches";
+import type {
+  AppSettings,
+  FacilityData,
+  Room,
+  StaffMember,
+  VisitTypeConfig,
+} from "@/lib/doctor/admin-types";
 import type {
   DoctorDocument,
   DoctorPatient,
@@ -34,8 +58,12 @@ import type {
 } from "@/lib/doctor/types";
 
 type DoctorDataContextValue = {
+  /** Global branch filter: all | bialystok | hajnowka */
+  branchFilter: string;
+  setBranchFilter: (id: string) => void;
   patients: DoctorPatient[];
   patientsLoading: boolean;
+  filteredPatients: DoctorPatient[];
   getPatientById: (id: string) => DoctorPatient | null;
   createPatient: (input: PatientInput) => DoctorPatient;
   updatePatient: (id: string, input: PatientInput) => DoctorPatient | null;
@@ -43,6 +71,7 @@ type DoctorDataContextValue = {
   resetPatients: () => void;
   visits: DoctorVisit[];
   visitsLoading: boolean;
+  filteredVisits: DoctorVisit[];
   getVisitById: (id: string) => DoctorVisit | null;
   updateVisitStatus: (id: string, status: VisitStatus) => DoctorVisit | null;
   updateVisit: (
@@ -60,6 +89,18 @@ type DoctorDataContextValue = {
   documentsForPatient: (patientId: string) => DoctorDocument[];
   documentsForVisit: (visitId: string) => DoctorDocument[];
   resetDocuments: () => void;
+  // Admin
+  facility: FacilityData | null;
+  settings: AppSettings | null;
+  staff: StaffMember[];
+  rooms: Room[];
+  visitTypes: VisitTypeConfig[];
+  adminLoading: boolean;
+  saveFacilityData: (data: FacilityData) => void;
+  saveSettingsData: (data: AppSettings) => void;
+  saveStaffData: (data: StaffMember[]) => void;
+  saveRoomsData: (data: Room[]) => void;
+  saveVisitTypesData: (data: VisitTypeConfig[]) => void;
 };
 
 const DoctorDataContext = createContext<DoctorDataContextValue | null>(null);
@@ -69,20 +110,49 @@ export function DoctorDataProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const [branchFilter, setBranchFilterState] = useState(ALL_BRANCHES_ID);
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
   const [visits, setVisits] = useState<DoctorVisit[]>([]);
   const [documents, setDocuments] = useState<DoctorDocument[]>([]);
+  const [facility, setFacility] = useState<FacilityData | null>(null);
+  const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [staff, setStaff] = useState<StaffMember[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [visitTypes, setVisitTypes] = useState<VisitTypeConfig[]>([]);
   const [patientsLoading, setPatientsLoading] = useState(true);
   const [visitsLoading, setVisitsLoading] = useState(true);
   const [documentsLoading, setDocumentsLoading] = useState(true);
+  const [adminLoading, setAdminLoading] = useState(true);
 
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem(BRANCH_STORAGE_KEY);
+      if (saved && isValidBranchFilter(saved)) setBranchFilterState(saved);
+    } catch {
+      // ignore
+    }
     setPatients(loadPatientsFromLocalStorage());
     setVisits(loadVisitsFromLocalStorage());
     setDocuments(loadDocumentsFromLocalStorage());
+    setFacility(loadFacility());
+    setSettings(loadSettings());
+    setStaff(loadStaff());
+    setRooms(loadRooms());
+    setVisitTypes(loadVisitTypes());
     setPatientsLoading(false);
     setVisitsLoading(false);
     setDocumentsLoading(false);
+    setAdminLoading(false);
+  }, []);
+
+  const setBranchFilter = useCallback((id: string) => {
+    if (!isValidBranchFilter(id)) return;
+    setBranchFilterState(id);
+    try {
+      localStorage.setItem(BRANCH_STORAGE_KEY, id);
+    } catch {
+      // ignore
+    }
   }, []);
 
   const persistPatients = useCallback((next: DoctorPatient[]) => {
@@ -100,6 +170,23 @@ export function DoctorDataProvider({
     saveDocumentsToLocalStorage(next);
   }, []);
 
+  const filteredVisits = useMemo(() => {
+    if (branchFilter === ALL_BRANCHES_ID) return visits;
+    return visits.filter((v) => v.branchId === branchFilter);
+  }, [visits, branchFilter]);
+
+  const filteredPatients = useMemo(() => {
+    if (branchFilter === ALL_BRANCHES_ID) return patients;
+    const ids = new Set(
+      visits
+        .filter((v) => v.branchId === branchFilter)
+        .map((v) => v.patientId)
+    );
+    return patients.filter(
+      (p) => p.primaryBranchId === branchFilter || ids.has(p.id)
+    );
+  }, [patients, visits, branchFilter]);
+
   const getPatientById = useCallback(
     (id: string) => patients.find((p) => p.id === id) ?? null,
     [patients]
@@ -107,11 +194,17 @@ export function DoctorDataProvider({
 
   const createPatient = useCallback(
     (input: PatientInput) => {
-      const record = createPatientRecord(input, patients);
+      const withBranch: PatientInput = {
+        ...input,
+        primaryBranchId:
+          input.primaryBranchId ??
+          (branchFilter !== ALL_BRANCHES_ID ? branchFilter : "bialystok"),
+      };
+      const record = createPatientRecord(withBranch, patients);
       persistPatients([record, ...patients]);
       return record;
     },
-    [patients, persistPatients]
+    [patients, persistPatients, branchFilter]
   );
 
   const updatePatient = useCallback(
@@ -193,10 +286,16 @@ export function DoctorDataProvider({
 
   const addVisit = useCallback(
     (visit: DoctorVisit) => {
-      persistVisits([visit, ...visits]);
-      return visit;
+      const withBranch: DoctorVisit = {
+        ...visit,
+        branchId:
+          visit.branchId ||
+          (branchFilter !== ALL_BRANCHES_ID ? branchFilter : "bialystok"),
+      };
+      persistVisits([withBranch, ...visits]);
+      return withBranch;
     },
-    [visits, persistVisits]
+    [visits, persistVisits, branchFilter]
   );
 
   const resetVisits = useCallback(() => {
@@ -205,15 +304,15 @@ export function DoctorDataProvider({
 
   const visitsByDate = useCallback(
     (date: string) =>
-      visits
+      filteredVisits
         .filter((v) => v.date === date)
         .sort((a, b) => a.time.localeCompare(b.time)),
-    [visits]
+    [filteredVisits]
   );
 
   const datesWithVisits = useMemo(() => {
-    return new Set(visits.map((v) => v.date));
-  }, [visits]);
+    return new Set(filteredVisits.map((v) => v.date));
+  }, [filteredVisits]);
 
   const addDocument = useCallback(
     (doc: DoctorDocument) => {
@@ -272,10 +371,38 @@ export function DoctorDataProvider({
     setDocuments(resetDocumentsLocalStorage());
   }, []);
 
+  const saveFacilityData = useCallback((data: FacilityData) => {
+    setFacility(data);
+    saveFacility(data);
+  }, []);
+
+  const saveSettingsData = useCallback((data: AppSettings) => {
+    setSettings(data);
+    saveSettings(data);
+  }, []);
+
+  const saveStaffData = useCallback((data: StaffMember[]) => {
+    setStaff(data);
+    saveStaff(data);
+  }, []);
+
+  const saveRoomsData = useCallback((data: Room[]) => {
+    setRooms(data);
+    saveRooms(data);
+  }, []);
+
+  const saveVisitTypesData = useCallback((data: VisitTypeConfig[]) => {
+    setVisitTypes(data);
+    saveVisitTypes(data);
+  }, []);
+
   const value = useMemo<DoctorDataContextValue>(
     () => ({
+      branchFilter,
+      setBranchFilter,
       patients,
       patientsLoading,
+      filteredPatients,
       getPatientById,
       createPatient,
       updatePatient,
@@ -283,6 +410,7 @@ export function DoctorDataProvider({
       resetPatients,
       visits,
       visitsLoading,
+      filteredVisits,
       getVisitById,
       updateVisitStatus,
       updateVisit,
@@ -297,10 +425,24 @@ export function DoctorDataProvider({
       documentsForPatient,
       documentsForVisit,
       resetDocuments,
+      facility,
+      settings,
+      staff,
+      rooms,
+      visitTypes,
+      adminLoading,
+      saveFacilityData,
+      saveSettingsData,
+      saveStaffData,
+      saveRoomsData,
+      saveVisitTypesData,
     }),
     [
+      branchFilter,
+      setBranchFilter,
       patients,
       patientsLoading,
+      filteredPatients,
       getPatientById,
       createPatient,
       updatePatient,
@@ -308,6 +450,7 @@ export function DoctorDataProvider({
       resetPatients,
       visits,
       visitsLoading,
+      filteredVisits,
       getVisitById,
       updateVisitStatus,
       updateVisit,
@@ -322,6 +465,17 @@ export function DoctorDataProvider({
       documentsForPatient,
       documentsForVisit,
       resetDocuments,
+      facility,
+      settings,
+      staff,
+      rooms,
+      visitTypes,
+      adminLoading,
+      saveFacilityData,
+      saveSettingsData,
+      saveStaffData,
+      saveRoomsData,
+      saveVisitTypesData,
     ]
   );
 

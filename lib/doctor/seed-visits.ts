@@ -27,6 +27,7 @@ type VisitSeed = {
   type: DoctorVisit["type"];
   note: string;
   departmentId?: string;
+  branchId?: string;
   medicalNote?: string;
   diagnoses?: DoctorVisit["diagnoses"];
   prescriptions?: DoctorVisit["prescriptions"];
@@ -53,6 +54,7 @@ function visit(partial: VisitSeed): DoctorVisit {
     type: partial.type,
     note: partial.note,
     departmentId: partial.departmentId ?? "ortopedia",
+    branchId: partial.branchId ?? "bialystok",
     medicalNote: partial.medicalNote ?? clinical.medicalNote,
     diagnoses: partial.diagnoses ?? clinical.diagnoses,
     prescriptions: partial.prescriptions ?? clinical.prescriptions,
@@ -324,6 +326,7 @@ export const SEED_VISITS: DoctorVisit[] = [
     type: "konsultacja",
     note: "Ból ścięgna Achillesa",
     needsTeleconfirm: true,
+    branchId: "hajnowka",
   }),
   visit({
     id: "v-013",
@@ -360,6 +363,7 @@ export const SEED_VISITS: DoctorVisit[] = [
     type: "konsultacja",
     note: "Kontuzja kolana – bieganie",
     needsTeleconfirm: true,
+    branchId: "hajnowka",
   }),
   visit({
     id: "v-016",
@@ -443,5 +447,6 @@ export const SEED_VISITS: DoctorVisit[] = [
     type: "konsultacja",
     note: "Pierwsza wizyta – uraz sportowy",
     needsTeleconfirm: true,
+    branchId: "hajnowka",
   }),
 ];

@@ -7,7 +7,7 @@ import type {
 } from "@/lib/doctor/types";
 
 /** Bump wersji przy zmianie schematu (reset localStorage). */
-export const DOCTOR_PATIENTS_STORAGE_KEY = "cmkw-doctor-patients-v1";
+export const DOCTOR_PATIENTS_STORAGE_KEY = "cmkw-doctor-patients-v2";
 
 export type PatientInput = {
   firstName: string;
@@ -27,6 +27,7 @@ export type PatientInput = {
   notes: string;
   rodConsent: boolean;
   status: PatientStatus;
+  primaryBranchId?: string;
 };
 
 function nextCardNumber(patients: DoctorPatient[]): string {
@@ -53,7 +54,10 @@ export function loadPatientsFromLocalStorage(): DoctorPatient[] {
       localStorage.setItem(DOCTOR_PATIENTS_STORAGE_KEY, JSON.stringify(seed));
       return seed;
     }
-    return parsed;
+    return parsed.map((p) => ({
+      ...p,
+      primaryBranchId: p.primaryBranchId ?? "bialystok",
+    }));
   } catch {
     return structuredClone(SEED_PATIENTS);
   }
@@ -101,6 +105,7 @@ export function createPatientRecord(
     rodConsent: input.rodConsent,
     rodConsentAt: input.rodConsent ? now : undefined,
     status: input.status,
+    primaryBranchId: input.primaryBranchId ?? "bialystok",
     createdAt: now,
     updatedAt: now,
   };
@@ -136,6 +141,7 @@ export function updatePatientRecord(
       ? prev.rodConsentAt ?? now
       : undefined,
     status: input.status,
+    primaryBranchId: input.primaryBranchId ?? prev.primaryBranchId ?? "bialystok",
     updatedAt: now,
   };
 }

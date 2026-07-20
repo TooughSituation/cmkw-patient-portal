@@ -47,6 +47,8 @@ export type DoctorPatient = {
   rodConsent: boolean;
   rodConsentAt?: string;
   status: PatientStatus;
+  /** Preferowany / domyślny oddział pacjenta */
+  primaryBranchId: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -100,7 +102,14 @@ export type DoctorVisit = {
   documentIds: string[];
   /** Wymaga telepotwierdzenia (SMS/telefon) */
   needsTeleconfirm: boolean;
+  /**
+   * Jednostka medyczna (ortopedia / rehabilitacja / poradnia) — legacy + raporty.
+   */
   departmentId: string;
+  /**
+   * Oddział geograficzny: bialystok | hajnowka
+   */
+  branchId: string;
   createdAt: string;
   updatedAt: string;
 };

@@ -8,9 +8,13 @@ import {
 /**
  * v3 — karta wizyty EDM: medicalNote, diagnoses, prescriptions, referrals, documents, teleconfirm.
  */
-export const DOCTOR_VISITS_STORAGE_KEY = "cmkw-doctor-visits-v3";
+export const DOCTOR_VISITS_STORAGE_KEY = "cmkw-doctor-visits-v4";
 
-const LEGACY_KEYS = ["cmkw-doctor-visits-v2", "cmkw-doctor-visits-v1"];
+const LEGACY_KEYS = [
+  "cmkw-doctor-visits-v3",
+  "cmkw-doctor-visits-v2",
+  "cmkw-doctor-visits-v1",
+];
 
 const VALID_STATUS = new Set<VisitStatus>([
   "scheduled",
@@ -58,9 +62,22 @@ export function normalizeVisit(
       : clinical.documentIds,
     needsTeleconfirm: Boolean(v.needsTeleconfirm),
     departmentId: v.departmentId ?? "ortopedia",
+    branchId:
+      v.branchId === "hajnowka" || v.branchId === "bialystok"
+        ? v.branchId
+        : // heuristic: rehab more often bialystok; some IDs map to hajnowka
+          v.doctorId === "sammoudi" || v.doctorId === "zawadzki"
+          ? hashBranch(v.id)
+          : "bialystok",
     createdAt: v.createdAt ?? new Date().toISOString(),
     updatedAt: v.updatedAt ?? new Date().toISOString(),
   };
+}
+
+function hashBranch(id: string): "bialystok" | "hajnowka" {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h + id.charCodeAt(i) * (i + 1)) % 5;
+  return h <= 2 ? "bialystok" : "hajnowka";
 }
 
 export function loadVisitsFromLocalStorage(): DoctorVisit[] {

@@ -5,7 +5,7 @@ import { useDoctorData } from "@/components/doctor/doctor-data-provider";
 /** Thin adapter — shared state via DoctorDataProvider. */
 export function useDoctorVisits() {
   const {
-    visits,
+    filteredVisits,
     visitsLoading,
     getVisitById,
     updateVisitStatus,
@@ -14,10 +14,13 @@ export function useDoctorVisits() {
     resetVisits,
     visitsByDate,
     datesWithVisits,
+    visits,
   } = useDoctorData();
 
   return {
-    visits,
+    /** Filtrowane wg oddziału */
+    visits: filteredVisits,
+    allVisits: visits,
     loading: visitsLoading,
     getById: getVisitById,
     updateStatus: updateVisitStatus,

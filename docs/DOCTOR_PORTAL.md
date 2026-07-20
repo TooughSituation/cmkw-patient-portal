@@ -1,6 +1,6 @@
 # Portal Lekarza / CMKW EDM
 
-**Status:** Etap 0–3 + **Etap 4 (Karta wizyty EDM + dokumenty + telepotwierdzenia)**  
+**Status:** Etap 0–4 + **Etap 5A (Oddziały + Terminy + Admin)**  
 **Prefix:** `/doctor/*`  
 **Role:** `doctor` | `admin` | `reception`  
 **Styl:** jasny brand CMKW (`#0849b0`, white / slate-50) — spójny z patient portalem
@@ -66,6 +66,19 @@ Usuń klucze i odśwież → seed od nowa.
 | `/doctor/icd10` | ICD-10 (Etap 3) |
 | `/doctor/kalkulatory` | Kalkulatory medyczne (Etap 3) |
 | `/doctor/wizyty/[id]` | **Karta wizyty EDM** (Etap 4) |
+| `/doctor/terminy` | Wyszukiwarka wolnych terminów (Etap 5A) |
+| `/doctor/admin` | Administracja placówki (Etap 5A) |
+
+### Etap 5A — oddziały / terminy / admin
+
+1. Topbar → przełącznik **Białystok / Hajnówka / Wszystkie** — filtruje kalendarz, wizyty, pacjentów
+2. `/doctor/terminy` — filtry, lista lekarzy ze slotami, **Zarezerwuj** → karta wizyty
+3. Dr Kiryluk ma najmniej slotów (availabilityFactor 0.22)
+4. `/doctor/admin` — statystyki, dane placówki, ustawienia (switch), pracownicy, gabinety, typy wizyt
+5. Nowa wizyta dziedziczy wybrany oddział (`branchId`)
+
+**localStorage:** `cmkw-doctor-branch-v1`, `cmkw-doctor-visits-v4`, staff/settings/rooms/facility keys  
+**JSON seed:** `data/departments.json`, `settings.json`, `facility.json`, `staff.json`, `rooms.json`
 
 ### Etap 4 — test flow wizyty
 
@@ -124,15 +137,15 @@ lib/pesel.ts                 # buildPesel, parsePesel, isValidPesel
 
 ---
 
-## Etap 5 — propozycje
+## Etap 6 — propozycje
 
-1. **E-recepta / e-skierowanie** (integracja P1 placeholder)  
-2. **Historia farmakoterapii** pacjenta (agregacja z wizyt)  
-3. **Szablony notatek** i skróty klawiszowe  
+1. **E-recepta / e-skierowanie** (P1)  
+2. **Harmonogramy pracy** lekarzy (grafik tygodniowy)  
+3. **Historia farmakoterapii**  
 4. **Prisma + Postgres** + API REST  
-5. **IVR / SMS** realne  
+5. Realne SMS/IVR  
 6. Integracja booking pacjenta ↔ EDM  
-7. RBAC granularne + audit log  
+7. RBAC + audit log  
 
 ---
 

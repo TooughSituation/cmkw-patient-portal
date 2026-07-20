@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import {
   Bell,
+  CalendarSearch,
   MessageSquare,
   Settings,
   Stethoscope,
@@ -24,13 +25,7 @@ import { DepartmentSwitcher } from "@/components/doctor/department-switcher";
 import { roleLabel } from "@/lib/auth/roles";
 import { toast } from "sonner";
 
-export function DoctorNavbar({
-  departmentId,
-  onDepartmentChange,
-}: {
-  departmentId: string;
-  onDepartmentChange: (id: string) => void;
-}) {
+export function DoctorNavbar() {
   const { data: session } = useSession();
   const user = session?.user;
   const initials = user
@@ -73,19 +68,27 @@ export function DoctorNavbar({
 
         <div className="mx-1 hidden h-6 w-px bg-slate-200 md:block" />
 
-        <DepartmentSwitcher
-          value={departmentId}
-          onChange={onDepartmentChange}
-        />
+        <DepartmentSwitcher />
 
         <div className="flex-1" />
 
         <div className="flex items-center gap-0.5">
           <Button
+            asChild
             variant="ghost"
             size="icon"
             className="size-9 text-slate-500 hover:bg-secondary hover:text-brand"
-            onClick={() => toast.info("Powiadomienia — wkrótce (Etap 3)")}
+            aria-label="Wyszukiwarka terminów"
+          >
+            <Link href="/doctor/terminy">
+              <CalendarSearch className="size-4" />
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-9 text-slate-500 hover:bg-secondary hover:text-brand"
+            onClick={() => toast.info("Powiadomienia — wkrótce")}
             aria-label="Powiadomienia"
           >
             <Bell className="size-4" />
@@ -94,19 +97,21 @@ export function DoctorNavbar({
             variant="ghost"
             size="icon"
             className="size-9 text-slate-500 hover:bg-secondary hover:text-brand"
-            onClick={() => toast.info("Wiadomości — wkrótce (Etap 3)")}
+            onClick={() => toast.info("Wiadomości — wkrótce")}
             aria-label="Wiadomości"
           >
             <MessageSquare className="size-4" />
           </Button>
           <Button
+            asChild
             variant="ghost"
             size="icon"
             className="size-9 text-slate-500 hover:bg-secondary hover:text-brand"
-            onClick={() => toast.info("Ustawienia — wkrótce (Etap 3)")}
-            aria-label="Ustawienia"
+            aria-label="Administracja"
           >
-            <Settings className="size-4" />
+            <Link href="/doctor/admin">
+              <Settings className="size-4" />
+            </Link>
           </Button>
 
           <DropdownMenu>
@@ -146,10 +151,10 @@ export function DoctorNavbar({
                 <Link href="/doctor">Kalendarz</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/doctor/wizyty">Lista wizyt</Link>
+                <Link href="/doctor/terminy">Terminy</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/doctor/pacjenci">Pacjenci</Link>
+                <Link href="/doctor/admin">Administracja</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <div className="p-1">

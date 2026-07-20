@@ -34,6 +34,8 @@ import {
   type VisitType,
   VISIT_TYPE_LABELS,
 } from "@/lib/doctor/types";
+import { useDoctorData } from "@/components/doctor/doctor-data-provider";
+import { ALL_BRANCHES_ID } from "@/lib/doctor/branches";
 
 export function QuickVisitDialog({
   trigger,
@@ -45,6 +47,7 @@ export function QuickVisitDialog({
   const router = useRouter();
   const { patients, loading: patientsLoading } = useDoctorPatients();
   const { addVisit } = useDoctorVisits();
+  const { branchFilter } = useDoctorData();
   const [open, setOpen] = useState(false);
   const [patientId, setPatientId] = useState("");
   const [doctorId, setDoctorId] = useState(doctors[0]?.id ?? "kiryluk");
@@ -117,6 +120,8 @@ export function QuickVisitDialog({
         : "",
       needsTeleconfirm: needsTele,
       departmentId: "ortopedia",
+      branchId:
+        branchFilter !== ALL_BRANCHES_ID ? branchFilter : "bialystok",
       createdAt: now,
       updatedAt: now,
     };

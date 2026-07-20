@@ -40,6 +40,7 @@ import { DocumentsPanel } from "@/components/doctor/documents-panel";
 import { EmptyState } from "@/components/doctor/empty-state";
 import { useDoctorVisits } from "@/hooks/use-doctor-visits";
 import { getDepartmentById } from "@/lib/doctor/departments";
+import { getBranchById } from "@/lib/doctor/branches";
 import {
   VISIT_TYPE_LABELS,
   maskPesel,
@@ -176,6 +177,7 @@ export function VisitCard({ visitId }: { visitId: string }) {
   }
 
   const dept = getDepartmentById(visit.departmentId);
+  const branch = getBranchById(visit.branchId);
 
   return (
     <div className="p-3 md:p-4 lg:p-5">
@@ -211,6 +213,7 @@ export function VisitCard({ visitId }: { visitId: string }) {
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
               {VISIT_TYPE_LABELS[visit.type]} · {visit.doctorName}
+              {branch ? ` · ${branch.shortName}` : ""}
               {dept ? ` · ${dept.shortName}` : ""}
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-3">
