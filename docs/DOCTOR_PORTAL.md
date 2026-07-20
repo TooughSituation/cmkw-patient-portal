@@ -1,6 +1,6 @@
 # Portal Lekarza / CMKW EDM
 
-**Status:** Etap 0–5A + **Etap 6B (Grafiki pracy + kalendarz D/T/M)**  
+**Status:** Etap 0–7 + **Etap 8 (Drag & Drop + zaawansowany UX kalendarza)**  
 **Prefix:** `/doctor/*`  
 **Role:** `doctor` | `admin` | `reception`  
 **Styl:** jasny brand CMKW (`#0849b0`, white / slate-50) — spójny z patient portalem
@@ -70,6 +70,23 @@ Usuń klucze i odśwież → seed od nowa.
 | `/doctor/terminy` | Wyszukiwarka wolnych terminów (Etap 5A) |
 | `/doctor/admin` | Administracja placówki (Etap 5A) |
 | `/doctor/admin/grafiki` | Grafiki pracy lekarzy (Etap 6B) |
+
+### Etap 8 — Drag & Drop + UX kalendarza
+
+1. Login `jan.kiryluk@cmkw.pl` / `jankiryluk123` → `/doctor`
+2. Widok **Dzień** lub **Tydzień** — przeciągnij wizytę na inny slot (ghost + highlight zielony/czerwony)
+3. Drop na wolny slot w grafiku → dialog potwierdzenia → toast + zapis w store
+4. Drop poza grafik / na zajęty / urlop → toast błędu, brak przeniesienia
+5. Zakończona / odwołana — nie da się przeciągnąć
+6. **PPM** na wizycie → Edytuj, status, Duplikuj, Anuluj, Otwórz kartę
+7. **2× klik** → karta wizyty; hover → tooltip (PESEL maskowany)
+8. Skróty: `N` szybka wizyta · `F` szukaj · `T` dziś · `←`/`→` · `1/2/3` widoki · `?` cheatsheet · `Esc` zamyka
+9. Kafelki dashboardu filtrują kalendarz (dziś / do potwierdzenia / w trakcie)
+10. Preferencje widoku i filtra lekarza w localStorage
+
+**Zależności:** `@dnd-kit/core`, `@dnd-kit/utilities`  
+**Komponenty:** `components/doctor/calendar/*`, `hooks/use-calendar-keyboard.ts`  
+**localStorage:** `cmkw-doctor-cal-mode-v1`, `cmkw-doctor-cal-doctor-v1` (+ visits store)
 
 ### Etap 6B — grafiki + kalendarz
 
@@ -150,15 +167,16 @@ lib/pesel.ts                 # buildPesel, parsePesel, isValidPesel
 
 ---
 
-## Etap 7 — propozycje
+## Etap 9 — propozycje
 
-1. **E-recepta / e-skierowanie** (P1)  
-2. **Drag & drop** wizyt w kalendarzu tygodniowym  
-3. **Historia farmakoterapii**  
-4. **Prisma + Postgres** + API REST  
-5. Realne SMS/IVR  
-6. Integracja booking pacjenta ↔ EDM  
-7. RBAC + audit log  
+1. **E-recepta / e-skierowanie** (P1) + szablony dokumentów  
+2. **Historia farmakoterapii** na karcie pacjenta  
+3. **Prisma + Postgres** + API REST (zamiast localStorage)  
+4. Realne SMS/IVR telepotwierdzeń  
+5. Integracja booking pacjenta ↔ EDM  
+6. RBAC + audit log  
+7. Kolumny wielu lekarzy w tygodniu (resource view)  
+8. Recurring visits / serie wizyt  
 
 ---
 

@@ -1,7 +1,7 @@
 # Podsumowanie projektu — CMKW Patient Portal (dla GrokWeb)
 
 **Data aktualizacji:** 2026-07-20  
-**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–7: separacja loginów, seed demo, UX polish)**  
+**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–8: DnD kalendarz, skróty, context menu)**  
 **Konto:** TooughSituation / toough-situation
 
 ---
@@ -40,7 +40,7 @@ Własne `.git`; parent `akwen-web` ignoruje ten folder.
 - Next.js **15.5** App Router · React 19 · TypeScript  
 - Tailwind CSS **v4** · shadcn/ui (Button, Card, Table, Badge, Select, Calendar, Dialog, DropdownMenu, Tabs, Input, Avatar, …)  
 - **Auth.js v5** — Credentials + JWT (8 h) + **role** w tokenie  
-- Zod · bcryptjs · date-fns · react-day-picker · sonner  
+- Zod · bcryptjs · date-fns · react-day-picker · sonner · **@dnd-kit/core** + **@dnd-kit/utilities**  
 
 ---
 
@@ -253,15 +253,22 @@ npm install && npm run dev   # http://localhost:3000
 
 ## 12. Backlog
 
-### EDM Etap 7
+### EDM Etap 8 (zrobione)
+
+- Drag & drop wizyt (dzień/tydzień) + walidacja grafiku  
+- Context menu, tooltip, double-click  
+- Keyboard shortcuts + cheatsheet (`?`)  
+- Dashboard kafelki filtrujące kalendarz  
+
+### EDM Etap 9
 
 1. E-recepta / e-skierowanie (P1)  
-2. Drag & drop w kalendarzu  
-3. Historia farmakoterapii  
-4. Prisma + API REST  
-5. Realne SMS/IVR  
-6. Integracja booking ↔ EDM  
-7. RBAC + audit  
+2. Historia farmakoterapii  
+3. Prisma + API REST  
+4. Realne SMS/IVR  
+5. Integracja booking ↔ EDM  
+6. RBAC + audit  
+7. Resource view (wiele kolumn lekarzy)  
 
 ### Platforma
 
@@ -285,17 +292,17 @@ npm install && npm run dev   # http://localhost:3000
 > **Gotowe:**  
 > - Pełny klon publicznej strony cmkirylukwenta.pl  
 > - Portal pacjenta: auth (PESEL+RODO), booking + mock płatność  
-> - **Portal Lekarza EDM Etap 0–7:** pełny EDM + **osobne loginy** (`/login` pacjent, `/doctor/login` lekarz), CTA na stronie, seed 6 lekarzy + 3 pacjentów, dashboard insights, UX polish  
+> - **Portal Lekarza EDM Etap 0–8:** pełny EDM + **DnD kalendarz** (dzień/tydzień), skróty klawiszowe, context menu, potwierdzenie przeniesienia, walidacja grafiku  
 > - Brand: `#0849b0`, white EDM shell  
 > - **Demo EDM:** `jan.kiryluk@cmkw.pl` / `jankiryluk123`  
 > - **Demo pacjent:** `jan.kowalski@email.pl` / `jankowalski123`  
 > - Docs: `docs/GROKWEB_SUMMARY.md`, `docs/DOCTOR_PORTAL.md`  
 >  
-> **Brak (Etap 8):** Prisma, e-recepta P1, drag&drop, realne SMS.  
+> **Brak (Etap 9):** Prisma, e-recepta P1, realne SMS, historia farmakoterapii.  
 > Następny krok: [tu wstaw zadanie].
 
 ---
 
 ## 14. TL;DR
 
-CMKW = **klon strony** + **portal pacjenta** + **Portal Lekarza EDM** (Etap 0–7: osobne loginy, seed demo, grafiki, karta wizyty…). Demo: `jan.kiryluk@cmkw.pl` / `jankiryluk123`. Kolejny etap: Prisma / e-recepta.
+CMKW = **klon strony** + **portal pacjenta** + **Portal Lekarza EDM** (Etap 0–8: DnD kalendarz, skróty, grafiki, karta wizyty…). Demo: `jan.kiryluk@cmkw.pl` / `jankiryluk123`. Kolejny etap: Prisma / e-recepta.

@@ -40,15 +40,21 @@ import { ALL_BRANCHES_ID } from "@/lib/doctor/branches";
 export function QuickVisitDialog({
   trigger,
   defaultDate,
+  open: openProp,
+  onOpenChange,
 }: {
   trigger: React.ReactNode;
   defaultDate?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const router = useRouter();
   const { patients, loading: patientsLoading } = useDoctorPatients();
   const { addVisit } = useDoctorVisits();
   const { branchFilter } = useDoctorData();
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const open = openProp ?? uncontrolledOpen;
+  const setOpen = onOpenChange ?? setUncontrolledOpen;
   const [patientId, setPatientId] = useState("");
   const [doctorId, setDoctorId] = useState(doctors[0]?.id ?? "kiryluk");
   const [date, setDate] = useState(
