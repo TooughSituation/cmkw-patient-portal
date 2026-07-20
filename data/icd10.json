@@ -1,0 +1,1544 @@
+[
+  {
+    "code": "M00.9",
+    "namePl": "Ropne zapalenie stawu, nieokreślone",
+    "nameLa": "Arthritis pyogenica, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-024",
+      "drug-025"
+    ]
+  },
+  {
+    "code": "M02.9",
+    "namePl": "Reaktywne zapalenie stawów, nieokreślone",
+    "nameLa": "Arthritis reaktiva, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M05.9",
+    "namePl": "Seropozytywne reumatoidalne zapalenie stawów, nieokreślone",
+    "nameLa": "Arthritis rheumatoides seropositiva, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Reumatologia",
+    "relatedDrugIds": [
+      "drug-034",
+      "drug-035",
+      "drug-003"
+    ]
+  },
+  {
+    "code": "M06.0",
+    "namePl": "Seronegatywne reumatoidalne zapalenie stawów",
+    "nameLa": "Arthritis rheumatoides seronegativa",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Reumatologia",
+    "relatedDrugIds": [
+      "drug-034"
+    ]
+  },
+  {
+    "code": "M06.9",
+    "namePl": "Reumatoidalne zapalenie stawów, nieokreślone",
+    "nameLa": "Arthritis rheumatoides, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Reumatologia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M08.0",
+    "namePl": "Młodzieńcze reumatoidalne zapalenie stawów",
+    "nameLa": "Arthritis rheumatoides juvenilis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Reumatologia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M10.0",
+    "namePl": "Idiopatyczna dna moczanowa",
+    "nameLa": "Arthritis urica idiopathica",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Reumatologia",
+    "relatedDrugIds": [
+      "drug-032",
+      "drug-033"
+    ]
+  },
+  {
+    "code": "M10.9",
+    "namePl": "Dna moczanowa, nieokreślona",
+    "nameLa": "Arthritis urica, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Reumatologia",
+    "relatedDrugIds": [
+      "drug-033"
+    ]
+  },
+  {
+    "code": "M13.9",
+    "namePl": "Zapalenie stawów, nieokreślone",
+    "nameLa": "Arthritis, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M15.0",
+    "namePl": "Pierwotna uogólniona choroba zwyrodnieniowa stawów",
+    "nameLa": "Osteoarthrosis polyarticularis primaria",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M16.0",
+    "namePl": "Pierwotna obustronna koksartroza",
+    "nameLa": "Coxarthrosis primaria bilateralis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-003",
+      "drug-023",
+      "drug-018"
+    ]
+  },
+  {
+    "code": "M16.1",
+    "namePl": "Inna pierwotna koksartroza",
+    "nameLa": "Alia coxarthrosis primaria",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-003",
+      "drug-022",
+      "drug-012"
+    ]
+  },
+  {
+    "code": "M16.9",
+    "namePl": "Koksartroza, nieokreślona",
+    "nameLa": "Coxarthrosis, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M17.0",
+    "namePl": "Pierwotna obustronna gonartroza",
+    "nameLa": "Gonarthrosis primaria bilateralis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-002",
+      "drug-017",
+      "drug-023"
+    ]
+  },
+  {
+    "code": "M17.1",
+    "namePl": "Inna pierwotna gonartroza",
+    "nameLa": "Alia gonarthrosis primaria",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-001",
+      "drug-017",
+      "drug-018",
+      "drug-040"
+    ]
+  },
+  {
+    "code": "M17.9",
+    "namePl": "Gonartroza, nieokreślona",
+    "nameLa": "Gonarthrosis, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M19.0",
+    "namePl": "Pierwotna artroza innych stawów",
+    "nameLa": "Osteoarthrosis primaria aliorum articulorum",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M19.9",
+    "namePl": "Artroza, nieokreślona",
+    "nameLa": "Osteoarthrosis, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-040"
+    ]
+  },
+  {
+    "code": "M20.1",
+    "namePl": "Hallux valgus (nabyty)",
+    "nameLa": "Hallux valgus (acquisitus)",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M20.2",
+    "namePl": "Hallux rigidus",
+    "nameLa": "Hallux rigidus",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M21.4",
+    "namePl": "Płaskostopie (pes planus) (nabyte)",
+    "nameLa": "Pes planus (acquisitus)",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M22.2",
+    "namePl": "Zaburzenia rzepkowo-udowe",
+    "nameLa": "Disorderum patellofemoralium",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M23.2",
+    "namePl": "Uszkodzenie łąkotki w wyniku starego urazu lub oderwania",
+    "nameLa": "Laesio menisci e trauma vetere",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M23.5",
+    "namePl": "Przewlekła niestabilność kolana",
+    "nameLa": "Instabilitas chronica genus",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M23.8",
+    "namePl": "Inne wewnętrzne uszkodzenia kolana",
+    "nameLa": "Aliae laesiones internae genus",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M24.2",
+    "namePl": "Zaburzenie więzadła",
+    "nameLa": "Disorderum ligamenti",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M24.7",
+    "namePl": "Protrusio acetabuli",
+    "nameLa": "Protrusio acetabuli",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M25.5",
+    "namePl": "Ból stawu",
+    "nameLa": "Dolor articuli",
+    "chapter": "M",
+    "kind": "Objaw",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-001",
+      "drug-005",
+      "drug-038",
+      "drug-041"
+    ]
+  },
+  {
+    "code": "M25.6",
+    "namePl": "Sztywność stawu, nie sklasyfikowana gdzie indziej",
+    "nameLa": "Rigiditas articuli",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M40.0",
+    "namePl": "Kifozowanie posturalne",
+    "nameLa": "Kyphosis posturalis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M41.9",
+    "namePl": "Skolioza, nieokreślona",
+    "nameLa": "Scoliosis, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M42.1",
+    "namePl": "Osteochondroza kręgosłupa dorosłych",
+    "nameLa": "Osteochondrosis spinalis adultorum",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M43.1",
+    "namePl": "Spondylolisteza",
+    "nameLa": "Spondylolisthesis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M45",
+    "namePl": "Zesztywniające zapalenie stawów kręgosłupa",
+    "nameLa": "Spondylitis ankylopoetica",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Reumatologia",
+    "relatedDrugIds": [
+      "drug-004",
+      "drug-022",
+      "drug-031"
+    ]
+  },
+  {
+    "code": "M46.1",
+    "namePl": "Zapaleniem stawów krzyżowo-biodrowych, nie sklasyfikowane gdzie indziej",
+    "nameLa": "Sacroiliitis, non alibi classificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Reumatologia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M47.8",
+    "namePl": "Inne spondylozy",
+    "nameLa": "Aliae spondyloses",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M47.9",
+    "namePl": "Spondyloza, nieokreślona",
+    "nameLa": "Spondylosis, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M48.0",
+    "namePl": "Stenoza kanału kręgowego",
+    "nameLa": "Stenosis canalis spinalis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M48.1",
+    "namePl": "Hiperostoza ankylozująca [Forestier]",
+    "nameLa": "Hyperostosis ankylosans [Forestier]",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M50.1",
+    "namePl": "Zaburzenie krążka międzykręgowego szyjnego z radikulopatią",
+    "nameLa": "Disorderum disci cervicalis cum radiculopathia",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-036",
+      "drug-037"
+    ]
+  },
+  {
+    "code": "M51.1",
+    "namePl": "Zaburzenia krążków międzykręgowych lędźwiowych i innych z radikulopatią",
+    "nameLa": "Disorderum disci lumbalis cum radiculopathia",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-009",
+      "drug-036"
+    ]
+  },
+  {
+    "code": "M51.2",
+    "namePl": "Inne określone przemieszczenie krążka międzykręgowego",
+    "nameLa": "Alia specificata dislocatio disci intervertebralis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M53.1",
+    "namePl": "Zespół szyjno-ramienny",
+    "nameLa": "Syndroma cervicobrachiale",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M54.1",
+    "namePl": "Radikulopatia",
+    "nameLa": "Radiculopathia",
+    "chapter": "M",
+    "kind": "Objaw",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-037"
+    ]
+  },
+  {
+    "code": "M54.2",
+    "namePl": "Ból karku",
+    "nameLa": "Cervicalgia",
+    "chapter": "M",
+    "kind": "Objaw",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-005",
+      "drug-009"
+    ]
+  },
+  {
+    "code": "M54.3",
+    "namePl": "Rwa kulszowa",
+    "nameLa": "Ischias",
+    "chapter": "M",
+    "kind": "Objaw",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-007",
+      "drug-009",
+      "drug-036"
+    ]
+  },
+  {
+    "code": "M54.4",
+    "namePl": "Lumbago z rwa kulszową",
+    "nameLa": "Lumbago cum ischiade",
+    "chapter": "M",
+    "kind": "Objaw",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-007",
+      "drug-009",
+      "drug-010",
+      "drug-036"
+    ]
+  },
+  {
+    "code": "M54.5",
+    "namePl": "Ból w dole pleców",
+    "nameLa": "Dorsalgia lumbalis",
+    "chapter": "M",
+    "kind": "Objaw",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-001",
+      "drug-006",
+      "drug-010",
+      "drug-041"
+    ]
+  },
+  {
+    "code": "M54.6",
+    "namePl": "Ból w piersiowym odcinku kręgosłupa",
+    "nameLa": "Dorsalgia thoracica",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M54.9",
+    "namePl": "Ból grzbietu, nieokreślony",
+    "nameLa": "Dorsalgia, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M60.9",
+    "namePl": "Zapalenie mięśni, nieokreślone",
+    "nameLa": "Myositis, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M62.4",
+    "namePl": "Przykurcz mięśnia",
+    "nameLa": "Contractura musculi",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-011"
+    ]
+  },
+  {
+    "code": "M62.8",
+    "namePl": "Inne określone zaburzenia mięśni",
+    "nameLa": "Alia specificata disordera musculorum",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-009"
+    ]
+  },
+  {
+    "code": "M65.4",
+    "namePl": "Zapalenie pochewki ścięgna mięśnia zginacza długiego kciuka [de Quervain]",
+    "nameLa": "Tendovaginitis de Quervain",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-020"
+    ]
+  },
+  {
+    "code": "M65.9",
+    "namePl": "Zapalenie błony maziowej i pochewki ścięgna, nieokreślone",
+    "nameLa": "Synovitis et tenosynovitis, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-019"
+    ]
+  },
+  {
+    "code": "M67.4",
+    "namePl": "Ganglion",
+    "nameLa": "Ganglion",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M70.2",
+    "namePl": "Zapalenie kaletki wyrostka łokciowego",
+    "nameLa": "Bursitis olecrani",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M70.4",
+    "namePl": "Zapalenie kaletki przedrzepkowej",
+    "nameLa": "Bursitis praepatellaris",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M70.6",
+    "namePl": "Zapalenie kaletki krętarza",
+    "nameLa": "Bursitis trochanterica",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-019"
+    ]
+  },
+  {
+    "code": "M72.0",
+    "namePl": "Przykurcz rozcięgna dłoniowego [Dupuytren]",
+    "nameLa": "Fibromatosis palmaris [Dupuytren]",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M72.2",
+    "namePl": "Guzykowatość podeszwowa",
+    "nameLa": "Fibromatosis plantaris",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M75.0",
+    "namePl": "Zapalenie torebki stawowej barku",
+    "nameLa": "Capsulitis adhesiva humeri",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M75.1",
+    "namePl": "Zespół stożka rotatorów",
+    "nameLa": "Syndroma cuffae rotatorum",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-019",
+      "drug-038"
+    ]
+  },
+  {
+    "code": "M75.3",
+    "namePl": "Zapalne zapalenie ścięgna naramiennego",
+    "nameLa": "Tendinitis calcarea",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M75.4",
+    "namePl": "Zespół ciasnoty podbarkowej",
+    "nameLa": "Syndroma impingement",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-020"
+    ]
+  },
+  {
+    "code": "M75.5",
+    "namePl": "Zapalenie kaletki barku",
+    "nameLa": "Bursitis humeri",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M76.6",
+    "namePl": "Zapalenie ścięgna Achillesa",
+    "nameLa": "Tendinitis Achillis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-026",
+      "drug-038"
+    ]
+  },
+  {
+    "code": "M77.0",
+    "namePl": "Przyczepowe zapalenie nadkłykcia przyśrodkowego",
+    "nameLa": "Epicondylitis medialis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-020"
+    ]
+  },
+  {
+    "code": "M77.1",
+    "namePl": "Przyczepowe zapalenie nadkłykcia bocznego",
+    "nameLa": "Epicondylitis lateralis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-019"
+    ]
+  },
+  {
+    "code": "M77.3",
+    "namePl": "Ostroga piętowa",
+    "nameLa": "Calcar calcanei",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M79.1",
+    "namePl": "Bóle mięśni",
+    "nameLa": "Myalgia",
+    "chapter": "M",
+    "kind": "Objaw",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-001",
+      "drug-005",
+      "drug-038"
+    ]
+  },
+  {
+    "code": "M79.2",
+    "namePl": "Nerwoból i zapalenie nerwu, nieokreślone",
+    "nameLa": "Neuralgia et neuritis, non specificata",
+    "chapter": "M",
+    "kind": "Objaw",
+    "specialty": "Neurologia",
+    "relatedDrugIds": [
+      "drug-037"
+    ]
+  },
+  {
+    "code": "M79.3",
+    "namePl": "Panniculitis, nieokreślone",
+    "nameLa": "Panniculitis, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M79.6",
+    "namePl": "Ból w kończynie",
+    "nameLa": "Dolor in extremitate",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M79.7",
+    "namePl": "Fibromialgia",
+    "nameLa": "Fibromyalgia",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Reumatologia",
+    "relatedDrugIds": [
+      "drug-037"
+    ]
+  },
+  {
+    "code": "M79.8",
+    "namePl": "Inne określone zaburzenia tkanek miękkich",
+    "nameLa": "Alia specificata disordera textus mollis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-039"
+    ]
+  },
+  {
+    "code": "M80.0",
+    "namePl": "Osteoporoza pomenopauzalna ze złamaniem patologicznym",
+    "nameLa": "Osteoporosis postmenopausalis cum fractura pathologica",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-012",
+      "drug-013",
+      "drug-014",
+      "drug-015"
+    ]
+  },
+  {
+    "code": "M80.5",
+    "namePl": "Osteoporoza idiopatyczna ze złamaniem patologicznym",
+    "nameLa": "Osteoporosis idiopathica cum fractura pathologica",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M81.0",
+    "namePl": "Osteoporoza pomenopauzalna",
+    "nameLa": "Osteoporosis postmenopausalis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-012",
+      "drug-014",
+      "drug-015",
+      "drug-016"
+    ]
+  },
+  {
+    "code": "M81.8",
+    "namePl": "Inna osteoporoza",
+    "nameLa": "Alia osteoporosis",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M84.0",
+    "namePl": "Złe zrosty złamania",
+    "nameLa": "Malunio fracturae",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M84.1",
+    "namePl": "Brak zrostu złamania [pseudoartroza]",
+    "nameLa": "Non unio fracturae [pseudoarthrosis]",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-008"
+    ]
+  },
+  {
+    "code": "M84.3",
+    "namePl": "Złamanie z przeciążenia, nie sklasyfikowane gdzie indziej",
+    "nameLa": "Fractura a fatigatione",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M84.4",
+    "namePl": "Złamanie patologiczne, nie sklasyfikowane gdzie indziej",
+    "nameLa": "Fractura pathologica",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-014"
+    ]
+  },
+  {
+    "code": "M86.1",
+    "namePl": "Inne ostre ropne zapalenie kości i szpiku",
+    "nameLa": "Alia osteomyelitis acuta purulenta",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-025"
+    ]
+  },
+  {
+    "code": "M86.6",
+    "namePl": "Inne przewlekłe zapalenie kości i szpiku",
+    "nameLa": "Alia osteomyelitis chronica",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M86.9",
+    "namePl": "Zapalenie kości i szpiku, nieokreślone",
+    "nameLa": "Osteomyelitis, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-026"
+    ]
+  },
+  {
+    "code": "M87.0",
+    "namePl": "Jałowa martwica kości idiopatyczna",
+    "nameLa": "Necrosis aseptica ossis idiopathica",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M87.9",
+    "namePl": "Jałowa martwica kości, nieokreślona",
+    "nameLa": "Necrosis aseptica ossis, non specificata",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M93.0",
+    "namePl": "Złamanie nasady kości udowej (nieurazowe)",
+    "nameLa": "Epiphyseolysis capitis femoris non traumatica",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "M94.0",
+    "namePl": "Zespół chrzęstno-żebrowy [Tietze]",
+    "nameLa": "Syndroma costochondrale [Tietze]",
+    "chapter": "M",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S13.4",
+    "namePl": "Skręcenie i naderwanie kręgosłupa szyjnego",
+    "nameLa": "Distorsio et distensio columnae cervicalis",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S22.0",
+    "namePl": "Złamanie kręgu piersiowego",
+    "nameLa": "Fractura vertebrae thoracicae",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S32.0",
+    "namePl": "Złamanie kręgu lędźwiowego",
+    "nameLa": "Fractura vertebrae lumbalis",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S42.0",
+    "namePl": "Złamanie obojczyka",
+    "nameLa": "Fractura claviculae",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S42.2",
+    "namePl": "Złamanie górnego końca kości ramiennej",
+    "nameLa": "Fractura extremitatis superioris humeri",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S42.3",
+    "namePl": "Złamanie trzonu kości ramiennej",
+    "nameLa": "Fractura corporis humeri",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S43.0",
+    "namePl": "Zwichnięcie stawu ramiennego",
+    "nameLa": "Luxatio articuli humeri",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S43.1",
+    "namePl": "Zwichnięcie stawu barkowo-obojczykowego",
+    "nameLa": "Luxatio articuli acromioclavicularis",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S52.5",
+    "namePl": "Złamanie dolnego końca kości promieniowej",
+    "nameLa": "Fractura extremitatis inferioris radii",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S52.6",
+    "namePl": "Złamanie dolnego końca obu kości przedramienia",
+    "nameLa": "Fractura extremitatis inferioris ulnae et radii",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S62.3",
+    "namePl": "Złamanie innej kości śródręcza",
+    "nameLa": "Fractura aliorum ossium metacarpalium",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S72.0",
+    "namePl": "Złamanie szyjki kości udowej",
+    "nameLa": "Fractura colli femoris",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-027",
+      "drug-028"
+    ]
+  },
+  {
+    "code": "S72.1",
+    "namePl": "Złamanie przezkrętarzowe",
+    "nameLa": "Fractura pertrochanterica",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-028"
+    ]
+  },
+  {
+    "code": "S72.3",
+    "namePl": "Złamanie trzonu kości udowej",
+    "nameLa": "Fractura corporis femoris",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S82.0",
+    "namePl": "Złamanie rzepki",
+    "nameLa": "Fractura patellae",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S82.1",
+    "namePl": "Złamanie bliższego końca kości piszczelowej",
+    "nameLa": "Fractura extremitatis superioris tibiae",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S82.6",
+    "namePl": "Złamanie kostki bocznej",
+    "nameLa": "Fractura malleoli lateralis",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S83.2",
+    "namePl": "Rozerwanie łąkotki, świeże",
+    "nameLa": "Ruptura menisci, recens",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S83.4",
+    "namePl": "Skręcenie i naderwanie więzadła pobocznego kolana",
+    "nameLa": "Distorsio et distensio ligamenti collateralis genus",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S83.5",
+    "namePl": "Skręcenie i naderwanie więzadła krzyżowego kolana",
+    "nameLa": "Distorsio et distensio ligamenti cruciati genus",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-007"
+    ]
+  },
+  {
+    "code": "S86.0",
+    "namePl": "Uraz ścięgna Achillesa",
+    "nameLa": "Laesio tendinis Achillis",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S92.0",
+    "namePl": "Złamanie kości piętowej",
+    "nameLa": "Fractura calcanei",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "S93.4",
+    "namePl": "Skręcenie i naderwanie stawu skokowego",
+    "nameLa": "Distorsio et distensio articuli talocruralis",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-038",
+      "drug-039"
+    ]
+  },
+  {
+    "code": "S93.5",
+    "namePl": "Skręcenie i naderwanie stawów i więzadeł stopy",
+    "nameLa": "Distorsio et distensio articulorum et ligamentorum pedis",
+    "chapter": "S",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "T14.9",
+    "namePl": "Uraz, nieokreślony",
+    "nameLa": "Trauma, non specificatum",
+    "chapter": "T",
+    "kind": "Uraz",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-007"
+    ]
+  },
+  {
+    "code": "T81.4",
+    "namePl": "Zakażenie po zabiegu, nie sklasyfikowane gdzie indziej",
+    "nameLa": "Infectio postproceduralis",
+    "chapter": "T",
+    "kind": "Powikłanie",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-024"
+    ]
+  },
+  {
+    "code": "T84.0",
+    "namePl": "Mechaniczne powikłanie wewnętrznej protezy stawu",
+    "nameLa": "Complicatio mechanica prostheseos articuli internae",
+    "chapter": "T",
+    "kind": "Powikłanie",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "T84.5",
+    "namePl": "Zakażenie i odczyn zapalny spowodowane przez endoprotezę stawu",
+    "nameLa": "Infectio et reactio inflammatoria propter prosthesin articuli",
+    "chapter": "T",
+    "kind": "Powikłanie",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-024"
+    ]
+  },
+  {
+    "code": "T93.1",
+    "namePl": "Następstwa złamania kości udowej",
+    "nameLa": "Sequelae fracturae femoris",
+    "chapter": "T",
+    "kind": "Następstwa",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "A46",
+    "namePl": "Róża",
+    "nameLa": "Erysipelas",
+    "chapter": "A",
+    "kind": "Choroba",
+    "specialty": "Choroby zakaźne",
+    "relatedDrugIds": [
+      "drug-025"
+    ]
+  },
+  {
+    "code": "A49.0",
+    "namePl": "Zakażenie gronkowcowe, nieokreślone",
+    "nameLa": "Infectio staphylococcica, non specificata",
+    "chapter": "A",
+    "kind": "Choroba",
+    "specialty": "Choroby zakaźne",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "B02.2",
+    "namePl": "Półpasiec z innym zajęciem układu nerwowego",
+    "nameLa": "Zoster cum alia implicatione systematis nervosi",
+    "chapter": "B",
+    "kind": "Choroba",
+    "specialty": "Neurologia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "E11.9",
+    "namePl": "Cukrzyca insulinoniezależna bez powikłań",
+    "nameLa": "Diabetes mellitus non insulinodependens sine complicationibus",
+    "chapter": "E",
+    "kind": "Choroba",
+    "specialty": "Diabetologia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "E55.9",
+    "namePl": "Niedobór witaminy D, nieokreślony",
+    "nameLa": "Defectus vitamine D, non specificatus",
+    "chapter": "E",
+    "kind": "Choroba",
+    "specialty": "Endokrynologia",
+    "relatedDrugIds": [
+      "drug-015",
+      "drug-016"
+    ]
+  },
+  {
+    "code": "E78.0",
+    "namePl": "Czysta hipercholesterolemia",
+    "nameLa": "Hypercholesterolaemia pura",
+    "chapter": "E",
+    "kind": "Choroba",
+    "specialty": "Kardiologia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "E79.0",
+    "namePl": "Hiperurykemia bez objawów zapalenia stawów i tophi",
+    "nameLa": "Hyperuricaemia sine signis arthritis et tophi",
+    "chapter": "E",
+    "kind": "Choroba",
+    "specialty": "Reumatologia",
+    "relatedDrugIds": [
+      "drug-033"
+    ]
+  },
+  {
+    "code": "G35",
+    "namePl": "Stwardnienie rozsiane",
+    "nameLa": "Sclerosis multiplex",
+    "chapter": "G",
+    "kind": "Choroba",
+    "specialty": "Neurologia",
+    "relatedDrugIds": [
+      "drug-010",
+      "drug-011"
+    ]
+  },
+  {
+    "code": "G56.0",
+    "namePl": "Zespół cieśni nadgarstka",
+    "nameLa": "Syndroma canalis carpi",
+    "chapter": "G",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-036"
+    ]
+  },
+  {
+    "code": "G57.1",
+    "namePl": "Meralgia paresthetica",
+    "nameLa": "Meralgia paraesthetica",
+    "chapter": "G",
+    "kind": "Choroba",
+    "specialty": "Neurologia",
+    "relatedDrugIds": [
+      "drug-036"
+    ]
+  },
+  {
+    "code": "G62.9",
+    "namePl": "Polineuropatia, nieokreślona",
+    "nameLa": "Polyneuropathia, non specificata",
+    "chapter": "G",
+    "kind": "Choroba",
+    "specialty": "Neurologia",
+    "relatedDrugIds": [
+      "drug-037"
+    ]
+  },
+  {
+    "code": "G80",
+    "namePl": "Mózgowe porażenie dziecięce",
+    "nameLa": "Paralysis cerebralis infantilis",
+    "chapter": "G",
+    "kind": "Choroba",
+    "specialty": "Neurologia",
+    "relatedDrugIds": [
+      "drug-011"
+    ]
+  },
+  {
+    "code": "G81",
+    "namePl": "Porażenie połowicze",
+    "nameLa": "Hemiplegia",
+    "chapter": "G",
+    "kind": "Choroba",
+    "specialty": "Neurologia",
+    "relatedDrugIds": [
+      "drug-009"
+    ]
+  },
+  {
+    "code": "I10",
+    "namePl": "Samoistne (pierwotne) nadciśnienie",
+    "nameLa": "Hypertensio essentialis (primaria)",
+    "chapter": "I",
+    "kind": "Choroba",
+    "specialty": "Kardiologia",
+    "relatedDrugIds": [
+      "drug-042"
+    ]
+  },
+  {
+    "code": "I25.1",
+    "namePl": "Choroba niedokrwienna serca z miażdżycą tętnic wieńcowych",
+    "nameLa": "Morbus ischemicus cordis atheroscleroticus",
+    "chapter": "I",
+    "kind": "Choroba",
+    "specialty": "Kardiologia",
+    "relatedDrugIds": [
+      "drug-042"
+    ]
+  },
+  {
+    "code": "I26.9",
+    "namePl": "Zator tętnicy płucnej bez wzmianki o ostrym sercu płucnym",
+    "nameLa": "Embolia arteriae pulmonalis sine cor pulmonale acuto",
+    "chapter": "I",
+    "kind": "Choroba",
+    "specialty": "Kardiologia",
+    "relatedDrugIds": [
+      "drug-027"
+    ]
+  },
+  {
+    "code": "I82.9",
+    "namePl": "Zator i zakrzep żyły, nieokreślony",
+    "nameLa": "Embolia et thrombosis venae, non specificata",
+    "chapter": "I",
+    "kind": "Choroba",
+    "specialty": "Kardiologia",
+    "relatedDrugIds": [
+      "drug-028"
+    ]
+  },
+  {
+    "code": "J06.9",
+    "namePl": "Ostre zakażenie górnych dróg oddechowych, nieokreślone",
+    "nameLa": "Infectio acuta tractus respiratorii superioris, non specificata",
+    "chapter": "J",
+    "kind": "Choroba",
+    "specialty": "POZ",
+    "relatedDrugIds": [
+      "drug-025"
+    ]
+  },
+  {
+    "code": "K21.0",
+    "namePl": "Choroba refluksowa przełyku z zapaleniem przełyku",
+    "nameLa": "Morbus refluxus oesophageus cum oesophagitis",
+    "chapter": "K",
+    "kind": "Choroba",
+    "specialty": "Gastroenterologia",
+    "relatedDrugIds": [
+      "drug-029"
+    ]
+  },
+  {
+    "code": "K21.9",
+    "namePl": "Choroba refluksowa przełyku bez zapalenia przełyku",
+    "nameLa": "Morbus refluxus oesophageus sine oesophagitis",
+    "chapter": "K",
+    "kind": "Choroba",
+    "specialty": "Gastroenterologia",
+    "relatedDrugIds": [
+      "drug-030"
+    ]
+  },
+  {
+    "code": "K25.9",
+    "namePl": "Wrzód żołądka, nieokreślony jako ostry lub przewlekły, bez krwotoku lub perforacji",
+    "nameLa": "Ulcus ventriculi",
+    "chapter": "K",
+    "kind": "Choroba",
+    "specialty": "Gastroenterologia",
+    "relatedDrugIds": [
+      "drug-029"
+    ]
+  },
+  {
+    "code": "K29.7",
+    "namePl": "Zapalenie żołądka, nieokreślone",
+    "nameLa": "Gastritis, non specificata",
+    "chapter": "K",
+    "kind": "Choroba",
+    "specialty": "Gastroenterologia",
+    "relatedDrugIds": [
+      "drug-030"
+    ]
+  },
+  {
+    "code": "L03.1",
+    "namePl": "Ropień skóry, czyrak i czyrak gromadny kończyny",
+    "nameLa": "Abscessus cutis, furunculus et carbunculus membri",
+    "chapter": "L",
+    "kind": "Choroba",
+    "specialty": "Dermatologia",
+    "relatedDrugIds": [
+      "drug-024"
+    ]
+  },
+  {
+    "code": "L08.9",
+    "namePl": "Miejscowe zakażenie skóry i tkanki podskórnej, nieokreślone",
+    "nameLa": "Infectio localis cutis et subcutis, non specificata",
+    "chapter": "L",
+    "kind": "Choroba",
+    "specialty": "Dermatologia",
+    "relatedDrugIds": [
+      "drug-025"
+    ]
+  },
+  {
+    "code": "L40.5",
+    "namePl": "Łuszczyca stawowa",
+    "nameLa": "Psoriasis arthropathica",
+    "chapter": "L",
+    "kind": "Choroba",
+    "specialty": "Reumatologia",
+    "relatedDrugIds": [
+      "drug-034"
+    ]
+  },
+  {
+    "code": "R52",
+    "namePl": "Ból, nie sklasyfikowany gdzie indziej",
+    "nameLa": "Dolor, non alibi classificatus",
+    "chapter": "R",
+    "kind": "Objaw",
+    "specialty": "POZ",
+    "relatedDrugIds": [
+      "drug-005",
+      "drug-006"
+    ]
+  },
+  {
+    "code": "R26.2",
+    "namePl": "Trudności w chodzeniu, nie sklasyfikowane gdzie indziej",
+    "nameLa": "Difficultas ambulandi",
+    "chapter": "R",
+    "kind": "Choroba",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "Z47.0",
+    "namePl": "Kontrola po artroplastyce",
+    "nameLa": "Cura post arthroplasty",
+    "chapter": "Z",
+    "kind": "Czynnik zdrowotny",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "Z96.6",
+    "namePl": "Obecność endoprotezy stawu",
+    "nameLa": "Praesentia prostheseos articuli",
+    "chapter": "Z",
+    "kind": "Czynnik zdrowotny",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": [
+      "drug-027",
+      "drug-028"
+    ]
+  },
+  {
+    "code": "Z96.7",
+    "namePl": "Obecność innych implantów kości i ścięgien",
+    "nameLa": "Praesentia aliorum implantatorum ossis et tendinis",
+    "chapter": "Z",
+    "kind": "Czynnik zdrowotny",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  },
+  {
+    "code": "Z98.1",
+    "namePl": "Stan po artrodezie",
+    "nameLa": "Status post arthrodesin",
+    "chapter": "Z",
+    "kind": "Czynnik zdrowotny",
+    "specialty": "Ortopedia",
+    "relatedDrugIds": []
+  }
+]

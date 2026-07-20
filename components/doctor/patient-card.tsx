@@ -5,10 +5,13 @@ import { useMemo } from "react";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
 import {
+  BookMarked,
+  Calculator,
   CalendarPlus,
   FileText,
   Loader2,
   Pencil,
+  Pill,
   Printer,
   UserRound,
 } from "lucide-react";
@@ -151,6 +154,18 @@ export function PatientCard({ patientId }: { patientId: string }) {
           >
             <Printer className="size-4" />
             Drukuj
+          </Button>
+          <Button asChild variant="outline" className="h-9 gap-1.5">
+            <Link href="/doctor/leki">
+              <Pill className="size-4" />
+              Dodaj lek
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="h-9 gap-1.5">
+            <Link href="/doctor/icd10">
+              <BookMarked className="size-4" />
+              Dodaj kod ICD
+            </Link>
           </Button>
         </div>
       </div>
@@ -384,6 +399,20 @@ export function PatientCard({ patientId }: { patientId: string }) {
           <Button asChild variant="outline" className="w-full">
             <Link href="/doctor/pacjenci">← Lista pacjentów</Link>
           </Button>
+          <div className="grid grid-cols-2 gap-2">
+            <Button asChild variant="outline" size="sm" className="h-9 gap-1">
+              <Link href="/doctor/leki">
+                <Pill className="size-3.5" />
+                Leki
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm" className="h-9 gap-1">
+              <Link href="/doctor/kalkulatory">
+                <Calculator className="size-3.5" />
+                Kalk.
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
     </div>

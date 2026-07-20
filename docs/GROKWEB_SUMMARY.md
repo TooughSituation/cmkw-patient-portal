@@ -1,7 +1,7 @@
 # Podsumowanie projektu — CMKW Patient Portal (dla GrokWeb)
 
 **Data aktualizacji:** 2026-07-20  
-**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–2: kalendarz, wizyty, pacjenci CRUD)**  
+**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–3: + leki, ICD-10, kalkulatory)**  
 **Konto:** TooughSituation / toough-situation
 
 ---
@@ -79,6 +79,9 @@ Własne `.git`; parent `akwen-web` ignoruje ten folder.
 | `/doctor/pacjenci/nowy` | Dodawanie (Zod + RHF) |
 | `/doctor/pacjenci/[id]` | Karta pacjenta (zakładki + podsumowanie) |
 | `/doctor/pacjenci/[id]/edytuj` | Edycja (pełny PESEL tylko tu) |
+| `/doctor/leki` | Baza leków (42 seed, panel szczegółów) |
+| `/doctor/icd10` | ICD-10 (~151 kodów, filtr rozdziałów, kopiuj) |
+| `/doctor/kalkulatory` | 15 kalkulatorów medycznych |
 
 **Styl EDM:** jasny layout CMKW (white navbar, `#0849b0`) — **nie** dark MyDr.
 
@@ -243,15 +246,15 @@ npm install && npm run dev   # http://localhost:3000
 
 ## 12. Backlog
 
-### EDM Etap 3
+### EDM Etap 4
 
-1. Baza leków + ICD-10 + kalkulatory  
-2. Karta wizyty EDM (wywiad, rozpoznanie, zalecenia)  
-3. Telepotwierdzenia / IVR  
-4. Dokumenty w karcie pacjenta  
+1. Karta wizyty EDM (wywiad, ICD, leki, zalecenia)  
+2. Telepotwierdzenia / IVR  
+3. Dokumenty w karcie pacjenta  
+4. Historia leków/ICD przy pacjencie  
 5. API REST doctor + integracja z bookingiem pacjenta  
 6. Prisma + Postgres  
-7. RBAC granularne (reception vs doctor vs admin)  
+7. RBAC granularne  
 
 ### Platforma
 
@@ -275,16 +278,16 @@ npm install && npm run dev   # http://localhost:3000
 > **Gotowe:**  
 > - Pełny klon publicznej strony cmkirylukwenta.pl  
 > - Portal pacjenta: auth (PESEL+RODO), booking + mock płatność  
-> - **Portal Lekarza EDM Etap 0–2:** kalendarz, wizyty, **pacjenci CRUD + karta**; jasny brand CMKW; role doctor|admin|reception; 20 pacjentów + 20 wizyt  
-> - Brand: `#0849b0`, white EDM shell (nie dark MyDr)  
+> - **Portal Lekarza EDM Etap 0–3:** kalendarz, wizyty, pacjenci CRUD, **leki, ICD-10, kalkulatory**; jasny brand CMKW  
+> - Brand: `#0849b0`, white EDM shell  
 > - Docs: `docs/GROKWEB_SUMMARY.md`, `docs/DOCTOR_PORTAL.md`  
 >  
 > **Demo EDM:** `jan.kiryluk@cmkw.pl` / `Lekarz123!`  
-> **Brak (Etap 3):** leki, ICD, kalkulatory, karta wizyty, Prisma, realna płatność.  
+> **Brak (Etap 4):** karta wizyty EDM, telepotwierdzenia, Prisma, realna płatność.  
 > Następny krok: [tu wstaw zadanie].
 
 ---
 
 ## 14. TL;DR
 
-CMKW = **klon strony** cmkirylukwenta.pl + **portal pacjenta** + **Portal Lekarza EDM** (kalendarz, wizyty, pacjenci CRUD/karta — Etap 0–2), jasny brand CMKW. Store: localStorage + `.data`. Kolejny etap: leki / ICD / karta wizyty / Prisma.
+CMKW = **klon strony** + **portal pacjenta** + **Portal Lekarza EDM** (Etap 0–3: kalendarz, wizyty, pacjenci, leki, ICD-10, kalkulatory). Store: localStorage + `.data` + `data/*.json`. Kolejny etap: karta wizyty EDM / Prisma.

@@ -1,11 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import {
   Eye,
   MoreHorizontal,
   Pencil,
   CheckCircle2,
   XCircle,
+  Pill,
+  BookMarked,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -82,6 +85,19 @@ export function VisitRowActions({
           >
             <CheckCircle2 className="size-4 text-emerald-600" />
             Zakończ
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link href="/doctor/leki">
+              <Pill className="size-4" />
+              Dodaj lek
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/doctor/icd10">
+              <BookMarked className="size-4" />
+              Dodaj kod ICD
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

@@ -28,7 +28,7 @@ export function DoctorTabs() {
                 key={item.href}
                 type="button"
                 onClick={() =>
-                  toast.info(`${item.label} — dostępne w Etapie 3`)
+                  toast.info(`${item.label} — wkrótce (Etap 4)`)
                 }
                 className={cn(
                   "relative shrink-0 border-b-2 border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:text-slate-600 md:px-4",

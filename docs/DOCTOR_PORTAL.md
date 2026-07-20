@@ -1,6 +1,6 @@
 # Portal Lekarza / CMKW EDM
 
-**Status:** Etap 0–1 (kalendarz + wizyty) + **Etap 2 (Pacjenci CRUD)**  
+**Status:** Etap 0–2 + **Etap 3 (Leki + ICD-10 + Kalkulatory)**  
 **Prefix:** `/doctor/*`  
 **Role:** `doctor` | `admin` | `reception`  
 **Styl:** jasny brand CMKW (`#0849b0`, white / slate-50) — spójny z patient portalem
@@ -62,10 +62,25 @@ Usuń klucze i odśwież → seed od nowa.
 | `/doctor/pacjenci/nowy` | Dodawanie |
 | `/doctor/pacjenci/[id]` | Karta |
 | `/doctor/pacjenci/[id]/edytuj` | Edycja |
+| `/doctor/leki` | Baza leków (Etap 3) |
+| `/doctor/icd10` | ICD-10 (Etap 3) |
+| `/doctor/kalkulatory` | Kalkulatory medyczne (Etap 3) |
+
+### Etap 3 — test
+
+1. Menu: **Leki | ICD-10 | Kalkulatory**
+2. `/doctor/leki` — szukaj „ketoprofen” / „Ketonal” → panel szczegółów
+3. `/doctor/icd10` — filtr rozdział M, kod M17.1, **Kopiuj**, powiązane leki
+4. `/doctor/kalkulatory` — BMI, eGFR, BASDAI, HOMA, CHA₂DS₂-VASc…
+5. Karta pacjenta → „Dodaj lek” / „Dodaj kod ICD”
+6. Menu wizyty → akcje → Dodaj lek / ICD
+
+**Seed:** 42 leki (`data/drugs.json`), 151 kodów ICD (`data/icd10.json`), 15 kalkulatorów.  
+**localStorage:** `cmkw-doctor-drugs-v1`, `cmkw-doctor-icd10-v1`
 
 ---
 
-## Struktura (Etap 2)
+## Struktura (Etap 2–3)
 
 ```
 app/doctor/pacjenci/
@@ -96,17 +111,15 @@ lib/pesel.ts                 # buildPesel, parsePesel, isValidPesel
 
 ---
 
-## Etap 3 — propozycje
+## Etap 4 — propozycje
 
-1. **Baza leków** — wyszukiwarka + mock katalog + przypisanie do wizyty  
-2. **ICD-10** — kody + podpowiedzi w karcie wizyty  
-3. **Kalkulatory** — BMI, eGFR, dawki  
-4. **Karta wizyty EDM** — wywiad, rozpoznanie, zalecenia, e-recepta placeholder  
-5. **Telepotwierdzenia** + IVR  
-6. **Dokumenty** w karcie pacjenta (upload mock)  
-7. **Prisma + Postgres** — migracja z localStorage / `.data`  
-8. **API** `/api/doctor/patients`, `/api/doctor/visits`  
-9. Integracja booking pacjenta ↔ EDM  
+1. **Karta wizyty EDM** — wywiad, rozpoznanie (ICD), leki, zalecenia, e-recepta placeholder  
+2. **Telepotwierdzenia** + IVR  
+3. **Dokumenty** w karcie pacjenta  
+4. **Przypisywanie leków/ICD do wizyty/pacjenta** (historia farmakoterapii)  
+5. **Prisma + Postgres**  
+6. **API** doctor REST  
+7. Integracja booking pacjenta ↔ EDM  
 
 ---
 
