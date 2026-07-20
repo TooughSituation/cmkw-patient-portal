@@ -37,12 +37,30 @@ export function isFacilityRole(role: string | undefined | null): boolean {
 }
 
 /**
- * Widok całej placówki (bez izolacji lekarza):
- * facility, admin, reception.
- * Zwykły `doctor` jest izolowany.
+ * Widok multi-lekarz (bez izolacji do własnego doctorId):
+ * - `facility` — pełna placówka + przełącznik lekarzy
+ * - `reception` — operacyjnie widzi wszystkich (bez izolacji)
+ *
+ * `doctor` oraz `admin` z kontem lekarza (doctorId) są izolowani
+ * do własnego kalendarza (+ jawne udostępnienia).
  */
-export function canSeeAllDoctors(role: string | undefined | null): boolean {
-  return role === "facility" || role === "admin" || role === "reception";
+export function canSeeAllDoctors(
+  role: string | undefined | null,
+  doctorId?: string | null
+): boolean {
+  if (role === "facility" || role === "reception") return true;
+  // Admin bez doctorId (czyste konto admin) — widok placówki
+  if (role === "admin" && !doctorId) return true;
+  return false;
+}
+
+/** Indywidualny klinicysta (własny kalendarz) */
+export function isIndividualClinician(
+  role: string | undefined | null,
+  doctorId?: string | null
+): boolean {
+  if (!doctorId) return false;
+  return role === "doctor" || role === "admin";
 }
 
 /** Ustawienia placówki / admin panel */

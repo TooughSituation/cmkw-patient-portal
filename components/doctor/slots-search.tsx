@@ -52,8 +52,16 @@ const SPECIALTIES = [
 
 export function SlotsSearch() {
   const router = useRouter();
-  const { branchFilter, staff, visitTypes, schedules, adminLoading } =
-    useDoctorData();
+  const {
+    branchFilter,
+    staff,
+    visitTypes,
+    schedules,
+    adminLoading,
+    seesAllDoctors,
+    ownDoctorId,
+    allStaffDoctors,
+  } = useDoctorData();
   const { patients } = useDoctorPatients();
   const { addVisit, allVisits } = useDoctorVisits();
 
@@ -73,21 +81,35 @@ export function SlotsSearch() {
   const [patientId, setPatientId] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
-  const doctors = useMemo(
-    () => staff.filter((s) => s.role === "doctor" && s.active),
-    [staff]
-  );
+  const doctors = useMemo(() => {
+    if (seesAllDoctors) return allStaffDoctors;
+    if (ownDoctorId) {
+      return allStaffDoctors.filter(
+        (s) => (s.doctorId ?? s.id) === ownDoctorId
+      );
+    }
+    return [];
+  }, [seesAllDoctors, allStaffDoctors, ownDoctorId]);
+
+  const effectiveDoctorId =
+    !seesAllDoctors && ownDoctorId ? ownDoctorId : doctorId;
 
   const slots = useMemo(() => {
     if (adminLoading) return [];
     return generateFreeSlots({
-      staff,
+      staff: seesAllDoctors
+        ? staff
+        : staff.filter(
+            (s) =>
+              s.role !== "doctor" ||
+              (s.doctorId ?? s.id) === ownDoctorId
+          ),
       visitTypes,
       schedules,
       occupiedVisits: allVisits,
       days: 40,
       branchFilter,
-      doctorId,
+      doctorId: effectiveDoctorId,
       specialty,
       dateFrom,
       dateTo,
@@ -104,7 +126,9 @@ export function SlotsSearch() {
     schedules,
     allVisits,
     branchFilter,
-    doctorId,
+    effectiveDoctorId,
+    seesAllDoctors,
+    ownDoctorId,
     specialty,
     dateFrom,
     dateTo,
@@ -212,22 +236,33 @@ export function SlotsSearch() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Pracownik (lekarz)</Label>
-              <Select value={doctorId} onValueChange={setDoctorId}>
-                <SelectTrigger className="h-9 w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Wszyscy</SelectItem>
-                  {doctors.map((d) => (
-                    <SelectItem key={d.id} value={d.doctorId ?? d.id}>
-                      {d.title} {d.firstName} {d.lastName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {seesAllDoctors ? (
+              <div className="space-y-1">
+                <Label className="text-xs">Pracownik (lekarz)</Label>
+                <Select value={doctorId} onValueChange={setDoctorId}>
+                  <SelectTrigger className="h-9 w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Wszyscy</SelectItem>
+                    {doctors.map((d) => (
+                      <SelectItem key={d.id} value={d.doctorId ?? d.id}>
+                        {d.title} {d.firstName} {d.lastName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                <Label className="text-xs">Lekarz</Label>
+                <div className="flex h-9 items-center rounded-md border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700">
+                  {doctors[0]
+                    ? `${doctors[0].title} ${doctors[0].lastName}`
+                    : "Mój grafik"}
+                </div>
+              </div>
+            )}
             <div className="space-y-1">
               <Label className="text-xs">Specjalizacja</Label>
               <Select value={specialty} onValueChange={setSpecialty}>

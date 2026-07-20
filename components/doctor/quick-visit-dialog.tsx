@@ -55,22 +55,20 @@ export function QuickVisitDialog({
     branchFilter,
     ownDoctorId,
     seesAllDoctors,
-    visibleStaffDoctors,
+    allStaffDoctors,
   } = useDoctorData();
 
-  /** Lekarz: tylko własne konto; placówka/admin: widoczni lekarze */
+  /** Klinicysta: tylko własne konto; placówka: wszyscy */
   const selectableDoctors = useMemo(() => {
     if (!seesAllDoctors && ownDoctorId) {
       return doctors.filter((d) => d.id === ownDoctorId);
     }
-    if (visibleStaffDoctors.length) {
-      const ids = new Set(
-        visibleStaffDoctors.map((s) => s.doctorId ?? s.id)
-      );
+    if (seesAllDoctors && allStaffDoctors.length) {
+      const ids = new Set(allStaffDoctors.map((s) => s.doctorId ?? s.id));
       return doctors.filter((d) => ids.has(d.id));
     }
     return doctors;
-  }, [seesAllDoctors, visibleStaffDoctors, ownDoctorId]);
+  }, [seesAllDoctors, allStaffDoctors, ownDoctorId]);
 
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const open = openProp ?? uncontrolledOpen;

@@ -50,6 +50,7 @@ import {
   resetCalendarAccess,
 } from "@/lib/doctor/calendar-access-client";
 import {
+  SHARED_PREVIEW_KEY,
   VIEW_AS_DOCTOR_KEY,
   canEditDoctorData,
   getSharedDoctorIds,
@@ -65,6 +66,7 @@ import {
   canAccessFacilityAdmin,
   canManageCalendarSharing,
   canSeeAllDoctors,
+  isIndividualClinician,
   type UserRole,
 } from "@/lib/auth/roles";
 import type {
@@ -95,23 +97,40 @@ type DoctorDataContextValue = {
   sessionRole: UserRole | undefined;
   /** doctorId ze staff (dla lekarzy) */
   ownDoctorId: string | undefined;
-  /** facility/admin/reception — widzi wszystkich */
+  /** facility / reception — multi-lekarz */
   seesAllDoctors: boolean;
+  /** doctor lub admin z doctorId — izolacja do własnego kalendarza */
+  isClinician: boolean;
   canAccessAdmin: boolean;
   canManageSharing: boolean;
-  /** doctorId widocznych lekarzy lub "all" */
+  /** doctorId filtrujące dane w tej chwili lub "all" */
   visibleDoctorIds: string[] | "all";
-  /** Udostępnione kalendarze (poza własnym) */
+  /** Udostępnione doctorId (uprawnienia z admina) */
   sharedDoctorIds: string[];
+  /** Staff z udostępnionych kalendarzy (do selecta podglądu) */
+  sharedStaffDoctors: StaffMember[];
   calendarAccess: DoctorCalendarAccessMap;
   saveCalendarAccessData: (map: DoctorCalendarAccessMap) => void;
   resetCalendarAccessData: () => void;
-  /** Facility: filtr „jako lekarz” (null = cała placówka) */
+  /** Facility: filtr „jako lekarz” (null = wszyscy) */
   viewAsDoctorId: string | null;
   setViewAsDoctorId: (id: string | null) => void;
+  /**
+   * Klinicysta: podgląd udostępnionego kalendarza (null = własny).
+   * Nigdy nie miesza wielu lekarzy w jednym widoku.
+   */
+  sharedPreviewDoctorId: string | null;
+  setSharedPreviewDoctorId: (id: string | null) => void;
   canEditVisit: (visit: DoctorVisit) => boolean;
   canViewDoctor: (doctorId: string) => boolean;
+  /**
+   * Lista lekarzy w UI multi-wyboru:
+   * - facility: wszyscy aktywni (ew. po viewAs)
+   * - klinicysta: tylko własny profil staff
+   */
   visibleStaffDoctors: StaffMember[];
+  /** Wszyscy aktywni lekarze (tylko do UI facility / admin sharing) */
+  allStaffDoctors: StaffMember[];
   patients: DoctorPatient[];
   patientsLoading: boolean;
   filteredPatients: DoctorPatient[];
@@ -181,6 +200,9 @@ export function DoctorDataProvider({
   const [viewAsDoctorId, setViewAsDoctorIdState] = useState<string | null>(
     null
   );
+  const [sharedPreviewDoctorId, setSharedPreviewDoctorIdState] = useState<
+    string | null
+  >(null);
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
   const [visits, setVisits] = useState<DoctorVisit[]>([]);
   const [documents, setDocuments] = useState<DoctorDocument[]>([]);
@@ -203,6 +225,8 @@ export function DoctorDataProvider({
       if (saved && isValidBranchFilter(saved)) setBranchFilterState(saved);
       const viewAs = localStorage.getItem(VIEW_AS_DOCTOR_KEY);
       if (viewAs) setViewAsDoctorIdState(viewAs);
+      const preview = localStorage.getItem(SHARED_PREVIEW_KEY);
+      if (preview) setSharedPreviewDoctorIdState(preview);
     } catch {
       // ignore
     }
@@ -222,7 +246,8 @@ export function DoctorDataProvider({
     setAdminLoading(false);
   }, []);
 
-  const seesAllDoctors = canSeeAllDoctors(sessionRole);
+  const seesAllDoctors = canSeeAllDoctors(sessionRole, ownDoctorId);
+  const isClinician = isIndividualClinician(sessionRole, ownDoctorId);
   const canAccessAdmin = canAccessFacilityAdmin(sessionRole);
   const canManageSharing = canManageCalendarSharing(sessionRole);
 
@@ -231,6 +256,19 @@ export function DoctorDataProvider({
     [calendarAccess, ownDoctorId]
   );
 
+  // Wyczyść nieaktualny podgląd udostępnienia
+  useEffect(() => {
+    if (!sharedPreviewDoctorId) return;
+    if (!sharedDoctorIds.includes(sharedPreviewDoctorId)) {
+      setSharedPreviewDoctorIdState(null);
+      try {
+        localStorage.removeItem(SHARED_PREVIEW_KEY);
+      } catch {
+        // ignore
+      }
+    }
+  }, [sharedDoctorIds, sharedPreviewDoctorId]);
+
   const visibleDoctorIds = useMemo(
     () =>
       resolveVisibleDoctorIds({
@@ -238,8 +276,16 @@ export function DoctorDataProvider({
         ownDoctorId,
         sharedIds: sharedDoctorIds,
         viewAsDoctorId: seesAllDoctors ? viewAsDoctorId : null,
+        sharedPreviewDoctorId: isClinician ? sharedPreviewDoctorId : null,
       }),
-    [seesAllDoctors, ownDoctorId, sharedDoctorIds, viewAsDoctorId]
+    [
+      seesAllDoctors,
+      ownDoctorId,
+      sharedDoctorIds,
+      viewAsDoctorId,
+      isClinician,
+      sharedPreviewDoctorId,
+    ]
   );
 
   const setBranchFilter = useCallback((id: string) => {
@@ -262,12 +308,23 @@ export function DoctorDataProvider({
     }
   }, []);
 
+  const setSharedPreviewDoctorId = useCallback((id: string | null) => {
+    setSharedPreviewDoctorIdState(id);
+    try {
+      if (id) localStorage.setItem(SHARED_PREVIEW_KEY, id);
+      else localStorage.removeItem(SHARED_PREVIEW_KEY);
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const canViewDoctor = useCallback(
     (doctorId: string) => {
-      if (visibleDoctorIds === "all") return true;
-      return visibleDoctorIds.includes(doctorId);
+      if (seesAllDoctors) return true;
+      if (ownDoctorId && doctorId === ownDoctorId) return true;
+      return sharedDoctorIds.includes(doctorId);
     },
-    [visibleDoctorIds]
+    [seesAllDoctors, ownDoctorId, sharedDoctorIds]
   );
 
   const canEditVisit = useCallback(
@@ -279,14 +336,30 @@ export function DoctorDataProvider({
     [seesAllDoctors, ownDoctorId]
   );
 
+  const allStaffDoctors = useMemo(
+    () => staff.filter((s) => s.role === "doctor" && s.active),
+    [staff]
+  );
+
+  const sharedStaffDoctors = useMemo(() => {
+    if (!sharedDoctorIds.length) return [];
+    const set = new Set(sharedDoctorIds);
+    return allStaffDoctors.filter((d) => set.has(d.doctorId ?? d.id));
+  }, [allStaffDoctors, sharedDoctorIds]);
+
+  /** UI list — klinicysta: tylko siebie; facility: wszyscy */
   const visibleStaffDoctors = useMemo(() => {
-    const docs = staff.filter((s) => s.role === "doctor" && s.active);
-    if (visibleDoctorIds === "all") return docs;
-    return docs.filter((d) => {
-      const id = d.doctorId ?? d.id;
-      return visibleDoctorIds.includes(id);
-    });
-  }, [staff, visibleDoctorIds]);
+    if (seesAllDoctors) {
+      if (viewAsDoctorId) {
+        return allStaffDoctors.filter(
+          (d) => (d.doctorId ?? d.id) === viewAsDoctorId
+        );
+      }
+      return allStaffDoctors;
+    }
+    if (!ownDoctorId) return [];
+    return allStaffDoctors.filter((d) => (d.doctorId ?? d.id) === ownDoctorId);
+  }, [seesAllDoctors, viewAsDoctorId, allStaffDoctors, ownDoctorId]);
 
   const persistPatients = useCallback((next: DoctorPatient[]) => {
     setPatients(next);
@@ -666,18 +739,23 @@ export function DoctorDataProvider({
       sessionRole,
       ownDoctorId,
       seesAllDoctors,
+      isClinician,
       canAccessAdmin,
       canManageSharing,
       visibleDoctorIds,
       sharedDoctorIds,
+      sharedStaffDoctors,
       calendarAccess,
       saveCalendarAccessData,
       resetCalendarAccessData,
       viewAsDoctorId,
       setViewAsDoctorId,
+      sharedPreviewDoctorId,
+      setSharedPreviewDoctorId,
       canEditVisit,
       canViewDoctor,
       visibleStaffDoctors,
+      allStaffDoctors,
       patients,
       patientsLoading,
       filteredPatients,
@@ -727,18 +805,23 @@ export function DoctorDataProvider({
       sessionRole,
       ownDoctorId,
       seesAllDoctors,
+      isClinician,
       canAccessAdmin,
       canManageSharing,
       visibleDoctorIds,
       sharedDoctorIds,
+      sharedStaffDoctors,
       calendarAccess,
       saveCalendarAccessData,
       resetCalendarAccessData,
       viewAsDoctorId,
       setViewAsDoctorId,
+      sharedPreviewDoctorId,
+      setSharedPreviewDoctorId,
       canEditVisit,
       canViewDoctor,
       visibleStaffDoctors,
+      allStaffDoctors,
       patients,
       patientsLoading,
       filteredPatients,

@@ -37,7 +37,7 @@ import { VisitRowActions } from "@/components/doctor/visit-row-actions";
 import { EmptyState } from "@/components/doctor/empty-state";
 import { PatientNameLink } from "@/components/doctor/patient-name-link";
 import { QuickVisitDialog } from "@/components/doctor/quick-visit-dialog";
-import { doctors } from "@/lib/booking/doctors";
+import { useDoctorData } from "@/components/doctor/doctor-data-provider";
 import {
   VISIT_STATUS_LABELS,
   maskPesel,
@@ -49,6 +49,7 @@ const PAGE_SIZE = 10;
 
 export function VisitsList() {
   const { visits, loading, updateStatus } = useDoctorVisits();
+  const { seesAllDoctors, allStaffDoctors } = useDoctorData();
 
   const [patient, setPatient] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -194,28 +195,33 @@ export function VisitsList() {
                 className="h-9"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Lekarz</Label>
-              <Select
-                value={doctorId}
-                onValueChange={(v) => {
-                  setDoctorId(v);
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="h-9 w-full">
-                  <SelectValue placeholder="Wszyscy" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Wszyscy lekarze</SelectItem>
-                  {doctors.map((d) => (
-                    <SelectItem key={d.id} value={d.id}>
-                      {d.title} {d.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {seesAllDoctors ? (
+              <div className="space-y-1.5">
+                <Label className="text-xs">Lekarz</Label>
+                <Select
+                  value={doctorId}
+                  onValueChange={(v) => {
+                    setDoctorId(v);
+                    setPage(1);
+                  }}
+                >
+                  <SelectTrigger className="h-9 w-full">
+                    <SelectValue placeholder="Wszyscy" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Wszyscy lekarze</SelectItem>
+                    {allStaffDoctors.map((d) => (
+                      <SelectItem
+                        key={d.doctorId ?? d.id}
+                        value={d.doctorId ?? d.id}
+                      >
+                        {d.title} {d.lastName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
             <div className="space-y-1.5">
               <Label className="text-xs">Stan</Label>
               <Select

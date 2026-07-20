@@ -75,14 +75,13 @@ Usuń klucze i odśwież → seed od nowa.
 
 ### Etap 9 — rola Placówka + izolacja lekarzy
 
-1. Login `cmkw@cmkw.pl` / `cmkw123` → badge **Placówka**, pełny kalendarz, Admin, statystyki
-2. Przełącznik „Cała placówka / filtr jako lekarz” w topbarze
-3. Admin → **Udostępnianie kalendarzy** — matryca checkboxów, seed Wenta→Kiryluk
-4. Login `tomasz.wenta@cmkw.pl` → tylko swoje wizyty + podgląd Kiryluka (bez edycji cudzych)
-5. Login `pawel.frankowski@cmkw.pl` → wyłącznie własne dane, brak menu Admin
-6. Próba `/doctor/admin` jako zwykły lekarz → redirect + toast
+1. Login `cmkw@cmkw.pl` / `cmkw123` → badge **Widok placówki**, przełącznik lekarzy + awatary (prawo)
+2. Login `jan.kiryluk@cmkw.pl` → **zero** innych lekarzy w UI (admin z doctorId = izolacja kliniczna)
+3. Login `tomasz.wenta@cmkw.pl` → domyślnie tylko swój kalendarz; select fioletowy „Udostępnione: Kiryluk” (podgląd)
+4. Admin → **Udostępnianie kalendarzy** — matryca, seed Wenta→Kiryluk
+5. Próba `/doctor/admin` jako doctor bez uprawnień → redirect + toast
 
-**localStorage:** `cmkw-doctor-calendar-access-v1`, `cmkw-doctor-view-as-v1`  
+**localStorage:** `cmkw-doctor-calendar-access-v1`, `cmkw-doctor-view-as-v1`, `cmkw-doctor-shared-preview-v1`  
 **Seed użytkowników:** `DEMO_SEED_VERSION = 8` (facility user)
 
 ### Etap 8 — Drag & Drop + UX kalendarza

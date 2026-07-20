@@ -7,6 +7,8 @@ export type DoctorCalendarAccessMap = Record<string, string[]>;
 
 export const CALENDAR_ACCESS_STORAGE_KEY = "cmkw-doctor-calendar-access-v1";
 export const VIEW_AS_DOCTOR_KEY = "cmkw-doctor-view-as-v1";
+/** Lekarz: podgląd udostępnionego kalendarza (null = własny) */
+export const SHARED_PREVIEW_KEY = "cmkw-doctor-shared-preview-v1";
 
 /** Seed demo: Tomasz Wenta widzi kalendarz Jana Kiryluka */
 export const SEED_CALENDAR_ACCESS: DoctorCalendarAccessMap = {
@@ -37,16 +39,20 @@ export function getSharedDoctorIds(
 }
 
 /**
- * Lista doctorId widocznych dla użytkownika.
- * - canSeeAll → "all"
- * - doctor → [własny, ...udostępnione]
+ * Lista doctorId filtrujących dane w danym momencie.
+ * - canSeeAll + brak viewAs → "all"
+ * - canSeeAll + viewAs → [viewAs]
+ * - klinicysta: domyślnie TYLKO własny; przy podglądzie udostępnionego → tylko ten ID
+ *   (nigdy jednocześnie własny + cudzy w jednym widoku)
  */
 export function resolveVisibleDoctorIds(opts: {
   canSeeAll: boolean;
   ownDoctorId?: string | null;
   sharedIds?: string[];
-  /** Facility/admin: filtr „jako lekarz” */
+  /** Facility: filtr „jako lekarz” */
   viewAsDoctorId?: string | null;
+  /** Klinicysta: aktywny podgląd udostępnionego doctorId */
+  sharedPreviewDoctorId?: string | null;
 }): string[] | "all" {
   if (opts.canSeeAll) {
     if (opts.viewAsDoctorId) return [opts.viewAsDoctorId];
@@ -54,8 +60,12 @@ export function resolveVisibleDoctorIds(opts: {
   }
   const own = opts.ownDoctorId?.trim();
   if (!own) return [];
-  const shared = (opts.sharedIds ?? []).filter((id) => id && id !== own);
-  return Array.from(new Set([own, ...shared]));
+  const preview = opts.sharedPreviewDoctorId?.trim();
+  if (preview && preview !== own) {
+    const allowed = (opts.sharedIds ?? []).includes(preview);
+    if (allowed) return [preview];
+  }
+  return [own];
 }
 
 export function canViewDoctorCalendar(

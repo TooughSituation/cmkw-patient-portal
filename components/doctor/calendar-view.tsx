@@ -111,17 +111,19 @@ export function CalendarView() {
     schedules,
     branchFilter,
     validateVisitSlot,
-    visibleStaffDoctors,
+    allStaffDoctors,
     seesAllDoctors,
-    ownDoctorId,
-    sharedDoctorIds,
     canEditVisit,
+    viewAsDoctorId,
+    setViewAsDoctorId,
+    sharedPreviewDoctorId,
   } = useDoctorData();
 
   const [selected, setSelected] = useState<Date>(startOfDay(new Date()));
   const [mode, setMode] = useState<CalMode>("day");
   const [hideCompleted, setHideCompleted] = useState(false);
   const [query, setQuery] = useState("");
+  /** Tylko facility: dodatkowy filtr w toolbarze (synch z viewAs) */
   const [doctorFilter, setDoctorFilter] = useState("all");
   const [dashFilter, setDashFilter] = useState<
     "none" | "today" | "confirm" | "in_progress"
@@ -141,12 +143,23 @@ export function CalendarView() {
     try {
       const m = localStorage.getItem(CAL_MODE_STORAGE_KEY) as CalMode | null;
       if (m === "day" || m === "week" || m === "month") setMode(m);
-      const d = localStorage.getItem(CAL_DOCTOR_FILTER_KEY);
-      if (d) setDoctorFilter(d);
+      if (seesAllDoctors) {
+        const d = localStorage.getItem(CAL_DOCTOR_FILTER_KEY);
+        if (d) setDoctorFilter(d);
+      }
     } catch {
       // ignore
     }
-  }, []);
+  }, [seesAllDoctors]);
+
+  // Facility: synchronizuj filtr kalendarza z globalnym viewAs
+  useEffect(() => {
+    if (!seesAllDoctors) {
+      setDoctorFilter("all");
+      return;
+    }
+    setDoctorFilter(viewAsDoctorId ?? "all");
+  }, [seesAllDoctors, viewAsDoctorId]);
 
   const setModePersist = useCallback((m: CalMode) => {
     setMode(m);
@@ -157,33 +170,31 @@ export function CalendarView() {
     }
   }, []);
 
-  const setDoctorPersist = useCallback((id: string) => {
-    setDoctorFilter(id);
-    try {
-      localStorage.setItem(CAL_DOCTOR_FILTER_KEY, id);
-    } catch {
-      // ignore
-    }
-  }, []);
+  const setDoctorPersist = useCallback(
+    (id: string) => {
+      if (!seesAllDoctors) return;
+      setDoctorFilter(id);
+      setViewAsDoctorId(id === "all" ? null : id);
+      try {
+        localStorage.setItem(CAL_DOCTOR_FILTER_KEY, id);
+      } catch {
+        // ignore
+      }
+    },
+    [seesAllDoctors, setViewAsDoctorId]
+  );
 
-  const doctors = visibleStaffDoctors;
-
-  const showDoctorFilter =
-    seesAllDoctors || sharedDoctorIds.length > 0 || doctors.length > 1;
-
-  useEffect(() => {
-    // Lekarz bez udostępnień — zawsze własny filtr
-    if (!seesAllDoctors && ownDoctorId && sharedDoctorIds.length === 0) {
-      setDoctorFilter(ownDoctorId);
-    }
-  }, [seesAllDoctors, ownDoctorId, sharedDoctorIds.length]);
+  /** Multi-lekarz UI tylko dla placówki */
+  const showDoctorFilter = seesAllDoctors;
+  const doctors = allStaffDoctors;
 
   const dateKey = format(selected, "yyyy-MM-dd");
 
   const filterVisits = useCallback(
     (list: DoctorVisit[]) => {
       let out = list;
-      if (doctorFilter !== "all") {
+      // Provider już filtruje po widoczności; facility może dodatkowo zawęzić (zsynchronizowane z viewAs)
+      if (seesAllDoctors && doctorFilter !== "all") {
         out = out.filter((v) => v.doctorId === doctorFilter);
       }
       if (hideCompleted) {
@@ -213,7 +224,7 @@ export function CalendarView() {
       }
       return out;
     },
-    [doctorFilter, hideCompleted, dashFilter, query]
+    [doctorFilter, hideCompleted, dashFilter, query, seesAllDoctors]
   );
 
   const dayVisits = useMemo(() => {
@@ -469,6 +480,11 @@ export function CalendarView() {
           <div>
             <h1 className="text-lg font-semibold text-brand-heading md:text-xl">
               Kalendarz
+              {!seesAllDoctors && !sharedPreviewDoctorId ? (
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  · mój grafik
+                </span>
+              ) : null}
             </h1>
             <p className="text-sm text-muted-foreground">
               {format(selected, "EEEE, d MMMM yyyy", { locale: pl })} ·{" "}
@@ -528,29 +544,23 @@ export function CalendarView() {
             </div>
             {showDoctorFilter ? (
               <Select value={doctorFilter} onValueChange={setDoctorPersist}>
-                <SelectTrigger className="h-9 w-[170px] bg-white shadow-sm">
+                <SelectTrigger className="h-9 w-[180px] bg-white shadow-sm">
                   <SelectValue placeholder="Lekarz" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(seesAllDoctors || sharedDoctorIds.length > 0) && (
-                    <SelectItem value="all">
-                      {seesAllDoctors
-                        ? "Wszyscy lekarze"
-                        : "Moi + udostępnione"}
-                    </SelectItem>
-                  )}
+                  <SelectItem value="all">Wszyscy lekarze</SelectItem>
                   {doctors.map((d) => (
                     <SelectItem key={d.id} value={d.doctorId ?? d.id}>
                       {d.title} {d.lastName}
-                      {!seesAllDoctors &&
-                      ownDoctorId &&
-                      (d.doctorId ?? d.id) !== ownDoctorId
-                        ? " (udost.)"
-                        : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+            ) : null}
+            {sharedPreviewDoctorId ? (
+              <span className="rounded-full border border-violet-200 bg-violet-50 px-2.5 py-1 text-[11px] font-medium text-violet-800">
+                Podgląd udostępnionego kalendarza
+              </span>
             ) : null}
             <Input
               ref={searchRef}
