@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
 import {
@@ -230,7 +231,14 @@ export function VisitsList() {
                 <SelectContent>
                   <SelectItem value="all">Wszystkie stany</SelectItem>
                   {(
-                    Object.keys(VISIT_STATUS_LABELS) as VisitStatus[]
+                    [
+                      "scheduled",
+                      "confirmed",
+                      "teleconfirmed",
+                      "in_progress",
+                      "completed",
+                      "cancelled",
+                    ] as VisitStatus[]
                   ).map((s) => (
                     <SelectItem key={s} value={s}>
                       {VISIT_STATUS_LABELS[s]}
@@ -295,11 +303,14 @@ export function VisitsList() {
                       )}
                     >
                       <TableCell className="whitespace-nowrap">
-                        <div className="font-medium text-slate-900">
+                        <Link
+                          href={`/doctor/wizyty/${v.id}`}
+                          className="font-medium text-brand hover:underline"
+                        >
                           {format(parseISO(v.date), "d MMM yyyy", {
                             locale: pl,
                           })}
-                        </div>
+                        </Link>
                         <div className="font-mono text-xs text-slate-500">
                           {v.time}
                         </div>

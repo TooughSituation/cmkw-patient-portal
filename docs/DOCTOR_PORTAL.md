@@ -1,6 +1,6 @@
 # Portal Lekarza / CMKW EDM
 
-**Status:** Etap 0–2 + **Etap 3 (Leki + ICD-10 + Kalkulatory)**  
+**Status:** Etap 0–3 + **Etap 4 (Karta wizyty EDM + dokumenty + telepotwierdzenia)**  
 **Prefix:** `/doctor/*`  
 **Role:** `doctor` | `admin` | `reception`  
 **Styl:** jasny brand CMKW (`#0849b0`, white / slate-50) — spójny z patient portalem
@@ -65,6 +65,19 @@ Usuń klucze i odśwież → seed od nowa.
 | `/doctor/leki` | Baza leków (Etap 3) |
 | `/doctor/icd10` | ICD-10 (Etap 3) |
 | `/doctor/kalkulatory` | Kalkulatory medyczne (Etap 3) |
+| `/doctor/wizyty/[id]` | **Karta wizyty EDM** (Etap 4) |
+
+### Etap 4 — test flow wizyty
+
+1. Login `jan.kiryluk@cmkw.pl` / `Lekarz123!`
+2. Kalendarz → klik godzinę wizyty (np. 08:00) → karta `/doctor/wizyty/v-001`
+3. Zakładki: wywiad, ICD (picker), leki (picker), skierowania, dokumenty, historia
+4. Autosave notatki · Zapisz / W trakcie / Zakończ / Potwierdź / Anuluj
+5. Kalendarz dół → **Telepotwierdzenia** → Potwierdź / SMS / Odwołaj
+6. Szybka wizyta → „Zapisz i otwórz kartę”
+7. Karta pacjenta → Dokumenty (upload mock)
+
+**localStorage:** `cmkw-doctor-visits-v3`, `cmkw-doctor-documents-v1`
 
 ### Etap 3 — test
 
@@ -111,15 +124,15 @@ lib/pesel.ts                 # buildPesel, parsePesel, isValidPesel
 
 ---
 
-## Etap 4 — propozycje
+## Etap 5 — propozycje
 
-1. **Karta wizyty EDM** — wywiad, rozpoznanie (ICD), leki, zalecenia, e-recepta placeholder  
-2. **Telepotwierdzenia** + IVR  
-3. **Dokumenty** w karcie pacjenta  
-4. **Przypisywanie leków/ICD do wizyty/pacjenta** (historia farmakoterapii)  
-5. **Prisma + Postgres**  
-6. **API** doctor REST  
-7. Integracja booking pacjenta ↔ EDM  
+1. **E-recepta / e-skierowanie** (integracja P1 placeholder)  
+2. **Historia farmakoterapii** pacjenta (agregacja z wizyt)  
+3. **Szablony notatek** i skróty klawiszowe  
+4. **Prisma + Postgres** + API REST  
+5. **IVR / SMS** realne  
+6. Integracja booking pacjenta ↔ EDM  
+7. RBAC granularne + audit log  
 
 ---
 

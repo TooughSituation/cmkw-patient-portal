@@ -6,7 +6,6 @@ import { pl } from "date-fns/locale";
 import { format, parseISO, startOfDay } from "date-fns";
 import {
   Loader2,
-  Phone,
   Plus,
   Search,
   UserPlus,
@@ -31,6 +30,7 @@ import { VisitRowActions } from "@/components/doctor/visit-row-actions";
 import { EmptyState } from "@/components/doctor/empty-state";
 import { PatientNameLink } from "@/components/doctor/patient-name-link";
 import { QuickVisitDialog } from "@/components/doctor/quick-visit-dialog";
+import { TeleconfirmPanel } from "@/components/doctor/teleconfirm-panel";
 import { VISIT_TYPE_LABELS } from "@/lib/doctor/types";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -211,8 +211,13 @@ export function CalendarView() {
                           v.status === "completed" && "bg-slate-50/50"
                         )}
                       >
-                        <TableCell className="font-mono text-sm font-semibold text-slate-800">
-                          {v.time}
+                        <TableCell className="font-mono text-sm font-semibold">
+                          <Link
+                            href={`/doctor/wizyty/${v.id}`}
+                            className="text-brand hover:underline"
+                          >
+                            {v.time}
+                          </Link>
                         </TableCell>
                         <TableCell>
                           <PatientNameLink
@@ -254,29 +259,9 @@ export function CalendarView() {
         </Card>
       </div>
 
-      {/* Telepotwierdzenia placeholder */}
-      <Card className="mt-4 border-dashed border-slate-300 bg-white/80 shadow-none ring-0">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-            <Phone className="size-4 text-brand" />
-            Telepotwierdzenia
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <p className="text-sm text-slate-500">
-            Moduł potwierdzeń telefonicznych i SMS — placeholder (Etap 3).
-            Tutaj pojawi się kolejka pacjentów do potwierdzenia wizyty.
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-3 h-8"
-            onClick={() => toast.info("Telepotwierdzenia — wkrótce (Etap 3)")}
-          >
-            Otwórz kolejkę
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="mt-4">
+        <TeleconfirmPanel />
+      </div>
     </div>
   );
 }

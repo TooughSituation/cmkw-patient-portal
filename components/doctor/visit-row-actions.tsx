@@ -9,6 +9,7 @@ import {
   XCircle,
   Pill,
   BookMarked,
+  Phone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,33 +29,31 @@ export function VisitRowActions({
   visit: DoctorVisit;
   onStatusChange?: (id: string, status: VisitStatus) => void;
 }) {
+  const href = `/doctor/wizyty/${visit.id}`;
+
   return (
     <div className="flex items-center justify-end gap-0.5">
       <Button
+        asChild
         variant="ghost"
         size="icon-sm"
-        className="text-slate-500 hover:text-[#0849b0]"
-        onClick={() =>
-          toast.info("Podgląd wizyty", {
-            description: `${visit.patientFirstName} ${visit.patientLastName} · ${visit.date} ${visit.time}`,
-          })
-        }
-        aria-label="Podgląd"
+        className="text-slate-500 hover:text-brand"
+        aria-label="Podgląd karty"
       >
-        <Eye className="size-3.5" />
+        <Link href={href}>
+          <Eye className="size-3.5" />
+        </Link>
       </Button>
       <Button
+        asChild
         variant="ghost"
         size="icon-sm"
-        className="text-slate-500 hover:text-[#0849b0]"
-        onClick={() =>
-          toast.info("Edycja wizyty — wkrótce (Etap 2)", {
-            description: visit.id,
-          })
-        }
-        aria-label="Edytuj"
+        className="text-slate-500 hover:text-brand"
+        aria-label="Edytuj kartę"
       >
-        <Pencil className="size-3.5" />
+        <Link href={href}>
+          <Pencil className="size-3.5" />
+        </Link>
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -68,6 +67,10 @@ export function VisitRowActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem asChild>
+            <Link href={href}>Otwórz kartę wizyty</Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
               onStatusChange?.(visit.id, "confirmed");
@@ -76,6 +79,24 @@ export function VisitRowActions({
           >
             <CheckCircle2 className="size-4 text-sky-600" />
             Potwierdź
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              onStatusChange?.(visit.id, "teleconfirmed");
+              toast.success("Telepotwierdzona");
+            }}
+          >
+            <Phone className="size-4 text-violet-600" />
+            Telepotwierdź
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              onStatusChange?.(visit.id, "in_progress");
+              toast.success("Wizyta w trakcie");
+            }}
+          >
+            <CheckCircle2 className="size-4 text-amber-600" />
+            W trakcie
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
@@ -90,13 +111,13 @@ export function VisitRowActions({
           <DropdownMenuItem asChild>
             <Link href="/doctor/leki">
               <Pill className="size-4" />
-              Dodaj lek
+              Baza leków
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/doctor/icd10">
               <BookMarked className="size-4" />
-              Dodaj kod ICD
+              ICD-10
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />

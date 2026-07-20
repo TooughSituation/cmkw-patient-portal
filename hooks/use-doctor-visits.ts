@@ -7,7 +7,9 @@ export function useDoctorVisits() {
   const {
     visits,
     visitsLoading,
+    getVisitById,
     updateVisitStatus,
+    updateVisit,
     addVisit,
     resetVisits,
     visitsByDate,
@@ -17,7 +19,9 @@ export function useDoctorVisits() {
   return {
     visits,
     loading: visitsLoading,
+    getById: getVisitById,
     updateStatus: updateVisitStatus,
+    updateVisit,
     addVisit,
     reset: resetVisits,
     byDate: visitsByDate,

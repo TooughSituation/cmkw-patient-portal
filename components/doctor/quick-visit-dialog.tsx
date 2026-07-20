@@ -2,11 +2,13 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Plus, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -26,8 +28,12 @@ import {
 import { useDoctorPatients } from "@/hooks/use-doctor-patients";
 import { useDoctorVisits } from "@/hooks/use-doctor-visits";
 import { doctors, formatDoctorName } from "@/lib/booking/doctors";
-import type { DoctorVisit, VisitType } from "@/lib/doctor/types";
-import { VISIT_TYPE_LABELS } from "@/lib/doctor/types";
+import {
+  emptyVisitClinical,
+  type DoctorVisit,
+  type VisitType,
+  VISIT_TYPE_LABELS,
+} from "@/lib/doctor/types";
 
 export function QuickVisitDialog({
   trigger,
@@ -36,6 +42,7 @@ export function QuickVisitDialog({
   trigger: React.ReactNode;
   defaultDate?: string;
 }) {
+  const router = useRouter();
   const { patients, loading: patientsLoading } = useDoctorPatients();
   const { addVisit } = useDoctorVisits();
   const [open, setOpen] = useState(false);
@@ -47,6 +54,7 @@ export function QuickVisitDialog({
   const [time, setTime] = useState("10:00");
   const [type, setType] = useState<VisitType>("konsultacja");
   const [note, setNote] = useState("");
+  const [needsTele, setNeedsTele] = useState(true);
   const [search, setSearch] = useState("");
 
   const filteredPatients = useMemo(() => {
@@ -72,22 +80,25 @@ export function QuickVisitDialog({
     setNote("");
     setTime("10:00");
     setType("konsultacja");
+    setNeedsTele(true);
     setDate(defaultDate ?? new Date().toISOString().slice(0, 10));
   }
 
-  function handleSave() {
+  function buildVisit(): DoctorVisit | null {
     const patient = patients.find((p) => p.id === patientId);
     if (!patient) {
       toast.error("Wybierz pacjenta z listy.");
-      return;
+      return null;
     }
     if (!date || !time) {
       toast.error("Podaj datę i godzinę.");
-      return;
+      return null;
     }
     const doctor = doctors.find((d) => d.id === doctorId);
     const now = new Date().toISOString();
-    const visit: DoctorVisit = {
+    const clinical = emptyVisitClinical();
+    return {
+      ...clinical,
       id: `v-${crypto.randomUUID().slice(0, 8)}`,
       date,
       time,
@@ -101,16 +112,28 @@ export function QuickVisitDialog({
       status: "scheduled",
       type,
       note: note.trim(),
+      medicalNote: note.trim()
+        ? `Notatka wstępna:\n${note.trim()}`
+        : "",
+      needsTeleconfirm: needsTele,
       departmentId: "ortopedia",
       createdAt: now,
       updatedAt: now,
     };
+  }
+
+  function handleSave(openCard: boolean) {
+    const visit = buildVisit();
+    if (!visit) return;
     addVisit(visit);
     toast.success("Wizyta dodana.", {
-      description: `${patient.lastName} ${patient.firstName} · ${date} ${time}`,
+      description: `${visit.patientLastName} ${visit.patientFirstName} · ${visit.date} ${visit.time}`,
     });
     setOpen(false);
     resetForm();
+    if (openCard) {
+      router.push(`/doctor/wizyty/${visit.id}`);
+    }
   }
 
   return (
@@ -124,9 +147,12 @@ export function QuickVisitDialog({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-brand-heading">Szybka wizyta</DialogTitle>
+          <DialogTitle className="text-brand-heading">
+            Szybka wizyta
+          </DialogTitle>
           <DialogDescription>
-            Wybierz istniejącego pacjenta lub dodaj nowego w kartotece.
+            Wybierz pacjenta, typ wizyty i termin. Możesz od razu otworzyć pełną
+            kartę EDM.
           </DialogDescription>
         </DialogHeader>
 
@@ -206,7 +232,7 @@ export function QuickVisitDialog({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">Typ</Label>
+              <Label className="text-xs">Typ / usługa</Label>
               <Select
                 value={type}
                 onValueChange={(v) => setType(v as VisitType)}
@@ -226,26 +252,41 @@ export function QuickVisitDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs">Notatka</Label>
+            <Label className="text-xs">Notatka wstępna</Label>
             <Input
               value={note}
               onChange={(e) => setNote(e.target.value)}
               className="h-9"
-              placeholder="Opcjonalnie"
+              placeholder="Opcjonalnie — trafi do karty wizyty"
             />
           </div>
+
+          <label className="flex items-center gap-2 text-sm text-slate-700">
+            <Checkbox
+              checked={needsTele}
+              onCheckedChange={(v) => setNeedsTele(v === true)}
+            />
+            Wymaga telepotwierdzenia (SMS / telefon)
+          </label>
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-end">
           <Button variant="outline" onClick={() => setOpen(false)}>
             Anuluj
           </Button>
           <Button
-            className="gap-1.5 bg-brand text-white hover:bg-brand-deep"
-            onClick={handleSave}
+            variant="outline"
+            className="gap-1.5 border-brand/30 text-brand"
+            onClick={() => handleSave(false)}
           >
             <Plus className="size-4" />
             Zapisz wizytę
+          </Button>
+          <Button
+            className="gap-1.5 bg-brand text-white hover:bg-brand-deep"
+            onClick={() => handleSave(true)}
+          >
+            Zapisz i otwórz kartę
           </Button>
         </DialogFooter>
       </DialogContent>

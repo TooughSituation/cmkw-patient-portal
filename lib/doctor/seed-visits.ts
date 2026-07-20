@@ -1,10 +1,10 @@
 import type { DoctorVisit } from "@/lib/doctor/types";
+import { emptyVisitClinical } from "@/lib/doctor/types";
 import { SEED_PATIENTS } from "@/lib/doctor/seed-patients";
 import { format, addDays, subDays } from "date-fns";
 
 /**
- * Deterministyczne seed-y wizyt EDM (20).
- * Daty względne do „dziś”; patientId spięty z SEED_PATIENTS.
+ * Deterministyczne seed-y wizyt EDM (20) z notatkami / ICD / lekami (Etap 4).
  */
 function d(offset: number): string {
   return format(addDays(new Date(), offset), "yyyy-MM-dd");
@@ -16,23 +16,49 @@ function past(offset: number): string {
 
 const now = new Date().toISOString();
 
-function visit(
-  partial: Omit<
-    DoctorVisit,
-    | "patientFirstName"
-    | "patientLastName"
-    | "patientPesel"
-    | "patientGroups"
-    | "createdAt"
-    | "updatedAt"
-  > & { patientId: string }
-): DoctorVisit {
+type VisitSeed = {
+  id: string;
+  date: string;
+  time: string;
+  patientId: string;
+  doctorId: string;
+  doctorName: string;
+  status: DoctorVisit["status"];
+  type: DoctorVisit["type"];
+  note: string;
+  departmentId?: string;
+  medicalNote?: string;
+  diagnoses?: DoctorVisit["diagnoses"];
+  prescriptions?: DoctorVisit["prescriptions"];
+  referrals?: DoctorVisit["referrals"];
+  documentIds?: string[];
+  needsTeleconfirm?: boolean;
+};
+
+function visit(partial: VisitSeed): DoctorVisit {
   const patient = SEED_PATIENTS.find((p) => p.id === partial.patientId);
   if (!patient) {
     throw new Error(`Seed visit: missing patient ${partial.patientId}`);
   }
+  const clinical = emptyVisitClinical();
   return {
-    ...partial,
+    ...clinical,
+    id: partial.id,
+    date: partial.date,
+    time: partial.time,
+    patientId: partial.patientId,
+    doctorId: partial.doctorId,
+    doctorName: partial.doctorName,
+    status: partial.status,
+    type: partial.type,
+    note: partial.note,
+    departmentId: partial.departmentId ?? "ortopedia",
+    medicalNote: partial.medicalNote ?? clinical.medicalNote,
+    diagnoses: partial.diagnoses ?? clinical.diagnoses,
+    prescriptions: partial.prescriptions ?? clinical.prescriptions,
+    referrals: partial.referrals ?? clinical.referrals,
+    documentIds: partial.documentIds ?? clinical.documentIds,
+    needsTeleconfirm: partial.needsTeleconfirm ?? clinical.needsTeleconfirm,
     patientFirstName: patient.firstName,
     patientLastName: patient.lastName,
     patientPesel: patient.pesel,
@@ -53,7 +79,45 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "confirmed",
     type: "konsultacja",
     note: "Ból kolana prawego, MRI w toku",
-    departmentId: "ortopedia",
+    needsTeleconfirm: false,
+    medicalNote:
+      "Wywiad: ból kolana P od 3 mies., nasila się przy schodzeniu. Obrzęk okresowy. Brak urazu ostrego.\nBadanie: bolesność szpary przyśrodkowej, testy łąkotkowe (+/-), ROM prawie pełny.\nPlan: ocena MRI, NLPZ, odciążenie, ewentualnie iniekcja HA.",
+    diagnoses: [
+      {
+        code: "M17.1",
+        namePl: "Inna pierwotna gonartroza",
+        description: "Gonartroza kolana prawego, stadium radiologiczne II",
+      },
+    ],
+    prescriptions: [
+      {
+        id: "rx-001",
+        drugId: "drug-001",
+        drugName: "Ketonal Forte",
+        inn: "Ketoprofenum",
+        dosage: "100 mg 1×/d z posiłkiem",
+        duration: "7 dni",
+        notes: "Z IPP przy dolegliwościach żołądkowych",
+      },
+      {
+        id: "rx-002",
+        drugId: "drug-029",
+        drugName: "Omeprazol Sandoz",
+        inn: "Omeprazolum",
+        dosage: "20 mg rano",
+        duration: "7 dni",
+        notes: "",
+      },
+    ],
+    referrals: [
+      {
+        id: "ref-001",
+        title: "MRI kolana P",
+        type: "Obrazowanie",
+        notes: "Protokół łąkotki + chrząstka",
+      },
+    ],
+    documentIds: ["doc-visit-001"],
   }),
   visit({
     id: "v-002",
@@ -65,7 +129,15 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "scheduled",
     type: "kontrolna",
     note: "Kontrola po artroskopii",
-    departmentId: "ortopedia",
+    needsTeleconfirm: true,
+    medicalNote: "Kontrola 4 tyg. po artroskopii łąkotki. Pacjent zgłasza poprawę.",
+    diagnoses: [
+      {
+        code: "M23.2",
+        namePl: "Uszkodzenie łąkotki w wyniku starego urazu lub oderwania",
+        description: "Stan po artroskopii",
+      },
+    ],
   }),
   visit({
     id: "v-003",
@@ -74,10 +146,30 @@ export const SEED_VISITS: DoctorVisit[] = [
     patientId: "p-003",
     doctorId: "frankowski",
     doctorName: "Lek. Paweł Frankowski",
-    status: "confirmed",
+    status: "teleconfirmed",
     type: "konsultacja",
     note: "Uraz barku – siatkówka",
-    departmentId: "ortopedia",
+    needsTeleconfirm: true,
+    medicalNote:
+      "Uraz barku L podczas bloku. Ból nocny, ograniczenie uniesienia. Podejrzenie impingement / uszkodzenie stożka.",
+    diagnoses: [
+      {
+        code: "M75.1",
+        namePl: "Zespół stożka rotatorów",
+        description: "Bark L — siatkówka",
+      },
+    ],
+    prescriptions: [
+      {
+        id: "rx-003",
+        drugId: "drug-038",
+        drugName: "Voltaren Emulgel",
+        inn: "Diclofenacum diethylaminum",
+        dosage: "cienka warstwa 3×/d",
+        duration: "10 dni",
+        notes: "Miejscowo na bark",
+      },
+    ],
   }),
   visit({
     id: "v-004",
@@ -86,10 +178,29 @@ export const SEED_VISITS: DoctorVisit[] = [
     patientId: "p-004",
     doctorId: "kiryluk",
     doctorName: "Dr n. med. Jan Kiryluk",
-    status: "scheduled",
+    status: "in_progress",
     type: "kontrolna",
     note: "6 tyg. po endoprotezie biodra",
-    departmentId: "ortopedia",
+    medicalNote:
+      "Kontrola po THA. Chód z kulą, rana wygojona. RTG w normie. Zalecenia RHB.",
+    diagnoses: [
+      {
+        code: "Z96.6",
+        namePl: "Obecność endoprotezy stawu",
+        description: "THA biodro P",
+      },
+    ],
+    prescriptions: [
+      {
+        id: "rx-004",
+        drugId: "drug-027",
+        drugName: "Rivaroxaban Sandoz",
+        inn: "Rivaroxabanum",
+        dosage: "10 mg 1×/d",
+        duration: "do 35 dni po zabiegu (wg schematu)",
+        notes: "Profilaktyka VTE",
+      },
+    ],
   }),
   visit({
     id: "v-005",
@@ -101,7 +212,7 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "confirmed",
     type: "konsultacja",
     note: "Pierwsza wizyta – ból kręgosłupa L-S",
-    departmentId: "ortopedia",
+    needsTeleconfirm: true,
   }),
   visit({
     id: "v-006",
@@ -113,7 +224,14 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "completed",
     type: "rehabilitacja",
     note: "Sesja 4/10 – staw skokowy",
-    departmentId: "rehabilitacja",
+    medicalNote: "Sesja RHB 4/10. Poprawa ROM i siły. Kontynuacja programu.",
+    diagnoses: [
+      {
+        code: "S93.4",
+        namePl: "Skręcenie i naderwanie stawu skokowego",
+        description: "Stan po skręceniu – faza RHB",
+      },
+    ],
   }),
   visit({
     id: "v-007",
@@ -125,7 +243,7 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "cancelled",
     type: "konsultacja",
     note: "Pacjent odwołał – przełożone",
-    departmentId: "ortopedia",
+    needsTeleconfirm: true,
   }),
   visit({
     id: "v-008",
@@ -137,7 +255,27 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "confirmed",
     type: "pilna",
     note: "Ostry ból – podejrzenie uszkodzenia ACL",
-    departmentId: "ortopedia",
+    needsTeleconfirm: false,
+    medicalNote:
+      "Uraz skrętny kolana podczas biegu. Bloq, obrzęk. Lachman (+). Pilne MRI.",
+    diagnoses: [
+      {
+        code: "S83.5",
+        namePl: "Skręcenie i naderwanie więzadła krzyżowego kolana",
+        description: "Podejrzenie ACL",
+      },
+    ],
+    prescriptions: [
+      {
+        id: "rx-005",
+        drugId: "drug-007",
+        drugName: "Tramal",
+        inn: "Tramadoli hydrochloridum",
+        dosage: "50 mg w razie bólu, max 4×/d",
+        duration: "3–5 dni",
+        notes: "Ostrożnie – senność",
+      },
+    ],
   }),
   visit({
     id: "v-009",
@@ -149,7 +287,7 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "scheduled",
     type: "zabieg",
     note: "Kwalifikacja do PRP kolano L",
-    departmentId: "ortopedia",
+    needsTeleconfirm: true,
   }),
   visit({
     id: "v-010",
@@ -158,10 +296,10 @@ export const SEED_VISITS: DoctorVisit[] = [
     patientId: "p-010",
     doctorId: "torba",
     doctorName: "Lek. Grzegorz Torba",
-    status: "confirmed",
+    status: "teleconfirmed",
     type: "rehabilitacja",
     note: "Pooperacyjna RHB barku",
-    departmentId: "rehabilitacja",
+    needsTeleconfirm: true,
   }),
   visit({
     id: "v-011",
@@ -173,7 +311,7 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "scheduled",
     type: "konsultacja",
     note: "Hallux valgus – konsultacja",
-    departmentId: "ortopedia",
+    needsTeleconfirm: true,
   }),
   visit({
     id: "v-012",
@@ -185,7 +323,7 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "scheduled",
     type: "konsultacja",
     note: "Ból ścięgna Achillesa",
-    departmentId: "ortopedia",
+    needsTeleconfirm: true,
   }),
   visit({
     id: "v-013",
@@ -197,7 +335,7 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "confirmed",
     type: "kontrolna",
     note: "Kontrola RTG po złamaniu nadgarstka",
-    departmentId: "ortopedia",
+    needsTeleconfirm: false,
   }),
   visit({
     id: "v-014",
@@ -209,7 +347,7 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "scheduled",
     type: "zabieg",
     note: "Iniekcja dostawowa bark",
-    departmentId: "ortopedia",
+    needsTeleconfirm: true,
   }),
   visit({
     id: "v-015",
@@ -221,7 +359,7 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "scheduled",
     type: "konsultacja",
     note: "Kontuzja kolana – bieganie",
-    departmentId: "ortopedia",
+    needsTeleconfirm: true,
   }),
   visit({
     id: "v-016",
@@ -233,7 +371,23 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "completed",
     type: "konsultacja",
     note: "Wydano skierowanie na USG",
-    departmentId: "ortopedia",
+    medicalNote: "Ból barku – USG stożka zalecone. NLPZ doraźnie.",
+    diagnoses: [
+      {
+        code: "M75.4",
+        namePl: "Zespół ciasnoty podbarkowej",
+        description: "",
+      },
+    ],
+    referrals: [
+      {
+        id: "ref-002",
+        title: "USG barku",
+        type: "Obrazowanie",
+        notes: "Stożek rotatorów",
+      },
+    ],
+    documentIds: ["doc-visit-016"],
   }),
   visit({
     id: "v-017",
@@ -245,7 +399,7 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "completed",
     type: "rehabilitacja",
     note: "Sesja 8/10 – zakończono plan",
-    departmentId: "rehabilitacja",
+    medicalNote: "Zakończenie cyklu RHB. Ćwiczenia domowe, kontrola za 6 tyg.",
   }),
   visit({
     id: "v-018",
@@ -257,7 +411,7 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "cancelled",
     type: "kontrolna",
     note: "Nie stawił się",
-    departmentId: "ortopedia",
+    needsTeleconfirm: true,
   }),
   visit({
     id: "v-019",
@@ -269,7 +423,14 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "completed",
     type: "konsultacja",
     note: "Zalecenia – odciążenie, orteza",
-    departmentId: "poradnia",
+    medicalNote: "Skręcenie stawu skokowego – orteza, RICE, kontrola.",
+    diagnoses: [
+      {
+        code: "S93.4",
+        namePl: "Skręcenie i naderwanie stawu skokowego",
+        description: "Stopień II",
+      },
+    ],
   }),
   visit({
     id: "v-020",
@@ -281,6 +442,6 @@ export const SEED_VISITS: DoctorVisit[] = [
     status: "scheduled",
     type: "konsultacja",
     note: "Pierwsza wizyta – uraz sportowy",
-    departmentId: "ortopedia",
+    needsTeleconfirm: true,
   }),
 ];

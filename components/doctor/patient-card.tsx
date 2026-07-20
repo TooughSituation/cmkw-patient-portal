@@ -30,6 +30,7 @@ import {
 import { PatientGroups } from "@/components/doctor/patient-groups";
 import { VisitStatusBadge } from "@/components/doctor/visit-status-badge";
 import { EmptyState } from "@/components/doctor/empty-state";
+import { DocumentsPanel } from "@/components/doctor/documents-panel";
 import { useDoctorPatients } from "@/hooks/use-doctor-patients";
 import { useDoctorVisits } from "@/hooks/use-doctor-visits";
 import {
@@ -127,16 +128,11 @@ export function PatientCard({ patientId }: { patientId: string }) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button
-            className="h-9 gap-1.5 bg-brand text-white hover:bg-brand-deep"
-            onClick={() =>
-              toast.info("Nowa wizyta", {
-                description: "Formularz wizyty — Etap 3 (powiązanie z kalendarzem)",
-              })
-            }
-          >
-            <CalendarPlus className="size-4" />
-            Nowa wizyta
+          <Button asChild className="h-9 gap-1.5 bg-brand text-white hover:bg-brand-deep">
+            <Link href="/doctor">
+              <CalendarPlus className="size-4" />
+              Nowa wizyta
+            </Link>
           </Button>
           <Button asChild variant="outline" className="h-9 gap-1.5">
             <Link href={`/doctor/pacjenci/${patient.id}/edytuj`}>
@@ -216,7 +212,7 @@ export function PatientCard({ patientId }: { patientId: string }) {
                           <TableRow key={v.id}>
                             <TableCell className="whitespace-nowrap">
                               <Link
-                                href="/doctor/wizyty"
+                                href={`/doctor/wizyty/${v.id}`}
                                 className="font-medium text-brand hover:underline"
                               >
                                 {format(parseISO(v.date), "d MMM yyyy", {
@@ -310,9 +306,7 @@ export function PatientCard({ patientId }: { patientId: string }) {
                     Brak notatek przy pacjencie.
                   </p>
                 )}
-                <div className="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-muted-foreground">
-                  Załączniki i dokumentacja medyczna — placeholder (Etap 3).
-                </div>
+                <DocumentsPanel patientId={patient.id} scope="patient" />
               </CardContent>
             </Card>
           </TabsContent>

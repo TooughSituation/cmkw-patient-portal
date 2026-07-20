@@ -21,7 +21,17 @@ import {
   resetVisitsLocalStorage,
   saveVisitsToLocalStorage,
 } from "@/lib/doctor/visits-client";
-import type { DoctorPatient, DoctorVisit, VisitStatus } from "@/lib/doctor/types";
+import {
+  loadDocumentsFromLocalStorage,
+  resetDocumentsLocalStorage,
+  saveDocumentsToLocalStorage,
+} from "@/lib/doctor/documents-client";
+import type {
+  DoctorDocument,
+  DoctorPatient,
+  DoctorVisit,
+  VisitStatus,
+} from "@/lib/doctor/types";
 
 type DoctorDataContextValue = {
   patients: DoctorPatient[];
@@ -33,11 +43,23 @@ type DoctorDataContextValue = {
   resetPatients: () => void;
   visits: DoctorVisit[];
   visitsLoading: boolean;
+  getVisitById: (id: string) => DoctorVisit | null;
   updateVisitStatus: (id: string, status: VisitStatus) => DoctorVisit | null;
+  updateVisit: (
+    id: string,
+    patch: Partial<DoctorVisit>
+  ) => DoctorVisit | null;
   addVisit: (visit: DoctorVisit) => DoctorVisit;
   resetVisits: () => void;
   visitsByDate: (date: string) => DoctorVisit[];
   datesWithVisits: Set<string>;
+  documents: DoctorDocument[];
+  documentsLoading: boolean;
+  addDocument: (doc: DoctorDocument) => DoctorDocument;
+  removeDocument: (id: string) => void;
+  documentsForPatient: (patientId: string) => DoctorDocument[];
+  documentsForVisit: (visitId: string) => DoctorDocument[];
+  resetDocuments: () => void;
 };
 
 const DoctorDataContext = createContext<DoctorDataContextValue | null>(null);
@@ -49,14 +71,18 @@ export function DoctorDataProvider({
 }) {
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
   const [visits, setVisits] = useState<DoctorVisit[]>([]);
+  const [documents, setDocuments] = useState<DoctorDocument[]>([]);
   const [patientsLoading, setPatientsLoading] = useState(true);
   const [visitsLoading, setVisitsLoading] = useState(true);
+  const [documentsLoading, setDocumentsLoading] = useState(true);
 
   useEffect(() => {
     setPatients(loadPatientsFromLocalStorage());
     setVisits(loadVisitsFromLocalStorage());
+    setDocuments(loadDocumentsFromLocalStorage());
     setPatientsLoading(false);
     setVisitsLoading(false);
+    setDocumentsLoading(false);
   }, []);
 
   const persistPatients = useCallback((next: DoctorPatient[]) => {
@@ -67,6 +93,11 @@ export function DoctorDataProvider({
   const persistVisits = useCallback((next: DoctorVisit[]) => {
     setVisits(next);
     saveVisitsToLocalStorage(next);
+  }, []);
+
+  const persistDocuments = useCallback((next: DoctorDocument[]) => {
+    setDocuments(next);
+    saveDocumentsToLocalStorage(next);
   }, []);
 
   const getPatientById = useCallback(
@@ -88,7 +119,6 @@ export function DoctorDataProvider({
       const updated = updatePatientRecord(id, input, patients);
       if (!updated) return null;
       persistPatients(patients.map((p) => (p.id === id ? updated : p)));
-      // sync denormalized visit fields
       persistVisits(
         visits.map((v) =>
           v.patientId === id
@@ -119,11 +149,40 @@ export function DoctorDataProvider({
     setPatients(resetPatientsLocalStorage());
   }, []);
 
+  const getVisitById = useCallback(
+    (id: string) => visits.find((v) => v.id === id) ?? null,
+    [visits]
+  );
+
   const updateVisitStatus = useCallback(
     (id: string, status: VisitStatus) => {
       const next = visits.map((v) =>
         v.id === id
-          ? { ...v, status, updatedAt: new Date().toISOString() }
+          ? {
+              ...v,
+              status,
+              needsTeleconfirm:
+                status === "teleconfirmed" ? false : v.needsTeleconfirm,
+              updatedAt: new Date().toISOString(),
+            }
+          : v
+      );
+      persistVisits(next);
+      return next.find((v) => v.id === id) ?? null;
+    },
+    [visits, persistVisits]
+  );
+
+  const updateVisit = useCallback(
+    (id: string, patch: Partial<DoctorVisit>) => {
+      const next = visits.map((v) =>
+        v.id === id
+          ? {
+              ...v,
+              ...patch,
+              id: v.id,
+              updatedAt: new Date().toISOString(),
+            }
           : v
       );
       persistVisits(next);
@@ -156,6 +215,63 @@ export function DoctorDataProvider({
     return new Set(visits.map((v) => v.date));
   }, [visits]);
 
+  const addDocument = useCallback(
+    (doc: DoctorDocument) => {
+      const next = [doc, ...documents];
+      persistDocuments(next);
+      if (doc.visitId) {
+        persistVisits(
+          visits.map((v) =>
+            v.id === doc.visitId
+              ? {
+                  ...v,
+                  documentIds: Array.from(
+                    new Set([...(v.documentIds ?? []), doc.id])
+                  ),
+                  updatedAt: new Date().toISOString(),
+                }
+              : v
+          )
+        );
+      }
+      return doc;
+    },
+    [documents, visits, persistDocuments, persistVisits]
+  );
+
+  const removeDocument = useCallback(
+    (id: string) => {
+      persistDocuments(documents.filter((d) => d.id !== id));
+      persistVisits(
+        visits.map((v) => ({
+          ...v,
+          documentIds: (v.documentIds ?? []).filter((x) => x !== id),
+        }))
+      );
+    },
+    [documents, visits, persistDocuments, persistVisits]
+  );
+
+  const documentsForPatient = useCallback(
+    (patientId: string) =>
+      documents
+        .filter((d) => d.patientId === patientId)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [documents]
+  );
+
+  const documentsForVisit = useCallback(
+    (visitId: string) =>
+      documents
+        .filter((d) => d.visitId === visitId)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [documents]
+  );
+
+  const resetDocuments = useCallback(() => {
+    setDocuments(resetDocumentsLocalStorage());
+  }, []);
+
   const value = useMemo<DoctorDataContextValue>(
     () => ({
       patients,
@@ -167,11 +283,20 @@ export function DoctorDataProvider({
       resetPatients,
       visits,
       visitsLoading,
+      getVisitById,
       updateVisitStatus,
+      updateVisit,
       addVisit,
       resetVisits,
       visitsByDate,
       datesWithVisits,
+      documents,
+      documentsLoading,
+      addDocument,
+      removeDocument,
+      documentsForPatient,
+      documentsForVisit,
+      resetDocuments,
     }),
     [
       patients,
@@ -183,11 +308,20 @@ export function DoctorDataProvider({
       resetPatients,
       visits,
       visitsLoading,
+      getVisitById,
       updateVisitStatus,
+      updateVisit,
       addVisit,
       resetVisits,
       visitsByDate,
       datesWithVisits,
+      documents,
+      documentsLoading,
+      addDocument,
+      removeDocument,
+      documentsForPatient,
+      documentsForVisit,
+      resetDocuments,
     ]
   );
 
