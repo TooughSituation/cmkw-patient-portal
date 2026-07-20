@@ -37,13 +37,13 @@ export function DepartmentSwitcher({ className }: { className?: string }) {
     OPTIONS.find((o) => o.id === branchFilter) ?? OPTIONS[0]!;
 
   return (
+    <div data-tour="doctor-branch-switcher" className={cn(className)}>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
           className={cn(
-            "h-9 max-w-[240px] gap-2 border-brand/20 bg-secondary/60 px-3 text-sm font-medium text-brand-heading shadow-sm hover:bg-secondary hover:text-brand",
-            className
+            "h-9 max-w-[240px] gap-2 border-brand/20 bg-secondary/60 px-3 text-sm font-medium text-brand-heading shadow-sm hover:bg-secondary hover:text-brand"
           )}
         >
           <Building2 className="size-4 shrink-0 text-brand" />
@@ -76,5 +76,6 @@ export function DepartmentSwitcher({ className }: { className?: string }) {
         </p>
       </DropdownMenuContent>
     </DropdownMenu>
+    </div>
   );
 }

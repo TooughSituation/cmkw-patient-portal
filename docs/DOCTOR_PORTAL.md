@@ -1,6 +1,6 @@
 # Portal Lekarza / CMKW EDM
 
-**Status:** Etap 0–8 + **Etap 9 (rola Placówka + izolacja danych lekarzy)**  
+**Status:** Etap 0–9 + **Etap 10 (Przewodnik / Product Tour)**  
 **Prefix:** `/doctor/*`  
 **Role:** `facility` | `doctor` | `admin` | `reception`  
 **Styl:** jasny brand CMKW (`#0849b0`, white / slate-50) — spójny z patient portalem
@@ -72,6 +72,16 @@ Usuń klucze i odśwież → seed od nowa.
 | `/doctor/terminy` | Wyszukiwarka wolnych terminów (Etap 5A) |
 | `/doctor/admin` | Administracja placówki (Etap 5A) |
 | `/doctor/admin/grafiki` | Grafiki pracy lekarzy (Etap 6B) |
+
+### Etap 10 — Przewodnik (spotlight tour)
+
+1. Menu EDM → **Przewodnik** (`/doctor/przewodnik`)
+2. Pacjent: `/portal/przewodnik` lub przycisk na dashboardzie
+3. Ścieżki: Pacjent / Lekarz / Placówka / Pełny (facility)
+4. Spotlight: przyciemnienie + highlight + licznik **PRZEWODNIK n / m**
+5. Sterowanie: Następny / Poprzedni / Esc / strzałki
+
+**Komponenty:** `components/tour/*`, `lib/tour/*` · atrybuty `data-tour="..."`
 
 ### Etap 9 — rola Placówka + izolacja lekarzy
 

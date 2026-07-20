@@ -160,7 +160,7 @@ export function BookingWizard({ patient }: Props) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="patient-booking-wizard">
       {/* Stepper */}
       <ol className="flex flex-wrap gap-2">
         {STEPS.map((label, i) => (

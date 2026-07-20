@@ -90,7 +90,10 @@ export function PaymentMock() {
   }
 
   return (
-    <div className="mx-auto max-w-lg space-y-6">
+    <div
+      className="mx-auto max-w-lg space-y-6"
+      data-tour="patient-payment"
+    >
       <Card className="border-gray-100 shadow-sm">
         <CardHeader>
           <div className="mb-2 flex size-12 items-center justify-center rounded-full bg-secondary text-brand">

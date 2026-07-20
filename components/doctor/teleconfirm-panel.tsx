@@ -23,7 +23,10 @@ export function TeleconfirmPanel() {
     .slice(0, 12);
 
   return (
-    <Card className="border-slate-200 bg-white shadow-sm ring-slate-200">
+    <Card
+      className="border-slate-200 bg-white shadow-sm ring-slate-200"
+      data-tour="doctor-teleconfirm"
+    >
       <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 pb-3">
         <CardTitle className="flex items-center gap-2 text-base text-brand-heading">
           <Phone className="size-4 text-brand" />

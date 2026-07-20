@@ -227,7 +227,7 @@ export function PatientsList() {
   }
 
   return (
-    <div className="p-3 md:p-4 lg:p-5">
+    <div className="p-3 md:p-4 lg:p-5" data-tour="doctor-patients-list">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-lg font-semibold text-brand-heading md:text-xl">

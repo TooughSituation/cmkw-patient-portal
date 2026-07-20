@@ -76,7 +76,7 @@ export function CalculatorsPanel({
   }
 
   return (
-    <div className="p-3 md:p-4 lg:p-5">
+    <div className="p-3 md:p-4 lg:p-5" data-tour="doctor-calculators">
       <div className="mb-4">
         <h1 className="text-lg font-semibold text-brand-heading md:text-xl">
           Kalkulatory medyczne

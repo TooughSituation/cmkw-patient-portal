@@ -34,7 +34,10 @@ export default async function PortalPage() {
   const { user } = session;
 
   return (
-    <div className="bg-muted/40 py-12 md:py-16">
+    <div
+      className="bg-muted/40 py-12 md:py-16"
+      data-tour="patient-dashboard"
+    >
       <div className="mx-auto max-w-5xl px-4 md:px-6">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800 ring-1 ring-emerald-200">
@@ -45,10 +48,17 @@ export default async function PortalPage() {
             <Button
               asChild
               className="gap-2 bg-brand text-white hover:bg-brand-deep"
+              data-tour="patient-book-cta"
             >
               <Link href="/portal/umow-wizyte">
                 <CalendarPlus className="size-4" />
                 Umów wizytę
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="gap-2 border-brand/30">
+              <Link href="/portal/przewodnik">
+                <FileText className="size-4" />
+                Przewodnik
               </Link>
             </Button>
             <LogoutButton
@@ -73,7 +83,10 @@ export default async function PortalPage() {
           <MyAppointments />
         </div>
 
-        <Card className="mb-8 border-gray-100 shadow-sm">
+        <Card
+          className="mb-8 border-gray-100 shadow-sm"
+          data-tour="patient-profile"
+        >
           <CardHeader>
             <CardTitle className="text-brand-heading">Dane konta</CardTitle>
             <CardDescription>

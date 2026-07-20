@@ -36,6 +36,7 @@ export function ViewAsDoctorSwitcher({ className }: { className?: string }) {
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
       <Badge
+        data-tour="doctor-role-badge"
         variant="outline"
         className={cn(
           "border-brand/30 bg-secondary font-semibold text-brand-deep",
@@ -57,7 +58,10 @@ export function ViewAsDoctorSwitcher({ className }: { className?: string }) {
           value={viewAsDoctorId ?? "all"}
           onValueChange={(v) => setViewAsDoctorId(v === "all" ? null : v)}
         >
-          <SelectTrigger className="h-8 w-[200px] border-slate-200 bg-white text-xs shadow-sm">
+          <SelectTrigger
+            data-tour="facility-view-as"
+            className="h-8 w-[200px] border-slate-200 bg-white text-xs shadow-sm"
+          >
             <SelectValue placeholder="Wszyscy lekarze" />
           </SelectTrigger>
           <SelectContent>

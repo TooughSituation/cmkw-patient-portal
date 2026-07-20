@@ -149,7 +149,10 @@ export function AdminPanel() {
   const s = settingsForm ?? settings;
 
   return (
-    <div className="flex min-h-[calc(100vh-7rem)] flex-col md:flex-row">
+    <div
+      className="flex min-h-[calc(100vh-7rem)] flex-col md:flex-row"
+      data-tour="admin-panel"
+    >
       <aside className="w-full shrink-0 border-b border-slate-200 bg-white md:w-60 md:border-r md:border-b-0">
         <div className="p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -164,6 +167,13 @@ export function AdminPanel() {
             <button
               key={m.id}
               type="button"
+              data-tour={
+                m.id === "sharing"
+                  ? "admin-sharing"
+                  : m.id === "stats"
+                    ? "admin-stats"
+                    : undefined
+              }
               onClick={() => setSection(m.id)}
               className={cn(
                 "flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm transition",

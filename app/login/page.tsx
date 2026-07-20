@@ -69,6 +69,17 @@ export default function LoginPage() {
               </p>
             </div>
 
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              Nie masz konta?{" "}
+              <Link
+                href="/rejestracja"
+                data-tour="patient-register-link"
+                className="font-semibold text-brand hover:text-brand-deep"
+              >
+                Zarejestruj się
+              </Link>
+            </p>
+
             <div className="mt-4 flex items-center justify-center gap-2 border-t border-slate-100 pt-4">
               <Stethoscope className="size-4 text-brand-deep" />
               <Link

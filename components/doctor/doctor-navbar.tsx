@@ -37,11 +37,15 @@ export function DoctorNavbar() {
     : "LK";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 text-slate-800 shadow-sm backdrop-blur">
+    <header
+      className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 text-slate-800 shadow-sm backdrop-blur"
+      data-tour="doctor-navbar"
+    >
       <div className="flex h-14 items-center gap-3 px-3 md:px-5">
         <Link
           href="/doctor"
           className="flex shrink-0 items-center gap-2.5 pr-1"
+          data-tour="doctor-logo"
         >
           <div className="relative hidden size-8 overflow-hidden rounded-md sm:block">
             <Image

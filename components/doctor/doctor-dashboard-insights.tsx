@@ -83,7 +83,10 @@ export function DoctorDashboardInsights({
   ];
 
   return (
-    <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div
+      className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
+      data-tour="doctor-dashboard-insights"
+    >
       {cards.map((c) => {
         const active =
           c.filter !== "patients" && activeFilter === c.filter;

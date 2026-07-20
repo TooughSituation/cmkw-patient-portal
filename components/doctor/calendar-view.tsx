@@ -478,7 +478,10 @@ export function CalendarView() {
 
         <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-lg font-semibold text-brand-heading md:text-xl">
+            <h1
+              className="text-lg font-semibold text-brand-heading md:text-xl"
+              data-tour="doctor-calendar-title"
+            >
               Kalendarz
               {!seesAllDoctors && !sharedPreviewDoctorId ? (
                 <span className="ml-2 text-sm font-normal text-muted-foreground">
@@ -509,7 +512,10 @@ export function CalendarView() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-sm">
+            <div
+              className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-sm"
+              data-tour="doctor-cal-modes"
+            >
               {(["day", "week", "month"] as CalMode[]).map((m) => (
                 <button
                   key={m}
@@ -526,7 +532,10 @@ export function CalendarView() {
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-0.5">
+            <div
+              className="flex items-center gap-0.5"
+              data-tour="doctor-cal-nav"
+            >
               <Button variant="outline" size="icon-sm" onClick={goPrev}>
                 <ChevronLeft className="size-4" />
               </Button>
@@ -544,7 +553,10 @@ export function CalendarView() {
             </div>
             {showDoctorFilter ? (
               <Select value={doctorFilter} onValueChange={setDoctorPersist}>
-                <SelectTrigger className="h-9 w-[180px] bg-white shadow-sm">
+                <SelectTrigger
+                  className="h-9 w-[180px] bg-white shadow-sm"
+                  data-tour="facility-doctor-filter"
+                >
                   <SelectValue placeholder="Lekarz" />
                 </SelectTrigger>
                 <SelectContent>
@@ -575,23 +587,26 @@ export function CalendarView() {
               className="size-9"
               onClick={() => setHelpOpen(true)}
               title="Skróty (?)"
+              data-tour="doctor-cal-help"
             >
               <HelpCircle className="size-4" />
             </Button>
-            <QuickVisitDialog
-              open={quickOpen}
-              onOpenChange={setQuickOpen}
-              defaultDate={dateKey}
-              trigger={
-                <Button
-                  className="h-10 gap-2 bg-brand px-5 text-sm font-semibold text-white shadow-md hover:bg-brand-deep"
-                  onClick={() => setQuickOpen(true)}
-                >
-                  <Plus className="size-4" />
-                  Szybka wizyta
-                </Button>
-              }
-            />
+            <div data-tour="doctor-quick-visit">
+              <QuickVisitDialog
+                open={quickOpen}
+                onOpenChange={setQuickOpen}
+                defaultDate={dateKey}
+                trigger={
+                  <Button
+                    className="h-10 gap-2 bg-brand px-5 text-sm font-semibold text-white shadow-md hover:bg-brand-deep"
+                    onClick={() => setQuickOpen(true)}
+                  >
+                    <Plus className="size-4" />
+                    Szybka wizyta
+                  </Button>
+                }
+              />
+            </div>
             <Button
               asChild
               className="h-9 gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700"
@@ -679,19 +694,22 @@ export function CalendarView() {
                     />
                   </Card>
                 ) : null}
-                <DayTimeline
-                  date={dateKey}
-                  visits={dayVisits}
-                  allowedTimes={allowedForDrag?.times}
-                  dragVisitId={activeDrag?.id}
-                  onStatusChange={handleStatus}
-                  onDuplicate={handleDuplicate}
-                />
+                <div data-tour="doctor-cal-timeline">
+                  <DayTimeline
+                    date={dateKey}
+                    visits={dayVisits}
+                    allowedTimes={allowedForDrag?.times}
+                    dragVisitId={activeDrag?.id}
+                    onStatusChange={handleStatus}
+                    onDuplicate={handleDuplicate}
+                  />
+                </div>
               </div>
             </div>
           )}
 
           {mode === "week" && (
+            <div data-tour="doctor-cal-timeline">
             <WeekTimeline
               days={weekDays}
               visitsByDate={(d) => filterVisits(byDate(d))}
@@ -705,10 +723,14 @@ export function CalendarView() {
               onStatusChange={handleStatus}
               onDuplicate={handleDuplicate}
             />
+            </div>
           )}
 
           {mode === "month" && (
-            <Card className="border-slate-200 bg-white shadow-sm">
+            <Card
+              className="border-slate-200 bg-white shadow-sm"
+              data-tour="doctor-cal-timeline"
+            >
               <CardHeader className="flex flex-row items-center justify-between border-b pb-3">
                 <CardTitle className="text-base text-brand-heading">
                   {format(selected, "LLLL yyyy", { locale: pl })}

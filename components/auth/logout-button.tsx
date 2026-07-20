@@ -46,6 +46,7 @@ export function LogoutButton({
       onClick={handleLogout}
       disabled={loading}
       className={cn("gap-2", className)}
+      data-tour="patient-logout"
     >
       {loading ? (
         <Loader2 className="size-4 animate-spin" />

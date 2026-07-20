@@ -116,6 +116,9 @@ export function LoginForm({
       onSubmit={onSubmit}
       className={cn("space-y-4", className)}
       noValidate
+      data-tour={
+        isDoctorVariant ? "doctor-login-form" : "patient-login-form"
+      }
     >
       {errors.form && (
         <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

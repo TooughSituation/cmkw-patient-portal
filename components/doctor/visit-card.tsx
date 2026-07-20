@@ -180,7 +180,7 @@ export function VisitCard({ visitId }: { visitId: string }) {
   const branch = getBranchById(visit.branchId);
 
   return (
-    <div className="p-3 md:p-4 lg:p-5">
+    <div className="p-3 md:p-4 lg:p-5" data-tour="doctor-visit-card">
       <div className="mb-3">
         <Button asChild variant="ghost" size="sm" className="h-8 gap-1 px-2">
           <Link href="/doctor/wizyty">

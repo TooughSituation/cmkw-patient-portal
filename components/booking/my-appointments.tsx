@@ -76,7 +76,10 @@ export function MyAppointments() {
   const upcoming = items.filter((a) => a.status !== "cancelled");
 
   return (
-    <Card className="border-gray-100 shadow-sm">
+    <Card
+      className="border-gray-100 shadow-sm"
+      data-tour="patient-my-appointments"
+    >
       <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-3">
         <div>
           <CardTitle className="text-brand-heading">Moje wizyty</CardTitle>

@@ -41,6 +41,7 @@ export function DoctorSidebar({ className }: { className?: string }) {
         className
       )}
       aria-label="Przełącznik lekarzy — widok placówki"
+      data-tour="facility-doctor-sidebar"
     >
       <button
         type="button"
