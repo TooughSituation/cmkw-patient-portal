@@ -29,13 +29,13 @@ export function DepartmentSwitcher({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           className={cn(
-            "h-9 gap-2 border border-white/10 bg-white/5 px-3 text-sm text-slate-100 hover:bg-white/10 hover:text-white",
+            "h-9 gap-2 border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 hover:bg-secondary hover:text-brand-heading",
             className
           )}
         >
-          <Building2 className="size-4 opacity-80" />
+          <Building2 className="size-4 text-brand" />
           <span className="hidden max-w-[160px] truncate sm:inline">
             {current.shortName}
           </span>
@@ -56,7 +56,7 @@ export function DepartmentSwitcher({
               <span className="text-xs text-muted-foreground">{d.name}</span>
             </span>
             {d.id === current.id ? (
-              <Check className="size-4 text-primary" />
+              <Check className="size-4 text-brand" />
             ) : null}
           </DropdownMenuItem>
         ))}

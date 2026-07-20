@@ -1,8 +1,9 @@
-# Portal Lekarza / CMKW EDM — Etap 0 + 1
+# Portal Lekarza / CMKW EDM
 
-**Status:** fundament + kalendarz + lista wizyt  
+**Status:** Etap 0–1 (kalendarz + wizyty) + **Etap 2 (Pacjenci CRUD)**  
 **Prefix:** `/doctor/*`  
-**Role:** `doctor` | `admin` | `reception`
+**Role:** `doctor` | `admin` | `reception`  
+**Styl:** jasny brand CMKW (`#0849b0`, white / slate-50) — spójny z patient portalem
 
 ---
 
@@ -14,13 +15,102 @@ npm install
 npm run dev
 ```
 
-Otwórz: [http://localhost:3000/doctor](http://localhost:3000/doctor)
+- EDM: http://localhost:3000/doctor  
+- Pacjenci: http://localhost:3000/doctor/pacjenci  
 
-Bez sesji → redirect na `/login?callbackUrl=/doctor`.
+**Demo:** `jan.kiryluk@cmkw.pl` / `Lekarz123!`
 
 ---
 
-## Konta demo (seed przy starcie)
+## Testowanie krok po kroku (Etap 2)
+
+1. Zaloguj się kontem lekarza (powyżej).
+2. Upewnij się, że navbar jest **jasny** (biały), nie navy MyDr.
+3. Zakładka **Pacjenci** → lista z 20 seedami (po pierwszym załadowaniu localStorage).
+4. Wyszukaj po nazwisku `Kowalska` → wynik Anna Kowalska.
+5. Filtry zaawansowane: status / grupa / miasto.
+6. Sortuj po kolumnie (Nazwisko, Data ur., Ostatnia wizyta, Status).
+7. Klik nazwisko → **karta pacjenta** (`/doctor/pacjenci/p-001`):
+   - Historia wizyt, dane, notatki, grupy/RODO
+   - Prawa kolumna: podsumowanie
+8. **Edytuj** → zmień telefon → Zapisz → weryfikacja na karcie.
+9. **Dodaj pacjenta** (`/doctor/pacjenci/nowy`):
+   - PESEL poprawny (suma kontrolna) → auto data ur. + płeć
+   - Duplikat PESEL → błąd
+10. Z **Kalendarza**: SZYBKA WIZYTA → wybór pacjenta → wizyta pojawia się w tabeli dnia.
+11. Z **Wizyty** / kalendarza: klik nazwiska pacjenta → karta.
+12. PESEL na listach i karcie zawsze maskowany (`******`); pełny tylko w edycji.
+
+### Reset danych
+
+DevTools → Application → Local Storage:
+
+- `cmkw-doctor-patients-v1`
+- `cmkw-doctor-visits-v2`
+
+Usuń klucze i odśwież → seed od nowa.
+
+---
+
+## Routing
+
+| Ścieżka | Opis |
+|---------|------|
+| `/doctor` | Kalendarz |
+| `/doctor/wizyty` | Lista wizyt |
+| `/doctor/pacjenci` | Lista pacjentów |
+| `/doctor/pacjenci/nowy` | Dodawanie |
+| `/doctor/pacjenci/[id]` | Karta |
+| `/doctor/pacjenci/[id]/edytuj` | Edycja |
+
+---
+
+## Struktura (Etap 2)
+
+```
+app/doctor/pacjenci/
+  page.tsx
+  nowy/page.tsx
+  [id]/page.tsx
+  [id]/edytuj/page.tsx
+
+components/doctor/
+  doctor-data-provider.tsx   # wspólny state patients+visits
+  patients-list.tsx
+  patient-form.tsx
+  patient-card.tsx
+  patient-edit-client.tsx
+  patient-name-link.tsx
+  quick-visit-dialog.tsx
+  … (shell light CMKW)
+
+lib/doctor/
+  seed-patients.ts           # 20 pacjentów, poprawne PESEL
+  seed-visits.ts             # patientId powiązany
+  patients-client.ts / patients-store.ts
+  visits-client.ts (v2)
+
+lib/validations/patient.ts
+lib/pesel.ts                 # buildPesel, parsePesel, isValidPesel
+```
+
+---
+
+## Etap 3 — propozycje
+
+1. **Baza leków** — wyszukiwarka + mock katalog + przypisanie do wizyty  
+2. **ICD-10** — kody + podpowiedzi w karcie wizyty  
+3. **Kalkulatory** — BMI, eGFR, dawki  
+4. **Karta wizyty EDM** — wywiad, rozpoznanie, zalecenia, e-recepta placeholder  
+5. **Telepotwierdzenia** + IVR  
+6. **Dokumenty** w karcie pacjenta (upload mock)  
+7. **Prisma + Postgres** — migracja z localStorage / `.data`  
+8. **API** `/api/doctor/patients`, `/api/doctor/visits`  
+9. Integracja booking pacjenta ↔ EDM  
+
+---
+
+## Konta demo
 
 | E-mail | Hasło | Rola |
 |--------|-------|------|
@@ -28,86 +118,3 @@ Bez sesji → redirect na `/login?callbackUrl=/doctor`.
 | `tomas.wenta@cmkw.pl` | `Lekarz123!` | doctor |
 | `recepcja@cmkw.pl` | `Recep123!` | reception |
 | `admin@cmkw.pl` | `Admin123!` | admin |
-
-Pacjent (rejestracja na `/rejestracja`) **nie** wejdzie na `/doctor` → redirect na `/portal`.
-
----
-
-## Testowanie ręcznie
-
-1. Zaloguj się jako `jan.kiryluk@cmkw.pl` / `Lekarz123!`
-2. Powinien otworzyć się **Kalendarz** (`/doctor`) — dark navbar, zakładki, mini-kalendarz, tabela dnia
-3. Przełącz datę w mini-kalendarzu; dni z wizytami mają niebieską kropkę
-4. Filtr „Ukryj zakończone”, wyszukiwarka, akcje wiersza (potwierdź / zakończ / odwołaj) + toast
-5. Zakładka **Wizyty** → filtry (pacjent, data od-do, lekarz, stan), paginacja
-6. Wyloguj → zaloguj jako pacjent → `/doctor` → `/portal`
-7. Personel na `/portal` → redirect na `/doctor`
-
-### Dane
-
-- **localStorage** klucz: `cmkw-doctor-visits-v1`
-- **Serwer (dev):** `.data/doctor-visits.json` (po wywołaniach store’a serwerowego)
-- Seed: 20 wizyt (`lib/doctor/seed-visits.ts`), daty względne do „dziś”
-
-Reset wizyt w przeglądarce: DevTools → Application → Local Storage → usuń klucz.
-
----
-
-## Struktura folderów
-
-```
-app/doctor/
-  layout.tsx              # DoctorShell + metadata
-  page.tsx                # Kalendarz
-  wizyty/page.tsx         # Lista wizyt
-
-components/doctor/
-  doctor-shell.tsx
-  doctor-navbar.tsx
-  doctor-tabs.tsx
-  doctor-sidebar.tsx
-  department-switcher.tsx
-  calendar-view.tsx
-  visits-list.tsx
-  visit-status-badge.tsx
-  visit-row-actions.tsx
-  patient-groups.tsx
-  empty-state.tsx
-
-lib/doctor/
-  types.ts
-  departments.ts
-  nav.ts
-  seed-visits.ts
-  visits-client.ts        # localStorage (klient)
-  visits-store.ts         # .data/ (serwer / API)
-
-lib/auth/roles.ts
-hooks/use-doctor-visits.ts
-```
-
----
-
-## Etap 2 — kolejne pliki / zadania
-
-1. **Pacjenci CRUD** — `app/doctor/pacjenci/*`, kartoteka, PESEL, grupy, historia
-2. **Formularz wizyty** — dialog Szybka wizyta / Dodaj wizytę (walidacja Zod)
-3. **Karta wizyty / EDM** — wywiad, rozpoznanie, zalecenia, e-recepta placeholder
-4. **Baza leków** — wyszukiwarka + mock katalog
-5. **ICD-10** — wyszukiwarka kodów
-6. **Kalkulatory medyczne** (BMI, eGFR, …)
-7. **Telepotwierdzenia** — kolejka SMS/telefon
-8. **Powiadomienia / wiadomości** w navbarze
-9. **Prisma + Postgres** — migracja z localStorage / `.data`
-10. **Uprawnienia granularne** — reception vs doctor vs admin
-11. **API REST** — `/api/doctor/visits`, `/api/doctor/patients`
-12. **Integracja z bookingiem pacjenta** — wspólny model wizyt
-
----
-
-## Middleware (skrót)
-
-- `/doctor/*` → wymaga logowania + rola staff
-- pacjent na `/doctor` → `/portal`
-- staff na `/portal` → `/doctor`
-- zalogowany na `/login` → home wg roli

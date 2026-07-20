@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { pl } from "date-fns/locale";
 import { format, parseISO, startOfDay } from "date-fns";
 import {
@@ -28,6 +29,8 @@ import { VisitStatusBadge } from "@/components/doctor/visit-status-badge";
 import { PatientGroups } from "@/components/doctor/patient-groups";
 import { VisitRowActions } from "@/components/doctor/visit-row-actions";
 import { EmptyState } from "@/components/doctor/empty-state";
+import { PatientNameLink } from "@/components/doctor/patient-name-link";
+import { QuickVisitDialog } from "@/components/doctor/quick-visit-dialog";
 import { VISIT_TYPE_LABELS } from "@/lib/doctor/types";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -87,23 +90,23 @@ export function CalendarView() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button
-            className="h-9 gap-1.5 bg-[#0849b0] text-white hover:bg-[#063a8f]"
-            onClick={() =>
-              toast.info("Szybka wizyta — formularz w Etapie 2")
+          <QuickVisitDialog
+            defaultDate={dateKey}
+            trigger={
+              <Button className="h-9 gap-1.5 bg-brand text-white hover:bg-brand-deep">
+                <Plus className="size-4" />
+                Szybka wizyta
+              </Button>
             }
-          >
-            <Plus className="size-4" />
-            Szybka wizyta
-          </Button>
+          />
           <Button
+            asChild
             className="h-9 gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700"
-            onClick={() =>
-              toast.info("Dodaj pacjenta — formularz w Etapie 2")
-            }
           >
-            <UserPlus className="size-4" />
-            Dodaj pacjenta
+            <Link href="/doctor/pacjenci/nowy">
+              <UserPlus className="size-4" />
+              Dodaj pacjenta
+            </Link>
           </Button>
           <Button
             variant="outline"
@@ -132,7 +135,7 @@ export function CalendarView() {
               modifiers={{ hasVisit: daysWithDots }}
               modifiersClassNames={{
                 hasVisit:
-                  "after:absolute after:bottom-1 after:left-1/2 after:size-1 after:-translate-x-1/2 after:rounded-full after:bg-[#0849b0]",
+                  "after:absolute after:bottom-1 after:left-1/2 after:size-1 after:-translate-x-1/2 after:rounded-full after:bg-brand",
               }}
               className="w-full [--cell-size:2.25rem]"
             />
@@ -152,7 +155,7 @@ export function CalendarView() {
               <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-medium text-slate-600">
                 <input
                   type="checkbox"
-                  className="size-3.5 rounded border-slate-300 accent-[#0849b0]"
+                  className="size-3.5 rounded border-slate-300 accent-[var(--brand)]"
                   checked={hideCompleted}
                   onChange={(e) => setHideCompleted(e.target.checked)}
                 />
@@ -212,14 +215,15 @@ export function CalendarView() {
                           {v.time}
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium text-slate-900">
-                            {v.patientFirstName} {v.patientLastName}
-                          </div>
+                          <PatientNameLink
+                            patientId={v.patientId}
+                            firstName={v.patientFirstName}
+                            lastName={v.patientLastName}
+                            showDoctorHint
+                            doctorName={v.doctorName}
+                          />
                           <div className="text-xs text-slate-500 md:hidden">
                             {VISIT_TYPE_LABELS[v.type]}
-                          </div>
-                          <div className="mt-0.5 text-xs text-slate-400">
-                            {v.doctorName}
                           </div>
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
@@ -254,20 +258,20 @@ export function CalendarView() {
       <Card className="mt-4 border-dashed border-slate-300 bg-white/80 shadow-none ring-0">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-            <Phone className="size-4 text-[#0849b0]" />
+            <Phone className="size-4 text-brand" />
             Telepotwierdzenia
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <p className="text-sm text-slate-500">
-            Moduł potwierdzeń telefonicznych i SMS — placeholder (Etap 2).
+            Moduł potwierdzeń telefonicznych i SMS — placeholder (Etap 3).
             Tutaj pojawi się kolejka pacjentów do potwierdzenia wizyty.
           </p>
           <Button
             variant="outline"
             size="sm"
             className="mt-3 h-8"
-            onClick={() => toast.info("Telepotwierdzenia — wkrótce")}
+            onClick={() => toast.info("Telepotwierdzenia — wkrótce (Etap 3)")}
           >
             Otwórz kolejkę
           </Button>

@@ -34,6 +34,8 @@ import { VisitStatusBadge } from "@/components/doctor/visit-status-badge";
 import { PatientGroups } from "@/components/doctor/patient-groups";
 import { VisitRowActions } from "@/components/doctor/visit-row-actions";
 import { EmptyState } from "@/components/doctor/empty-state";
+import { PatientNameLink } from "@/components/doctor/patient-name-link";
+import { QuickVisitDialog } from "@/components/doctor/quick-visit-dialog";
 import { doctors } from "@/lib/booking/doctors";
 import {
   VISIT_STATUS_LABELS,
@@ -41,7 +43,6 @@ import {
   type VisitStatus,
 } from "@/lib/doctor/types";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 const PAGE_SIZE = 10;
 
@@ -112,10 +113,10 @@ export function VisitsList() {
     <div className="p-3 md:p-4 lg:p-5">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-slate-900 md:text-xl">
+          <h1 className="text-lg font-semibold text-brand-heading md:text-xl">
             Lista wizyt
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             {filtered.length}{" "}
             {filtered.length === 1
               ? "wizyta"
@@ -125,19 +126,20 @@ export function VisitsList() {
             (wszystkie filtry)
           </p>
         </div>
-        <Button
-          className="h-9 gap-1.5 bg-[#0849b0] text-white hover:bg-[#063a8f]"
-          onClick={() => toast.info("Dodaj wizytę — formularz w Etapie 2")}
-        >
-          <Plus className="size-4" />
-          Dodaj wizytę
-        </Button>
+        <QuickVisitDialog
+          trigger={
+            <Button className="h-9 gap-1.5 bg-brand text-white hover:bg-brand-deep">
+              <Plus className="size-4" />
+              Dodaj wizytę
+            </Button>
+          }
+        />
       </div>
 
       {/* Filters */}
       <Card className="mb-4 border-slate-200 bg-white shadow-sm ring-slate-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold text-slate-700">
+          <CardTitle className="text-sm font-semibold text-brand-heading">
             Filtry
           </CardTitle>
         </CardHeader>
@@ -303,9 +305,11 @@ export function VisitsList() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium text-slate-900">
-                          {v.patientFirstName} {v.patientLastName}
-                        </div>
+                        <PatientNameLink
+                          patientId={v.patientId}
+                          firstName={v.patientFirstName}
+                          lastName={v.patientLastName}
+                        />
                         <div className="text-xs text-slate-400 lg:hidden">
                           {v.doctorName}
                         </div>

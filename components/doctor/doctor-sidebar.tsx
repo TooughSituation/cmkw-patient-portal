@@ -19,7 +19,7 @@ export function DoctorSidebar({ className }: { className?: string }) {
   return (
     <aside
       className={cn(
-        "hidden w-14 shrink-0 flex-col items-center gap-2 border-l border-slate-200 bg-[#1e293b] py-3 xl:flex",
+        "hidden w-14 shrink-0 flex-col items-center gap-2 border-l border-slate-200 bg-white py-3 xl:flex",
         className
       )}
       aria-label="Szybki dostęp — personel"
@@ -34,10 +34,10 @@ export function DoctorSidebar({ className }: { className?: string }) {
               description: "Filtr lekarza — wkrótce",
             })
           }
-          className="rounded-full ring-offset-2 ring-offset-[#1e293b] transition hover:ring-2 hover:ring-[#0849b0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0849b0]"
+          className="rounded-full ring-offset-2 ring-offset-white transition hover:ring-2 hover:ring-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
         >
-          <Avatar className="size-9 border border-slate-600">
-            <AvatarFallback className="bg-slate-700 text-[11px] font-semibold text-slate-100">
+          <Avatar className="size-9 border border-slate-200">
+            <AvatarFallback className="bg-secondary text-[11px] font-semibold text-brand-deep">
               {s.initials}
             </AvatarFallback>
           </Avatar>

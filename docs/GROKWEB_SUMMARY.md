@@ -1,7 +1,7 @@
 # Podsumowanie projektu — CMKW Patient Portal (dla GrokWeb)
 
 **Data aktualizacji:** 2026-07-20  
-**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–1)** + deploy  
+**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–2: kalendarz, wizyty, pacjenci CRUD)**  
 **Konto:** TooughSituation / toough-situation
 
 ---
@@ -69,12 +69,18 @@ Własne `.git`; parent `akwen-web` ignoruje ten folder.
 | `/portal/umow-wizyte/sukces` | Potwierdzenie |
 | `/api/auth/*`, `/api/appointments` | API |
 
-### Portal Lekarza / CMKW EDM (Etap 0–1)
+### Portal Lekarza / CMKW EDM (Etap 0–2)
 
 | Ścieżka | Opis |
 |---------|------|
 | `/doctor` | **Kalendarz** — mini-kalendarz + widok dnia + tabela wizyt |
-| `/doctor/wizyty` | **Lista wizyt** — filtry, statusy, paginacja |
+| `/doctor/wizyty` | **Lista wizyt** — filtry, statusy, paginacja, szybka wizyta |
+| `/doctor/pacjenci` | **Lista pacjentów** — wyszukiwanie, sort, filtry, paginacja |
+| `/doctor/pacjenci/nowy` | Dodawanie (Zod + RHF) |
+| `/doctor/pacjenci/[id]` | Karta pacjenta (zakładki + podsumowanie) |
+| `/doctor/pacjenci/[id]/edytuj` | Edycja (pełny PESEL tylko tu) |
+
+**Styl EDM:** jasny layout CMKW (white navbar, `#0849b0`) — **nie** dark MyDr.
 
 **Middleware:**
 
@@ -142,46 +148,40 @@ Na `/doctor/*` marketingowy header/footer jest ukryty (`AppChrome`).
 
 ---
 
-## 8. Portal Lekarza EDM (Etap 0–1) — szczegóły
+## 8. Portal Lekarza EDM (Etap 0–2) — szczegóły
 
-### UI (klimat MyDr)
+### UI (brand CMKW — jasny)
 
-- Dark top navbar: logo CMKW EDM, badge ZnanyLekarz, przełącznik oddziałów, powiadomienia/wiadomości/ustawienia, avatar  
-- Zakładki: Kalendarz | Wizyty | Pacjenci* | Baza leków* | Kalkulatory* | ICD-10* | Inne*  
-- Prawy sidebar z avatarami lekarzy (xl+)  
+- Biały top navbar + logo, badge EDM, oddział, powiadomienia, avatar  
+- Zakładki: Kalendarz | Wizyty | **Pacjenci** | Baza leków* | Kalkulatory* | ICD-10* | Inne*  
+- Prawy sidebar (jasny) z avatarami lekarzy (xl+)  
 - Toasty (sonner), loading + empty states  
 
-\* placeholdery → Etap 2
+\* placeholdery → Etap 3
 
-### Kalendarz `/doctor`
+### Kalendarz / Wizyty
 
-- Lewy mini-kalendarz (react-day-picker / shadcn Calendar, locale PL)  
-- Tabela dnia: Godzina | Pacjent | Grupy | Stan | Typ | Notatka | Akcje  
-- Przyciski: SZYBKA WIZYTA, DODAJ PACJENTA, ZAKOŃCZ DZIEŃ  
-- Filtr „Ukryj zakończone”, wyszukiwarka  
-- Placeholder Telepotwierdzenia  
+- Mini-kalendarz, tabela dnia, Szybka wizyta (dialog + wybór pacjenta)  
+- Link z nazwiska pacjenta → karta  
+- Lista wizyt: filtry, paginacja, statusy  
 
-### Lista wizyt `/doctor/wizyty`
+### Pacjenci (Etap 2)
 
-- Filtry: pacjent, data od–do, lekarz, stan  
-- Kolumny + PESEL maskowany + badge statusów  
-- Statusy: Zaplanowana, Potwierdzona, Odwołana, Zakończona  
-- Paginacja (10/str), DODAJ WIZYTĘ  
-
-### Dane
-
-- Seed: **20 wizyt** (`lib/doctor/seed-visits.ts`), daty względne do „dziś”  
-- Klient: `localStorage` klucz `cmkw-doctor-visits-v1`  
-- Serwer (pod API): `.data/doctor-visits.json`  
-- Lekarze seed: Kiryluk, Wenta, Frankowski, Zawadzki, Torba, Sammoudi  
+- Lista: Nazwisko | Imię | PESEL mask | Telefon | Data ur. | Ostatnia wizyta | Status | Akcje  
+- Wyszukiwanie + filtry zaawansowane + sort + paginacja  
+- Formularz: Zod + react-hook-form, PESEL → auto data ur. + płeć  
+- Karta: Historia wizyt | Dane | Notatki | Grupy/RODO + podsumowanie  
+- Seed: **20 pacjentów** + **20 wizyt** (`patientId`), poprawne PESEL  
+- Store: `cmkw-doctor-patients-v1`, `cmkw-doctor-visits-v2` + `.data/patients.json`  
+- Shared state: `DoctorDataProvider`  
 
 ### Pliki
 
 ```
-app/doctor/layout.tsx  page.tsx  wizyty/page.tsx
-components/doctor/*
-lib/doctor/*   lib/auth/roles.ts
-hooks/use-doctor-visits.ts
+app/doctor/…  pacjenci/…
+components/doctor/*  (list, form, card, quick-visit, data-provider)
+lib/doctor/seed-patients.ts  patients-client.ts
+lib/validations/patient.ts  lib/pesel.ts (build/parse)
 docs/DOCTOR_PORTAL.md
 ```
 
@@ -243,14 +243,14 @@ npm install && npm run dev   # http://localhost:3000
 
 ## 12. Backlog
 
-### EDM Etap 2
+### EDM Etap 3
 
-1. Pacjenci CRUD  
-2. Formularze Szybka wizyta / Dodaj wizytę  
-3. Karta wizyty EDM (wywiad, ICD, zalecenia)  
-4. Baza leków, ICD-10, kalkulatory  
-5. Telepotwierdzenia (pełny moduł)  
-6. API REST doctor + integracja z bookingiem pacjenta  
+1. Baza leków + ICD-10 + kalkulatory  
+2. Karta wizyty EDM (wywiad, rozpoznanie, zalecenia)  
+3. Telepotwierdzenia / IVR  
+4. Dokumenty w karcie pacjenta  
+5. API REST doctor + integracja z bookingiem pacjenta  
+6. Prisma + Postgres  
 7. RBAC granularne (reception vs doctor vs admin)  
 
 ### Platforma
@@ -275,16 +275,16 @@ npm install && npm run dev   # http://localhost:3000
 > **Gotowe:**  
 > - Pełny klon publicznej strony cmkirylukwenta.pl  
 > - Portal pacjenta: auth (PESEL+RODO), booking + mock płatność  
-> - **Portal Lekarza EDM Etap 0–1:** `/doctor` kalendarz, `/doctor/wizyty` lista; role doctor|admin|reception; seed staff; 20 mock wizyt (localStorage + .data)  
-> - Brand: `#0849b0`, navy EDM `#0f172a`  
+> - **Portal Lekarza EDM Etap 0–2:** kalendarz, wizyty, **pacjenci CRUD + karta**; jasny brand CMKW; role doctor|admin|reception; 20 pacjentów + 20 wizyt  
+> - Brand: `#0849b0`, white EDM shell (nie dark MyDr)  
 > - Docs: `docs/GROKWEB_SUMMARY.md`, `docs/DOCTOR_PORTAL.md`  
 >  
 > **Demo EDM:** `jan.kiryluk@cmkw.pl` / `Lekarz123!`  
-> **Brak (Etap 2):** pacjenci CRUD, leki, ICD, kalkulatory, karta wizyty, Prisma, realna płatność.  
+> **Brak (Etap 3):** leki, ICD, kalkulatory, karta wizyty, Prisma, realna płatność.  
 > Następny krok: [tu wstaw zadanie].
 
 ---
 
 ## 14. TL;DR
 
-CMKW = **klon strony** cmkirylukwenta.pl + **portal pacjenta** (auth + wizyty) + **Portal Lekarza EDM** (kalendarz + lista wizyt, Etap 0–1), live na Vercel. Store tymczasowy; kolejny etap EDM: pacjenci CRUD, formularze wizyt, Prisma.
+CMKW = **klon strony** cmkirylukwenta.pl + **portal pacjenta** + **Portal Lekarza EDM** (kalendarz, wizyty, pacjenci CRUD/karta — Etap 0–2), jasny brand CMKW. Store: localStorage + `.data`. Kolejny etap: leki / ICD / karta wizyty / Prisma.

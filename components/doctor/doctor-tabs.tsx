@@ -19,7 +19,7 @@ export function DoctorTabs() {
       className="border-b border-slate-200 bg-white"
       aria-label="Główne sekcje EDM"
     >
-      <div className="flex gap-0 overflow-x-auto px-2 md:px-4">
+      <div className="flex gap-0 overflow-x-auto px-2 md:px-5">
         {DOCTOR_NAV.map((item) => {
           const active = isActive(item.href);
           if (item.disabled) {
@@ -28,7 +28,7 @@ export function DoctorTabs() {
                 key={item.href}
                 type="button"
                 onClick={() =>
-                  toast.info(`${item.label} — dostępne w Etapie 2`)
+                  toast.info(`${item.label} — dostępne w Etapie 3`)
                 }
                 className={cn(
                   "relative shrink-0 border-b-2 border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:text-slate-600 md:px-4",
@@ -47,8 +47,8 @@ export function DoctorTabs() {
               className={cn(
                 "relative shrink-0 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors md:px-4",
                 active
-                  ? "border-[#0849b0] text-[#0849b0]"
-                  : "border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900"
+                  ? "border-brand text-brand"
+                  : "border-transparent text-slate-600 hover:border-slate-300 hover:text-brand-heading"
               )}
             >
               {item.label}
