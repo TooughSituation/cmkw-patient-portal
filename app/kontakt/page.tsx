@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Mail, MapPin, Phone, UserRound } from "lucide-react";
 import { PageHero } from "@/components/layout/page-hero";
 import { ContentSection } from "@/components/layout/content-section";
+import { MapSection } from "@/components/map-section";
 import { siteConfig } from "@/lib/site-config";
 import { Button } from "@/components/ui/button";
 
@@ -114,17 +115,7 @@ export default function KontaktPage() {
         </div>
       </ContentSection>
 
-      <ContentSection patterned className="!pt-8">
-        <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-          <iframe
-            title="Mapa — Centrum Medyczne Kiryluk i Wenta"
-            src="https://maps.google.com/maps?q=Wis%C5%82awy%20Szymborskiej%202%2C%20Bia%C5%82ystok&t=&z=15&ie=UTF8&iwloc=&output=embed"
-            className="h-[360px] w-full border-0"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        </div>
-      </ContentSection>
+      <MapSection height={450} />
     </>
   );
 }

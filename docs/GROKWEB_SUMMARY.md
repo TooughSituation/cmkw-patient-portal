@@ -295,8 +295,8 @@ npm install && npm run dev   # http://localhost:3000
 > - Portal pacjenta: auth (PESEL+RODO), booking + mock płatność  
 > - **Portal Lekarza EDM Etap 0–9:** DnD kalendarz + **rola Placówka** + izolacja lekarzy + udostępnianie kalendarzy  
 > - Brand: `#0849b0`, white EDM shell  
-> - **Demo placówka:** `cmkw@cmkw.pl` / `cmkw123`  
-> - **Demo lekarz:** `jan.kiryluk@cmkw.pl` / `jankiryluk123`  
+> - **Demo placówka:** `cmkw@cmkw.pl` / `cmkw123` (tylko ta rola widzi Administrację)  
+> - **Demo lekarz:** `jan.kiryluk@cmkw.pl` / `jankiryluk123` · `tomas.wenta@cmkw.pl` / `tomaswenta123`  
 > - **Demo pacjent:** `jan.kowalski@email.pl` / `jankowalski123`  
 > - Docs: `docs/GROKWEB_SUMMARY.md`, `docs/DOCTOR_PORTAL.md`  
 >  

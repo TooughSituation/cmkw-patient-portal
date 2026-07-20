@@ -36,15 +36,16 @@ export default function NaszZespolPage() {
           patterned={index % 2 === 1}
           id={member.id}
         >
-          <div className="grid items-start gap-8 md:grid-cols-[220px_1fr]">
-            <div className="mx-auto w-full max-w-[220px]">
-              <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-gray-100 bg-secondary shadow-sm">
+          <div className="grid items-start gap-8 md:grid-cols-[200px_1fr] md:gap-10">
+            <div className="mx-auto w-full max-w-[200px]">
+              {/* Zaokrąglone zdjęcia zespołu */}
+              <div className="relative mx-auto aspect-square w-full max-w-[180px] overflow-hidden rounded-full border-4 border-white bg-secondary shadow-[0_8px_24px_rgba(43,45,129,0.15)] ring-1 ring-brand/10">
                 <Image
                   src={member.image}
                   alt={`${member.title} ${member.name}`}
                   fill
-                  className="object-cover object-top"
-                  sizes="220px"
+                  className="object-cover object-[center_15%]"
+                  sizes="180px"
                 />
               </div>
             </div>

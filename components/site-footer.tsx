@@ -41,7 +41,15 @@ export function SiteFooter() {
                 href="/login"
                 className="text-[#999] transition-colors hover:text-white"
               >
-                Rejestracja / Portal Pacjenta
+                Portal Pacjenta
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/doctor/login"
+                className="text-[#999] transition-colors hover:text-white"
+              >
+                Dla Lekarza
               </Link>
             </li>
           </ul>
@@ -54,7 +62,10 @@ export function SiteFooter() {
           <ul className="space-y-2 text-sm text-[#999]">
             {siteConfig.phones.map((phone) => (
               <li key={phone.href}>
-                <a href={phone.href} className="hover:text-white">
+                <a
+                  href={phone.href}
+                  className="transition-colors hover:text-white"
+                >
                   {phone.label}
                 </a>
               </li>
@@ -62,9 +73,19 @@ export function SiteFooter() {
             <li>
               <a
                 href={`mailto:${siteConfig.email}`}
-                className="hover:text-white"
+                className="transition-colors hover:text-white"
               >
                 {siteConfig.email}
+              </a>
+            </li>
+            <li>
+              <a
+                href={siteConfig.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-white"
+              >
+                {siteConfig.address.full}
               </a>
             </li>
           </ul>
@@ -76,7 +97,19 @@ export function SiteFooter() {
           <p>
             © {year} {siteConfig.company}
           </p>
-          <p>Portal pacjenta · Next.js</p>
+          <p>
+            <a
+              href="https://cdx.pl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-colors hover:text-[#999]"
+              title="tworzenie stron internetowych"
+            >
+              Created by: cdx.pl
+            </a>
+            <span className="mx-2 text-[#444]">·</span>
+            <span>Portal pacjenta</span>
+          </p>
         </div>
       </div>
     </footer>

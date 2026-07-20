@@ -20,7 +20,10 @@ export const siteConfig = {
   hours:
     "Rejestracja telefoniczna jest czynna od poniedziałku do piątku w godzinach 8:00 – 18:00",
   mapsUrl:
-    "https://www.google.pl/maps/dir//Wisławy+Szymborskiej+2,+15-424+Białystok",
+    "https://www.google.pl/maps/dir//Wisławy+Szymborskiej+2,+15-424+Białystok/@53.1322934,23.1477863,16.13z/data=!4m8!4m7!1m0!1m5!1m1!1s0x471ffdda04cbb265:0xc000984c54a7f971!2m2!1d23.1493531!2d53.132977",
+  /** Embed Google Maps jak na cmkirylukwenta.pl (homepage / kontakt) */
+  mapsEmbedUrl:
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d18074.919315415536!2d23.13603835238804!3d53.13328105352336!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x471ffd6b34080ced%3A0xee895a75fb49e39a!2sCentrum%20Medyczne%20Kiryluk%20%26%20Wenta!5e0!3m2!1spl!2spl!4v1782712999473!5m2!1spl!2spl",
   /** Menu jak na cmkirylukwenta.pl + CTA portalu w UI */
   nav: [
     { title: "Strona Główna", href: "/" },

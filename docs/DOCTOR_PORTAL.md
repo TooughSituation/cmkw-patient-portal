@@ -20,7 +20,7 @@ npm run dev
 
 **Demo placówka:** `cmkw@cmkw.pl` / `cmkw123` (facility — pełny widok)  
 **Demo admin:** `jan.kiryluk@cmkw.pl` / `jankiryluk123`  
-**Demo lekarz + udost.:** `tomasz.wenta@cmkw.pl` / `tomaszwenta123` (widzi też Kiryluka)  
+**Demo lekarz + udost.:** `tomas.wenta@cmkw.pl` / `tomaswenta123` (widzi też Kiryluka)  
 **Logowanie EDM:** `/doctor/login` · **Pacjent:** `/login`
 
 ---
@@ -77,9 +77,9 @@ Usuń klucze i odśwież → seed od nowa.
 
 1. Login `cmkw@cmkw.pl` / `cmkw123` → badge **Widok placówki**, przełącznik lekarzy + awatary (prawo)
 2. Login `jan.kiryluk@cmkw.pl` → **zero** innych lekarzy w UI (admin z doctorId = izolacja kliniczna)
-3. Login `tomasz.wenta@cmkw.pl` → domyślnie tylko swój kalendarz; select fioletowy „Udostępnione: Kiryluk” (podgląd)
-4. Admin → **Udostępnianie kalendarzy** — matryca, seed Wenta→Kiryluk
-5. Próba `/doctor/admin` jako doctor bez uprawnień → redirect + toast
+3. Login `tomas.wenta@cmkw.pl` → domyślnie tylko swój kalendarz; select fioletowy „Udostępnione: Kiryluk” (podgląd)
+4. Admin → **tylko facility** (`cmkw@cmkw.pl`) — Udostępnianie kalendarzy, seed Wenta→Kiryluk
+5. Lekarz (Kiryluk/Wenta) nie widzi zakładki Administracja; `/doctor/admin` → redirect + toast
 
 **localStorage:** `cmkw-doctor-calendar-access-v1`, `cmkw-doctor-view-as-v1`, `cmkw-doctor-shared-preview-v1`  
 **Seed użytkowników:** `DEMO_SEED_VERSION = 8` (facility user)
@@ -193,7 +193,7 @@ lib/pesel.ts                 # buildPesel, parsePesel, isValidPesel
 | E-mail | Hasło | Rola | Uwagi |
 |--------|-------|------|--------|
 | `jan.kiryluk@cmkw.pl` | `jankiryluk123` | admin | pełny widok |
-| `tomasz.wenta@cmkw.pl` | `tomaszwenta123` | doctor | + podgląd Kiryluka |
+| `tomas.wenta@cmkw.pl` | `tomaswenta123` | doctor | + podgląd Kiryluka |
 | `pawel.frankowski@cmkw.pl` | `pawelfrankowski123` | doctor | tylko własne |
 | `andrzej.zawadzki@cmkw.pl` | `andrzejzawadzki123` | doctor | |
 | `grzegorz.torba@cmkw.pl` | `grzegorztorba123` | doctor | |

@@ -98,7 +98,7 @@ async function ensureDemoAppointments(): Promise<void> {
       patientEmail: "tomasz.nowak@email.pl",
       patientPhone: "501222003",
       doctorId: "wenta",
-      doctorName: "Lek. Tomasz Wenta",
+      doctorName: "Lek. Tomas Wenta",
       serviceId: "konsultacja-ortopedyczna",
       serviceName: "Konsultacja ortopedyczna",
       pricePln: 250,

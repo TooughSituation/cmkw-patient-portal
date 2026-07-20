@@ -47,9 +47,9 @@ export const DEMO_DOCTOR_ACCOUNTS: DemoAccountSeed[] = [
   },
   {
     id: "user-doctor-wenta",
-    email: "tomasz.wenta@cmkw.pl",
-    password: "tomaszwenta123",
-    firstName: "Tomasz",
+    email: "tomas.wenta@cmkw.pl",
+    password: "tomaswenta123",
+    firstName: "Tomas",
     lastName: "Wenta",
     phone: "+48 85 123 45 02",
     pesel: buildPesel(1975, 3, 20, 202, "M"),
@@ -158,8 +158,8 @@ export const ALL_DEMO_ACCOUNTS: DemoAccountSeed[] = [
 
 /** Stare e-maile do usunięcia przy migracji seeda */
 export const LEGACY_DEMO_EMAILS = [
-  "tomas.wenta@cmkw.pl",
+  "tomasz.wenta@cmkw.pl",
   "admin@cmkw.pl",
 ];
 
-export const DEMO_SEED_VERSION = 8;
+export const DEMO_SEED_VERSION = 9;

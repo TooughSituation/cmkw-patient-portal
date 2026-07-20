@@ -9,6 +9,7 @@ export function AboutSection() {
         backgroundRepeat: "repeat",
         backgroundAttachment: "fixed",
       }}
+      aria-label="O nas"
     >
       <div className="mx-auto max-w-[900px] px-4 text-center md:px-6">
         {siteConfig.about.paragraphs.map((paragraph, index) => (

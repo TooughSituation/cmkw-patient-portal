@@ -15,7 +15,7 @@ export function AccessDeniedToast() {
     if (denied === "admin") {
       toast.error("Brak dostępu do ustawień placówki", {
         description:
-          "Ta sekcja jest dostępna dla konta placówki, administratora lub recepcji.",
+          "Administracja jest dostępna wyłącznie dla konta placówki (cmkw@cmkw.pl).",
       });
       const next = new URLSearchParams(searchParams.toString());
       next.delete("denied");

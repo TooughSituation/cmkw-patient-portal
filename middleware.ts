@@ -44,7 +44,7 @@ export default auth((req) => {
     if (!isDoctorPortalRole(role)) {
       return NextResponse.redirect(new URL("/portal", req.nextUrl.origin));
     }
-    // Admin / ustawienia placówki — tylko facility, admin, reception
+    // Administracja — wyłącznie rola facility (cmkw@cmkw.pl)
     if (
       (pathname === "/doctor/admin" ||
         pathname.startsWith("/doctor/admin/")) &&

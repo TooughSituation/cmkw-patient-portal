@@ -67,7 +67,7 @@ export const SEED_STAFF: StaffMember[] = [
     role: "doctor",
     branchIds: ["bialystok", "hajnowka"],
     active: true,
-    email: "tomasz.wenta@cmkw.pl",
+    email: "tomas.wenta@cmkw.pl",
     phone: "+48 85 123 45 02",
     doctorId: "wenta",
     availabilityFactor: 0.48,

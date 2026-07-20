@@ -63,18 +63,21 @@ export function isIndividualClinician(
   return role === "doctor" || role === "admin";
 }
 
-/** Ustawienia placówki / admin panel */
+/**
+ * Zakładka Administracja — wyłącznie konto placówki (`facility`).
+ * Lekarze (doctor/admin z doctorId), recepcja — bez dostępu do UI admin.
+ */
 export function canAccessFacilityAdmin(
   role: string | undefined | null
 ): boolean {
-  return role === "facility" || role === "admin" || role === "reception";
+  return role === "facility";
 }
 
-/** Zarządzanie udostępnianiem kalendarzy — placówka + admin */
+/** Zarządzanie udostępnianiem kalendarzy — tylko placówka */
 export function canManageCalendarSharing(
   role: string | undefined | null
 ): boolean {
-  return role === "facility" || role === "admin";
+  return role === "facility";
 }
 
 export function defaultHomeForRole(role: UserRole | string | undefined): string {
