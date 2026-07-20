@@ -10,7 +10,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LoginForm } from "@/components/auth/login-form";
-import { DEMO_DOCTOR_ACCOUNTS } from "@/lib/demo-accounts";
+import {
+  DEMO_DOCTOR_ACCOUNTS,
+  DEMO_FACILITY_ACCOUNTS,
+} from "@/lib/demo-accounts";
 
 export const metadata: Metadata = {
   title: "Portal Lekarza — logowanie",
@@ -67,7 +70,7 @@ export default function DoctorLoginPage() {
             >
               <LoginForm
                 variant="doctor"
-                defaultEmail="jan.kiryluk@cmkw.pl"
+                defaultEmail="cmkw@cmkw.pl"
               />
             </Suspense>
 
@@ -76,6 +79,13 @@ export default function DoctorLoginPage() {
                 Demo — szybki start
               </p>
               <ul className="mt-2 space-y-1 text-xs text-slate-600">
+                <li>
+                  <span className="font-mono font-medium text-brand-deep">
+                    {DEMO_FACILITY_ACCOUNTS[0]?.email}
+                  </span>{" "}
+                  / {DEMO_FACILITY_ACCOUNTS[0]?.password}{" "}
+                  <span className="text-muted-foreground">(placówka)</span>
+                </li>
                 <li>
                   <span className="font-mono font-medium text-brand-deep">
                     jan.kiryluk@cmkw.pl
@@ -87,7 +97,10 @@ export default function DoctorLoginPage() {
                   <span className="font-mono">
                     {DEMO_DOCTOR_ACCOUNTS[1]?.email}
                   </span>{" "}
-                  / {DEMO_DOCTOR_ACCOUNTS[1]?.password}
+                  / {DEMO_DOCTOR_ACCOUNTS[1]?.password}{" "}
+                  <span className="text-muted-foreground">
+                    (lekarz + udost. Kiryluk)
+                  </span>
                 </li>
               </ul>
             </div>

@@ -19,6 +19,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { STATUS_COLORS } from "@/lib/doctor/calendar-constants";
+import { useDoctorData } from "@/components/doctor/doctor-data-provider";
 import { maskPesel, type DoctorVisit, type VisitStatus } from "@/lib/doctor/types";
 import { cn } from "@/lib/utils";
 
@@ -36,8 +37,11 @@ export function VisitBlock({
   onDuplicate?: (visit: DoctorVisit) => void;
 }) {
   const router = useRouter();
-  const locked =
+  const { canEditVisit } = useDoctorData();
+  const statusLocked =
     visit.status === "completed" || visit.status === "cancelled";
+  const readOnly = !canEditVisit(visit);
+  const locked = statusLocked || readOnly;
 
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -124,7 +128,11 @@ export function VisitBlock({
               {visit.note ? (
                 <p className="mt-1 border-t pt-1">{visit.note}</p>
               ) : null}
-              {locked ? (
+              {readOnly ? (
+                <p className="mt-1 text-amber-600">
+                  Podgląd udostępniony — bez edycji
+                </p>
+              ) : statusLocked ? (
                 <p className="mt-1 text-amber-600">
                   Nieprzenoszalna (zakończona/odwołana)
                 </p>
@@ -137,59 +145,65 @@ export function VisitBlock({
       </ContextMenuTrigger>
       <ContextMenuContent className="w-52">
         <ContextMenuItem onClick={openCard}>Otwórz kartę</ContextMenuItem>
-        <ContextMenuItem asChild>
-          <Link href={`/doctor/wizyty/${visit.id}`}>Edytuj wizytę</Link>
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem
-          onClick={() => {
-            onStatusChange?.(visit.id, "confirmed");
-            toast.success("Potwierdzono");
-          }}
-        >
-          Status: Potwierdzona
-        </ContextMenuItem>
-        <ContextMenuItem
-          onClick={() => {
-            onStatusChange?.(visit.id, "teleconfirmed");
-            toast.success("Telepotwierdzona");
-          }}
-        >
-          Status: Telepotwierdzona
-        </ContextMenuItem>
-        <ContextMenuItem
-          onClick={() => {
-            onStatusChange?.(visit.id, "in_progress");
-            toast.success("W trakcie");
-          }}
-        >
-          Status: W trakcie
-        </ContextMenuItem>
-        <ContextMenuItem
-          onClick={() => {
-            onStatusChange?.(visit.id, "completed");
-            toast.success("Zakończona");
-          }}
-        >
-          Status: Zakończona
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem
-          onClick={() => {
-            onDuplicate?.(visit);
-          }}
-        >
-          Duplikuj
-        </ContextMenuItem>
-        <ContextMenuItem
-          className="text-destructive focus:text-destructive"
-          onClick={() => {
-            onStatusChange?.(visit.id, "cancelled");
-            toast.message("Wizyta odwołana");
-          }}
-        >
-          Anuluj wizytę
-        </ContextMenuItem>
+        {!readOnly ? (
+          <ContextMenuItem asChild>
+            <Link href={`/doctor/wizyty/${visit.id}`}>Edytuj wizytę</Link>
+          </ContextMenuItem>
+        ) : null}
+        {!readOnly ? (
+          <>
+            <ContextMenuSeparator />
+            <ContextMenuItem
+              onClick={() => {
+                onStatusChange?.(visit.id, "confirmed");
+                toast.success("Potwierdzono");
+              }}
+            >
+              Status: Potwierdzona
+            </ContextMenuItem>
+            <ContextMenuItem
+              onClick={() => {
+                onStatusChange?.(visit.id, "teleconfirmed");
+                toast.success("Telepotwierdzona");
+              }}
+            >
+              Status: Telepotwierdzona
+            </ContextMenuItem>
+            <ContextMenuItem
+              onClick={() => {
+                onStatusChange?.(visit.id, "in_progress");
+                toast.success("W trakcie");
+              }}
+            >
+              Status: W trakcie
+            </ContextMenuItem>
+            <ContextMenuItem
+              onClick={() => {
+                onStatusChange?.(visit.id, "completed");
+                toast.success("Zakończona");
+              }}
+            >
+              Status: Zakończona
+            </ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem
+              onClick={() => {
+                onDuplicate?.(visit);
+              }}
+            >
+              Duplikuj
+            </ContextMenuItem>
+            <ContextMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={() => {
+                onStatusChange?.(visit.id, "cancelled");
+                toast.message("Wizyta odwołana");
+              }}
+            >
+              Anuluj wizytę
+            </ContextMenuItem>
+          </>
+        ) : null}
       </ContextMenuContent>
     </ContextMenu>
   );

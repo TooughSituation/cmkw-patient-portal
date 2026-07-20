@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useSession } from "next-auth/react";
 import {
   createPatientRecord,
   loadPatientsFromLocalStorage,
@@ -44,10 +45,28 @@ import {
   resetSchedulesLocalStorage,
 } from "@/lib/doctor/schedules-client";
 import {
+  loadCalendarAccess,
+  saveCalendarAccess,
+  resetCalendarAccess,
+} from "@/lib/doctor/calendar-access-client";
+import {
+  VIEW_AS_DOCTOR_KEY,
+  canEditDoctorData,
+  getSharedDoctorIds,
+  resolveVisibleDoctorIds,
+  type DoctorCalendarAccessMap,
+} from "@/lib/doctor/calendar-access";
+import {
   ALL_BRANCHES_ID,
   BRANCH_STORAGE_KEY,
   isValidBranchFilter,
 } from "@/lib/doctor/branches";
+import {
+  canAccessFacilityAdmin,
+  canManageCalendarSharing,
+  canSeeAllDoctors,
+  type UserRole,
+} from "@/lib/auth/roles";
 import type {
   AppSettings,
   FacilityData,
@@ -72,6 +91,27 @@ type DoctorDataContextValue = {
   /** Global branch filter: all | bialystok | hajnowka */
   branchFilter: string;
   setBranchFilter: (id: string) => void;
+  /** Rola zalogowanego użytkownika EDM */
+  sessionRole: UserRole | undefined;
+  /** doctorId ze staff (dla lekarzy) */
+  ownDoctorId: string | undefined;
+  /** facility/admin/reception — widzi wszystkich */
+  seesAllDoctors: boolean;
+  canAccessAdmin: boolean;
+  canManageSharing: boolean;
+  /** doctorId widocznych lekarzy lub "all" */
+  visibleDoctorIds: string[] | "all";
+  /** Udostępnione kalendarze (poza własnym) */
+  sharedDoctorIds: string[];
+  calendarAccess: DoctorCalendarAccessMap;
+  saveCalendarAccessData: (map: DoctorCalendarAccessMap) => void;
+  resetCalendarAccessData: () => void;
+  /** Facility: filtr „jako lekarz” (null = cała placówka) */
+  viewAsDoctorId: string | null;
+  setViewAsDoctorId: (id: string | null) => void;
+  canEditVisit: (visit: DoctorVisit) => boolean;
+  canViewDoctor: (doctorId: string) => boolean;
+  visibleStaffDoctors: StaffMember[];
   patients: DoctorPatient[];
   patientsLoading: boolean;
   filteredPatients: DoctorPatient[];
@@ -113,6 +153,8 @@ type DoctorDataContextValue = {
   saveRoomsData: (data: Room[]) => void;
   saveVisitTypesData: (data: VisitTypeConfig[]) => void;
   schedules: DoctorSchedule[];
+  /** Grafiki widocznych lekarzy */
+  filteredSchedules: DoctorSchedule[];
   saveSchedulesData: (data: DoctorSchedule[]) => void;
   resetSchedules: () => void;
   validateVisitSlot: (input: {
@@ -131,7 +173,14 @@ export function DoctorDataProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const { data: session, status: sessionStatus } = useSession();
+  const sessionRole = session?.user?.role as UserRole | undefined;
+  const ownDoctorId = session?.user?.doctorId;
+
   const [branchFilter, setBranchFilterState] = useState(ALL_BRANCHES_ID);
+  const [viewAsDoctorId, setViewAsDoctorIdState] = useState<string | null>(
+    null
+  );
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
   const [visits, setVisits] = useState<DoctorVisit[]>([]);
   const [documents, setDocuments] = useState<DoctorDocument[]>([]);
@@ -141,6 +190,8 @@ export function DoctorDataProvider({
   const [rooms, setRooms] = useState<Room[]>([]);
   const [visitTypes, setVisitTypes] = useState<VisitTypeConfig[]>([]);
   const [schedules, setSchedules] = useState<DoctorSchedule[]>([]);
+  const [calendarAccess, setCalendarAccess] =
+    useState<DoctorCalendarAccessMap>({});
   const [patientsLoading, setPatientsLoading] = useState(true);
   const [visitsLoading, setVisitsLoading] = useState(true);
   const [documentsLoading, setDocumentsLoading] = useState(true);
@@ -150,6 +201,8 @@ export function DoctorDataProvider({
     try {
       const saved = localStorage.getItem(BRANCH_STORAGE_KEY);
       if (saved && isValidBranchFilter(saved)) setBranchFilterState(saved);
+      const viewAs = localStorage.getItem(VIEW_AS_DOCTOR_KEY);
+      if (viewAs) setViewAsDoctorIdState(viewAs);
     } catch {
       // ignore
     }
@@ -162,11 +215,32 @@ export function DoctorDataProvider({
     setRooms(loadRooms());
     setVisitTypes(loadVisitTypes());
     setSchedules(loadSchedulesFromLocalStorage());
+    setCalendarAccess(loadCalendarAccess());
     setPatientsLoading(false);
     setVisitsLoading(false);
     setDocumentsLoading(false);
     setAdminLoading(false);
   }, []);
+
+  const seesAllDoctors = canSeeAllDoctors(sessionRole);
+  const canAccessAdmin = canAccessFacilityAdmin(sessionRole);
+  const canManageSharing = canManageCalendarSharing(sessionRole);
+
+  const sharedDoctorIds = useMemo(
+    () => getSharedDoctorIds(calendarAccess, ownDoctorId),
+    [calendarAccess, ownDoctorId]
+  );
+
+  const visibleDoctorIds = useMemo(
+    () =>
+      resolveVisibleDoctorIds({
+        canSeeAll: seesAllDoctors,
+        ownDoctorId,
+        sharedIds: sharedDoctorIds,
+        viewAsDoctorId: seesAllDoctors ? viewAsDoctorId : null,
+      }),
+    [seesAllDoctors, ownDoctorId, sharedDoctorIds, viewAsDoctorId]
+  );
 
   const setBranchFilter = useCallback((id: string) => {
     if (!isValidBranchFilter(id)) return;
@@ -177,6 +251,42 @@ export function DoctorDataProvider({
       // ignore
     }
   }, []);
+
+  const setViewAsDoctorId = useCallback((id: string | null) => {
+    setViewAsDoctorIdState(id);
+    try {
+      if (id) localStorage.setItem(VIEW_AS_DOCTOR_KEY, id);
+      else localStorage.removeItem(VIEW_AS_DOCTOR_KEY);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const canViewDoctor = useCallback(
+    (doctorId: string) => {
+      if (visibleDoctorIds === "all") return true;
+      return visibleDoctorIds.includes(doctorId);
+    },
+    [visibleDoctorIds]
+  );
+
+  const canEditVisit = useCallback(
+    (visit: DoctorVisit) =>
+      canEditDoctorData(
+        { canSeeAll: seesAllDoctors, ownDoctorId },
+        visit.doctorId
+      ),
+    [seesAllDoctors, ownDoctorId]
+  );
+
+  const visibleStaffDoctors = useMemo(() => {
+    const docs = staff.filter((s) => s.role === "doctor" && s.active);
+    if (visibleDoctorIds === "all") return docs;
+    return docs.filter((d) => {
+      const id = d.doctorId ?? d.id;
+      return visibleDoctorIds.includes(id);
+    });
+  }, [staff, visibleDoctorIds]);
 
   const persistPatients = useCallback((next: DoctorPatient[]) => {
     setPatients(next);
@@ -194,25 +304,55 @@ export function DoctorDataProvider({
   }, []);
 
   const filteredVisits = useMemo(() => {
-    if (branchFilter === ALL_BRANCHES_ID) return visits;
-    return visits.filter((v) => v.branchId === branchFilter);
-  }, [visits, branchFilter]);
+    let list = visits;
+    if (branchFilter !== ALL_BRANCHES_ID) {
+      list = list.filter((v) => v.branchId === branchFilter);
+    }
+    if (visibleDoctorIds !== "all") {
+      const set = new Set(visibleDoctorIds);
+      list = list.filter((v) => set.has(v.doctorId));
+    }
+    return list;
+  }, [visits, branchFilter, visibleDoctorIds]);
 
   const filteredPatients = useMemo(() => {
-    if (branchFilter === ALL_BRANCHES_ID) return patients;
-    const ids = new Set(
-      visits
-        .filter((v) => v.branchId === branchFilter)
-        .map((v) => v.patientId)
+    const visitPatientIds = new Set(filteredVisits.map((v) => v.patientId));
+
+    if (seesAllDoctors && !viewAsDoctorId) {
+      if (branchFilter === ALL_BRANCHES_ID) return patients;
+      return patients.filter(
+        (p) =>
+          p.primaryBranchId === branchFilter || visitPatientIds.has(p.id)
+      );
+    }
+
+    // Lekarz (lub facility „jako lekarz”): tylko pacjenci powiązani z widocznymi wizytami
+    return patients.filter((p) => visitPatientIds.has(p.id));
+  }, [
+    patients,
+    filteredVisits,
+    seesAllDoctors,
+    viewAsDoctorId,
+    branchFilter,
+  ]);
+
+  const filteredSchedules = useMemo(() => {
+    if (visibleDoctorIds === "all") return schedules;
+    const set = new Set(visibleDoctorIds);
+    return schedules.filter(
+      (s) => set.has(s.doctorId) || set.has(s.staffId)
     );
-    return patients.filter(
-      (p) => p.primaryBranchId === branchFilter || ids.has(p.id)
-    );
-  }, [patients, visits, branchFilter]);
+  }, [schedules, visibleDoctorIds]);
 
   const getPatientById = useCallback(
-    (id: string) => patients.find((p) => p.id === id) ?? null,
-    [patients]
+    (id: string) => {
+      const p = patients.find((x) => x.id === id) ?? null;
+      if (!p) return null;
+      if (seesAllDoctors && !viewAsDoctorId) return p;
+      if (filteredPatients.some((x) => x.id === id)) return p;
+      return null;
+    },
+    [patients, filteredPatients, seesAllDoctors, viewAsDoctorId]
   );
 
   const createPatient = useCallback(
@@ -266,12 +406,27 @@ export function DoctorDataProvider({
   }, []);
 
   const getVisitById = useCallback(
-    (id: string) => visits.find((v) => v.id === id) ?? null,
-    [visits]
+    (id: string) => {
+      const v = visits.find((x) => x.id === id) ?? null;
+      if (!v) return null;
+      if (!canViewDoctor(v.doctorId)) return null;
+      return v;
+    },
+    [visits, canViewDoctor]
   );
 
   const updateVisitStatus = useCallback(
     (id: string, status: VisitStatus) => {
+      const current = visits.find((v) => v.id === id);
+      if (!current) return null;
+      if (
+        !canEditDoctorData(
+          { canSeeAll: seesAllDoctors, ownDoctorId },
+          current.doctorId
+        )
+      ) {
+        return null;
+      }
       const next = visits.map((v) =>
         v.id === id
           ? {
@@ -286,11 +441,21 @@ export function DoctorDataProvider({
       persistVisits(next);
       return next.find((v) => v.id === id) ?? null;
     },
-    [visits, persistVisits]
+    [visits, persistVisits, seesAllDoctors, ownDoctorId]
   );
 
   const updateVisit = useCallback(
     (id: string, patch: Partial<DoctorVisit>) => {
+      const current = visits.find((v) => v.id === id);
+      if (!current) return null;
+      if (
+        !canEditDoctorData(
+          { canSeeAll: seesAllDoctors, ownDoctorId },
+          current.doctorId
+        )
+      ) {
+        return null;
+      }
       const next = visits.map((v) =>
         v.id === id
           ? {
@@ -304,7 +469,7 @@ export function DoctorDataProvider({
       persistVisits(next);
       return next.find((v) => v.id === id) ?? null;
     },
-    [visits, persistVisits]
+    [visits, persistVisits, seesAllDoctors, ownDoctorId]
   );
 
   const validateVisitSlot = useCallback(
@@ -337,6 +502,16 @@ export function DoctorDataProvider({
 
   const addVisit = useCallback(
     (visit: DoctorVisit) => {
+      if (
+        !canEditDoctorData(
+          { canSeeAll: seesAllDoctors, ownDoctorId },
+          visit.doctorId
+        )
+      ) {
+        throw new Error(
+          "Brak uprawnień do dodawania wizyt dla tego lekarza."
+        );
+      }
       const withBranch: DoctorVisit = {
         ...visit,
         branchId:
@@ -355,7 +530,14 @@ export function DoctorDataProvider({
       persistVisits([withBranch, ...visits]);
       return withBranch;
     },
-    [visits, persistVisits, branchFilter, validateVisitSlot]
+    [
+      visits,
+      persistVisits,
+      branchFilter,
+      validateVisitSlot,
+      seesAllDoctors,
+      ownDoctorId,
+    ]
   );
 
   const resetVisits = useCallback(() => {
@@ -465,10 +647,37 @@ export function DoctorDataProvider({
     setSchedules(resetSchedulesLocalStorage());
   }, []);
 
+  const saveCalendarAccessData = useCallback(
+    (map: DoctorCalendarAccessMap) => {
+      setCalendarAccess(map);
+      saveCalendarAccess(map);
+    },
+    []
+  );
+
+  const resetCalendarAccessData = useCallback(() => {
+    setCalendarAccess(resetCalendarAccess());
+  }, []);
+
   const value = useMemo<DoctorDataContextValue>(
     () => ({
       branchFilter,
       setBranchFilter,
+      sessionRole,
+      ownDoctorId,
+      seesAllDoctors,
+      canAccessAdmin,
+      canManageSharing,
+      visibleDoctorIds,
+      sharedDoctorIds,
+      calendarAccess,
+      saveCalendarAccessData,
+      resetCalendarAccessData,
+      viewAsDoctorId,
+      setViewAsDoctorId,
+      canEditVisit,
+      canViewDoctor,
+      visibleStaffDoctors,
       patients,
       patientsLoading,
       filteredPatients,
@@ -478,7 +687,8 @@ export function DoctorDataProvider({
       removePatient,
       resetPatients,
       visits,
-      visitsLoading,
+      visitsLoading:
+        visitsLoading || sessionStatus === "loading",
       filteredVisits,
       getVisitById,
       updateVisitStatus,
@@ -506,6 +716,7 @@ export function DoctorDataProvider({
       saveRoomsData,
       saveVisitTypesData,
       schedules,
+      filteredSchedules,
       saveSchedulesData,
       resetSchedules,
       validateVisitSlot,
@@ -513,6 +724,21 @@ export function DoctorDataProvider({
     [
       branchFilter,
       setBranchFilter,
+      sessionRole,
+      ownDoctorId,
+      seesAllDoctors,
+      canAccessAdmin,
+      canManageSharing,
+      visibleDoctorIds,
+      sharedDoctorIds,
+      calendarAccess,
+      saveCalendarAccessData,
+      resetCalendarAccessData,
+      viewAsDoctorId,
+      setViewAsDoctorId,
+      canEditVisit,
+      canViewDoctor,
+      visibleStaffDoctors,
       patients,
       patientsLoading,
       filteredPatients,
@@ -523,6 +749,7 @@ export function DoctorDataProvider({
       resetPatients,
       visits,
       visitsLoading,
+      sessionStatus,
       filteredVisits,
       getVisitById,
       updateVisitStatus,
@@ -550,6 +777,7 @@ export function DoctorDataProvider({
       saveRoomsData,
       saveVisitTypesData,
       schedules,
+      filteredSchedules,
       saveSchedulesData,
       resetSchedules,
       validateVisitSlot,

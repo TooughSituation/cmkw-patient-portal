@@ -22,11 +22,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { DepartmentSwitcher } from "@/components/doctor/department-switcher";
+import { ViewAsDoctorSwitcher } from "@/components/doctor/view-as-doctor-switcher";
+import { useDoctorData } from "@/components/doctor/doctor-data-provider";
 import { roleLabel } from "@/lib/auth/roles";
 import { toast } from "sonner";
 
 export function DoctorNavbar() {
   const { data: session } = useSession();
+  const { canAccessAdmin } = useDoctorData();
   const user = session?.user;
   const initials = user
     ? `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.toUpperCase() ||
@@ -69,6 +72,7 @@ export function DoctorNavbar() {
         <div className="mx-1 hidden h-6 w-px bg-slate-200 md:block" />
 
         <DepartmentSwitcher />
+        <ViewAsDoctorSwitcher className="hidden md:flex" />
 
         <div className="flex-1" />
 
@@ -102,17 +106,19 @@ export function DoctorNavbar() {
           >
             <MessageSquare className="size-4" />
           </Button>
-          <Button
-            asChild
-            variant="ghost"
-            size="icon"
-            className="size-9 text-slate-500 hover:bg-secondary hover:text-brand"
-            aria-label="Administracja"
-          >
-            <Link href="/doctor/admin">
-              <Settings className="size-4" />
-            </Link>
-          </Button>
+          {canAccessAdmin ? (
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="size-9 text-slate-500 hover:bg-secondary hover:text-brand"
+              aria-label="Administracja"
+            >
+              <Link href="/doctor/admin">
+                <Settings className="size-4" />
+              </Link>
+            </Button>
+          ) : null}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -153,9 +159,11 @@ export function DoctorNavbar() {
               <DropdownMenuItem asChild>
                 <Link href="/doctor/terminy">Terminy</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/doctor/admin">Administracja</Link>
-              </DropdownMenuItem>
+              {canAccessAdmin ? (
+                <DropdownMenuItem asChild>
+                  <Link href="/doctor/admin">Administracja</Link>
+                </DropdownMenuItem>
+              ) : null}
               <DropdownMenuSeparator />
               <div className="p-1">
                 <LogoutButton

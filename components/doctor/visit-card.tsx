@@ -164,8 +164,8 @@ export function VisitCard({ visitId }: { visitId: string }) {
     return (
       <div className="p-6">
         <EmptyState
-          title="Nie znaleziono wizyty"
-          description="Wizyta mogła zostać usunięta lub ID jest nieprawidłowe."
+          title="Brak dostępu do wizyty"
+          description="Wizyta nie istnieje albo należy do innego lekarza poza Twoim zakresem widoczności."
         />
         <div className="mt-4 flex justify-center">
           <Button asChild variant="outline">

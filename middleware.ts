@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import { authConfig } from "@/auth.config";
 import { NextResponse } from "next/server";
 import {
+  canAccessFacilityAdmin,
   defaultHomeForRole,
   isDoctorPortalRole,
   isPatientRole,
@@ -42,6 +43,16 @@ export default auth((req) => {
     }
     if (!isDoctorPortalRole(role)) {
       return NextResponse.redirect(new URL("/portal", req.nextUrl.origin));
+    }
+    // Admin / ustawienia placówki — tylko facility, admin, reception
+    if (
+      (pathname === "/doctor/admin" ||
+        pathname.startsWith("/doctor/admin/")) &&
+      !canAccessFacilityAdmin(role)
+    ) {
+      const home = new URL("/doctor", req.nextUrl.origin);
+      home.searchParams.set("denied", "admin");
+      return NextResponse.redirect(home);
     }
   }
 

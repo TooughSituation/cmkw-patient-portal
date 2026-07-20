@@ -24,6 +24,7 @@ export const authConfig = {
         token.peselMasked = user.peselMasked;
         token.email = user.email;
         token.role = (user.role ?? "patient") as UserRole;
+        token.doctorId = user.doctorId;
       }
       return token;
     },
@@ -36,6 +37,7 @@ export const authConfig = {
         session.user.peselMasked = token.peselMasked as string;
         session.user.email = token.email as string;
         session.user.role = (token.role as UserRole) ?? "patient";
+        session.user.doctorId = token.doctorId as string | undefined;
       }
       return session;
     },

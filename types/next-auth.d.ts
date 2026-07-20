@@ -10,6 +10,8 @@ declare module "next-auth" {
       phone: string;
       peselMasked: string;
       role: UserRole;
+      /** Powiązanie ze staff / booking doctorId (lekarze) */
+      doctorId?: string;
     } & DefaultSession["user"];
   }
 
@@ -21,6 +23,7 @@ declare module "next-auth" {
     peselMasked: string;
     email: string;
     role: UserRole;
+    doctorId?: string;
   }
 }
 
@@ -32,5 +35,6 @@ declare module "next-auth/jwt" {
     phone: string;
     peselMasked: string;
     role: UserRole;
+    doctorId?: string;
   }
 }

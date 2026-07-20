@@ -3,16 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DOCTOR_NAV } from "@/lib/doctor/nav";
+import { useDoctorData } from "@/components/doctor/doctor-data-provider";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 export function DoctorTabs() {
   const pathname = usePathname();
+  const { canAccessAdmin } = useDoctorData();
 
   function isActive(href: string) {
     if (href === "/doctor") return pathname === "/doctor";
     return pathname === href || pathname.startsWith(`${href}/`);
   }
+
+  const items = DOCTOR_NAV.filter((item) => {
+    if (item.href === "/doctor/admin") return canAccessAdmin;
+    return true;
+  });
 
   return (
     <nav
@@ -20,7 +27,7 @@ export function DoctorTabs() {
       aria-label="Główne sekcje EDM"
     >
       <div className="flex gap-0 overflow-x-auto px-2 md:px-5">
-        {DOCTOR_NAV.map((item) => {
+        {items.map((item) => {
           const active = isActive(item.href);
           if (item.disabled) {
             return (
@@ -28,7 +35,7 @@ export function DoctorTabs() {
                 key={item.href}
                 type="button"
                 onClick={() =>
-                  toast.info(`${item.label} — wkrótce (Etap 4)`)
+                  toast.info(`${item.label} — wkrótce`)
                 }
                 className={cn(
                   "relative shrink-0 border-b-2 border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:text-slate-600 md:px-4",

@@ -107,8 +107,16 @@ export function CalendarView() {
     updateVisit,
     addVisit,
   } = useDoctorVisits();
-  const { staff, schedules, branchFilter, validateVisitSlot } =
-    useDoctorData();
+  const {
+    schedules,
+    branchFilter,
+    validateVisitSlot,
+    visibleStaffDoctors,
+    seesAllDoctors,
+    ownDoctorId,
+    sharedDoctorIds,
+    canEditVisit,
+  } = useDoctorData();
 
   const [selected, setSelected] = useState<Date>(startOfDay(new Date()));
   const [mode, setMode] = useState<CalMode>("day");
@@ -158,10 +166,17 @@ export function CalendarView() {
     }
   }, []);
 
-  const doctors = useMemo(
-    () => staff.filter((s) => s.role === "doctor" && s.active),
-    [staff]
-  );
+  const doctors = visibleStaffDoctors;
+
+  const showDoctorFilter =
+    seesAllDoctors || sharedDoctorIds.length > 0 || doctors.length > 1;
+
+  useEffect(() => {
+    // Lekarz bez udostępnień — zawsze własny filtr
+    if (!seesAllDoctors && ownDoctorId && sharedDoctorIds.length === 0) {
+      setDoctorFilter(ownDoctorId);
+    }
+  }, [seesAllDoctors, ownDoctorId, sharedDoctorIds.length]);
 
   const dateKey = format(selected, "yyyy-MM-dd");
 
@@ -289,6 +304,11 @@ export function CalendarView() {
       return;
     }
 
+    if (!canEditVisit(visit)) {
+      toast.error("Brak uprawnień do edycji tej wizyty (tylko podgląd).");
+      return;
+    }
+
     const parsed = parseSlotDropId(String(e.over.id));
     if (!parsed) return;
 
@@ -312,19 +332,30 @@ export function CalendarView() {
 
   function confirmMove() {
     if (!pendingMove) return;
+    if (!canEditVisit(pendingMove.visit)) {
+      toast.error("Brak uprawnień do edycji tej wizyty.");
+      setPendingMove(null);
+      return;
+    }
     setMoving(true);
     const { visit, date, time } = pendingMove;
-    // optimistic
-    updateVisit(visit.id, { date, time });
+    const updated = updateVisit(visit.id, { date, time });
     setPendingMove(null);
     setMoving(false);
+    if (!updated) {
+      toast.error("Nie udało się przenieść wizyty.");
+      return;
+    }
     toast.success("Wizyta przeniesiona", {
       description: `${date} ${time} · ${visit.patientLastName}`,
     });
   }
 
   function handleStatus(id: string, status: VisitStatus) {
-    updateStatus(id, status);
+    const ok = updateStatus(id, status);
+    if (!ok) {
+      toast.error("Brak uprawnień do zmiany statusu tej wizyty.");
+    }
   }
 
   function handleDuplicate(visit: DoctorVisit) {
@@ -495,19 +526,32 @@ export function CalendarView() {
                 <ChevronRight className="size-4" />
               </Button>
             </div>
-            <Select value={doctorFilter} onValueChange={setDoctorPersist}>
-              <SelectTrigger className="h-9 w-[170px] bg-white shadow-sm">
-                <SelectValue placeholder="Lekarz" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Wszyscy lekarze</SelectItem>
-                {doctors.map((d) => (
-                  <SelectItem key={d.id} value={d.doctorId ?? d.id}>
-                    {d.title} {d.lastName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {showDoctorFilter ? (
+              <Select value={doctorFilter} onValueChange={setDoctorPersist}>
+                <SelectTrigger className="h-9 w-[170px] bg-white shadow-sm">
+                  <SelectValue placeholder="Lekarz" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(seesAllDoctors || sharedDoctorIds.length > 0) && (
+                    <SelectItem value="all">
+                      {seesAllDoctors
+                        ? "Wszyscy lekarze"
+                        : "Moi + udostępnione"}
+                    </SelectItem>
+                  )}
+                  {doctors.map((d) => (
+                    <SelectItem key={d.id} value={d.doctorId ?? d.id}>
+                      {d.title} {d.lastName}
+                      {!seesAllDoctors &&
+                      ownDoctorId &&
+                      (d.doctorId ?? d.id) !== ownDoctorId
+                        ? " (udost.)"
+                        : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : null}
             <Input
               ref={searchRef}
               value={query}

@@ -51,12 +51,34 @@ export function QuickVisitDialog({
   const router = useRouter();
   const { patients, loading: patientsLoading } = useDoctorPatients();
   const { addVisit } = useDoctorVisits();
-  const { branchFilter } = useDoctorData();
+  const {
+    branchFilter,
+    ownDoctorId,
+    seesAllDoctors,
+    visibleStaffDoctors,
+  } = useDoctorData();
+
+  /** Lekarz: tylko własne konto; placówka/admin: widoczni lekarze */
+  const selectableDoctors = useMemo(() => {
+    if (!seesAllDoctors && ownDoctorId) {
+      return doctors.filter((d) => d.id === ownDoctorId);
+    }
+    if (visibleStaffDoctors.length) {
+      const ids = new Set(
+        visibleStaffDoctors.map((s) => s.doctorId ?? s.id)
+      );
+      return doctors.filter((d) => ids.has(d.id));
+    }
+    return doctors;
+  }, [seesAllDoctors, visibleStaffDoctors, ownDoctorId]);
+
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const open = openProp ?? uncontrolledOpen;
   const setOpen = onOpenChange ?? setUncontrolledOpen;
   const [patientId, setPatientId] = useState("");
-  const [doctorId, setDoctorId] = useState(doctors[0]?.id ?? "kiryluk");
+  const [doctorId, setDoctorId] = useState(
+    () => ownDoctorId ?? selectableDoctors[0]?.id ?? "kiryluk"
+  );
   const [date, setDate] = useState(
     defaultDate ?? new Date().toISOString().slice(0, 10)
   );
@@ -160,7 +182,16 @@ export function QuickVisitDialog({
       open={open}
       onOpenChange={(v) => {
         setOpen(v);
-        if (v && defaultDate) setDate(defaultDate);
+        if (v) {
+          if (defaultDate) setDate(defaultDate);
+          if (ownDoctorId && !seesAllDoctors) setDoctorId(ownDoctorId);
+          else if (
+            selectableDoctors.length &&
+            !selectableDoctors.some((d) => d.id === doctorId)
+          ) {
+            setDoctorId(selectableDoctors[0]!.id);
+          }
+        }
       }}
     >
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -242,7 +273,7 @@ export function QuickVisitDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {doctors.map((d) => (
+                  {selectableDoctors.map((d) => (
                     <SelectItem key={d.id} value={d.id}>
                       {formatDoctorName(d)}
                     </SelectItem>

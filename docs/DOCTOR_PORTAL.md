@@ -1,8 +1,8 @@
 # Portal Lekarza / CMKW EDM
 
-**Status:** Etap 0–7 + **Etap 8 (Drag & Drop + zaawansowany UX kalendarza)**  
+**Status:** Etap 0–8 + **Etap 9 (rola Placówka + izolacja danych lekarzy)**  
 **Prefix:** `/doctor/*`  
-**Role:** `doctor` | `admin` | `reception`  
+**Role:** `facility` | `doctor` | `admin` | `reception`  
 **Styl:** jasny brand CMKW (`#0849b0`, white / slate-50) — spójny z patient portalem
 
 ---
@@ -18,7 +18,9 @@ npm run dev
 - EDM: http://localhost:3000/doctor  
 - Pacjenci: http://localhost:3000/doctor/pacjenci  
 
-**Demo lekarz:** `jan.kiryluk@cmkw.pl` / `jankiryluk123` (admin)  
+**Demo placówka:** `cmkw@cmkw.pl` / `cmkw123` (facility — pełny widok)  
+**Demo admin:** `jan.kiryluk@cmkw.pl` / `jankiryluk123`  
+**Demo lekarz + udost.:** `tomasz.wenta@cmkw.pl` / `tomaszwenta123` (widzi też Kiryluka)  
 **Logowanie EDM:** `/doctor/login` · **Pacjent:** `/login`
 
 ---
@@ -70,6 +72,18 @@ Usuń klucze i odśwież → seed od nowa.
 | `/doctor/terminy` | Wyszukiwarka wolnych terminów (Etap 5A) |
 | `/doctor/admin` | Administracja placówki (Etap 5A) |
 | `/doctor/admin/grafiki` | Grafiki pracy lekarzy (Etap 6B) |
+
+### Etap 9 — rola Placówka + izolacja lekarzy
+
+1. Login `cmkw@cmkw.pl` / `cmkw123` → badge **Placówka**, pełny kalendarz, Admin, statystyki
+2. Przełącznik „Cała placówka / filtr jako lekarz” w topbarze
+3. Admin → **Udostępnianie kalendarzy** — matryca checkboxów, seed Wenta→Kiryluk
+4. Login `tomasz.wenta@cmkw.pl` → tylko swoje wizyty + podgląd Kiryluka (bez edycji cudzych)
+5. Login `pawel.frankowski@cmkw.pl` → wyłącznie własne dane, brak menu Admin
+6. Próba `/doctor/admin` jako zwykły lekarz → redirect + toast
+
+**localStorage:** `cmkw-doctor-calendar-access-v1`, `cmkw-doctor-view-as-v1`  
+**Seed użytkowników:** `DEMO_SEED_VERSION = 8` (facility user)
 
 ### Etap 8 — Drag & Drop + UX kalendarza
 
@@ -167,32 +181,25 @@ lib/pesel.ts                 # buildPesel, parsePesel, isValidPesel
 
 ---
 
-## Etap 9 — propozycje
+## Konta demo (Etap 9)
 
-1. **E-recepta / e-skierowanie** (P1) + szablony dokumentów  
-2. **Historia farmakoterapii** na karcie pacjenta  
-3. **Prisma + Postgres** + API REST (zamiast localStorage)  
-4. Realne SMS/IVR telepotwierdzeń  
-5. Integracja booking pacjenta ↔ EDM  
-6. RBAC + audit log  
-7. Kolumny wielu lekarzy w tygodniu (resource view)  
-8. Recurring visits / serie wizyt  
-
----
-
-## Konta demo (Etap 7)
-
-### Lekarze (`/doctor/login`) — hasło: `imienazwisko123`
+### Placówka (`/doctor/login`)
 
 | E-mail | Hasło | Rola |
 |--------|-------|------|
-| `jan.kiryluk@cmkw.pl` | `jankiryluk123` | admin |
-| `tomasz.wenta@cmkw.pl` | `tomaszwenta123` | doctor |
-| `pawel.frankowski@cmkw.pl` | `pawelfrankowski123` | doctor |
-| `andrzej.zawadzki@cmkw.pl` | `andrzejzawadzki123` | doctor |
-| `grzegorz.torba@cmkw.pl` | `grzegorztorba123` | doctor |
-| `saddam.sammoudi@cmkw.pl` | `saddamsammoudi123` | doctor |
-| `recepcja@cmkw.pl` | `recepcja123` | reception |
+| `cmkw@cmkw.pl` | `cmkw123` | facility |
+
+### Lekarze — hasło: `imienazwisko123`
+
+| E-mail | Hasło | Rola | Uwagi |
+|--------|-------|------|--------|
+| `jan.kiryluk@cmkw.pl` | `jankiryluk123` | admin | pełny widok |
+| `tomasz.wenta@cmkw.pl` | `tomaszwenta123` | doctor | + podgląd Kiryluka |
+| `pawel.frankowski@cmkw.pl` | `pawelfrankowski123` | doctor | tylko własne |
+| `andrzej.zawadzki@cmkw.pl` | `andrzejzawadzki123` | doctor | |
+| `grzegorz.torba@cmkw.pl` | `grzegorztorba123` | doctor | |
+| `saddam.sammoudi@cmkw.pl` | `saddamsammoudi123` | doctor | |
+| `recepcja@cmkw.pl` | `recepcja123` | reception | pełny widok operacyjny |
 
 ### Pacjenci (`/login`)
 
@@ -201,3 +208,20 @@ lib/pesel.ts                 # buildPesel, parsePesel, isValidPesel
 | `jan.kowalski@email.pl` | `jankowalski123` |
 | `tomasz.nowak@email.pl` | `tomasznowak123` |
 | `anna.nowicka@email.pl` | `annanowicka123` |
+
+---
+
+## Etap 10 — propozycje
+
+1. **E-recepta / e-skierowanie** (P1) + szablony dokumentów  
+2. **Historia farmakoterapii** na karcie pacjenta  
+3. **Prisma + Postgres** + API REST (zamiast localStorage)  
+4. Realne SMS/IVR telepotwierdzeń  
+5. Integracja booking pacjenta ↔ EDM  
+6. RBAC + audit log (serwerowy)  
+7. Kolumny wielu lekarzy w tygodniu (resource view)  
+8. Recurring visits / serie wizyt  
+
+---
+
+

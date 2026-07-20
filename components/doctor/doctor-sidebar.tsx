@@ -1,21 +1,26 @@
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { doctors } from "@/lib/booking/doctors";
+import { useDoctorData } from "@/components/doctor/doctor-data-provider";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const quickStaff = doctors.slice(0, 6).map((d) => {
-  const parts = d.name.split(" ");
-  const initials = parts
-    .map((p) => p[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-  return { id: d.id, name: d.name, initials, title: d.title };
-});
-
 export function DoctorSidebar({ className }: { className?: string }) {
+  const { visibleStaffDoctors, setViewAsDoctorId, seesAllDoctors } =
+    useDoctorData();
+
+  const quickStaff = visibleStaffDoctors.slice(0, 8).map((d) => {
+    const initials =
+      `${d.firstName?.[0] ?? ""}${d.lastName?.[0] ?? ""}`.toUpperCase() ||
+      "LK";
+    return {
+      id: d.doctorId ?? d.id,
+      name: `${d.firstName} ${d.lastName}`,
+      initials,
+      title: d.title,
+    };
+  });
+
   return (
     <aside
       className={cn(
@@ -29,11 +34,16 @@ export function DoctorSidebar({ className }: { className?: string }) {
           key={s.id}
           type="button"
           title={`${s.title} ${s.name}`}
-          onClick={() =>
-            toast.info(`${s.title} ${s.name}`, {
-              description: "Filtr lekarza — wkrótce",
-            })
-          }
+          onClick={() => {
+            if (seesAllDoctors) {
+              setViewAsDoctorId(s.id);
+              toast.success(`Widok: ${s.title} ${s.name}`);
+            } else {
+              toast.info(`${s.title} ${s.name}`, {
+                description: "Kalendarz w Twoim zakresie widoczności",
+              });
+            }
+          }}
           className="rounded-full ring-offset-2 ring-offset-white transition hover:ring-2 hover:ring-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
         >
           <Avatar className="size-9 border border-slate-200">

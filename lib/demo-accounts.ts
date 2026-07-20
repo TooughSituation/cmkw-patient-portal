@@ -2,8 +2,9 @@ import type { UserRole } from "@/lib/auth/roles";
 import { buildPesel } from "@/lib/pesel";
 
 /**
- * Konta demo — Etap 7.
+ * Konta demo — Etap 9.
  * Lekarze: imie.nazwisko@cmkw.pl / imienazwisko123
+ * Placówka: cmkw@cmkw.pl / cmkw123
  * Pacjenci: …@email.pl / imienazwisko123
  */
 export type DemoAccountSeed = {
@@ -17,6 +18,20 @@ export type DemoAccountSeed = {
   role: UserRole;
   doctorId?: string;
 };
+
+/** Konto placówki — pełny widok EDM */
+export const DEMO_FACILITY_ACCOUNTS: DemoAccountSeed[] = [
+  {
+    id: "user-facility-cmkw",
+    email: "cmkw@cmkw.pl",
+    password: "cmkw123",
+    firstName: "Centrum",
+    lastName: "CMKW",
+    phone: "+48 85 123 45 00",
+    pesel: buildPesel(2000, 1, 1, 999, "M"),
+    role: "facility",
+  },
+];
 
 export const DEMO_DOCTOR_ACCOUNTS: DemoAccountSeed[] = [
   {
@@ -135,6 +150,7 @@ export const DEMO_PATIENT_ACCOUNTS: DemoAccountSeed[] = [
 ];
 
 export const ALL_DEMO_ACCOUNTS: DemoAccountSeed[] = [
+  ...DEMO_FACILITY_ACCOUNTS,
   ...DEMO_DOCTOR_ACCOUNTS,
   ...DEMO_RECEPTION_ACCOUNTS,
   ...DEMO_PATIENT_ACCOUNTS,
@@ -146,4 +162,4 @@ export const LEGACY_DEMO_EMAILS = [
   "admin@cmkw.pl",
 ];
 
-export const DEMO_SEED_VERSION = 7;
+export const DEMO_SEED_VERSION = 8;

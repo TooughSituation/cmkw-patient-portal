@@ -69,8 +69,8 @@ export function PatientCard({ patientId }: { patientId: string }) {
     return (
       <div className="p-6">
         <EmptyState
-          title="Nie znaleziono pacjenta"
-          description="Rekord mógł zostać usunięty lub ID jest nieprawidłowe."
+          title="Brak dostępu do pacjenta"
+          description="Pacjent nie istnieje albo nie jest powiązany z Twoimi wizytami / zakresem widoczności."
         />
         <div className="mt-4 flex justify-center">
           <Button asChild variant="outline">
