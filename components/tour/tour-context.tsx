@@ -81,11 +81,8 @@ export function TourProvider({ children }: { children: ReactNode }) {
       }
       setStepIndex(index);
       const step = steps[index];
-      if (step?.href) {
-        const target = step.href.split("?")[0]!;
-        if (!pathMatches(pathname, step.href)) {
-          router.push(step.href);
-        }
+      if (step?.href && !pathMatches(pathname, step.href)) {
+        router.push(step.href);
       }
     },
     [steps, endTour, pathname, router]
