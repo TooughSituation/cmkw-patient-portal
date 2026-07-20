@@ -1,0 +1,562 @@
+[
+  {
+    "days": [
+      {
+        "weekday": 0,
+        "enabled": false,
+        "startTime": "09:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 1,
+        "enabled": true,
+        "startTime": "09:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 2,
+        "enabled": false,
+        "startTime": "09:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 3,
+        "enabled": true,
+        "startTime": "09:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 4,
+        "enabled": false,
+        "startTime": "09:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 5,
+        "enabled": true,
+        "startTime": "09:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 6,
+        "enabled": false,
+        "startTime": "09:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      }
+    ],
+    "exceptions": [
+      {
+        "id": "ex-k1",
+        "date": "2026-07-30",
+        "type": "urlop",
+        "note": "Kongres ortopedyczny"
+      },
+      {
+        "id": "ex-k2",
+        "date": "2026-07-31",
+        "type": "urlop",
+        "note": "Kongres ortopedyczny"
+      }
+    ],
+    "updatedAt": "2026-07-20T20:47:29.328Z",
+    "id": "sch-kiryluk-bialystok",
+    "staffId": "st-kiryluk",
+    "doctorId": "kiryluk",
+    "branchId": "bialystok"
+  },
+  {
+    "days": [
+      {
+        "weekday": 0,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 1,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 2,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 3,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 4,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 5,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 6,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 20
+      }
+    ],
+    "exceptions": [
+      {
+        "id": "ex-w1",
+        "date": "2026-08-07",
+        "type": "wolne",
+        "note": "Dzień szkoleniowy"
+      }
+    ],
+    "updatedAt": "2026-07-20T20:47:29.328Z",
+    "id": "sch-wenta-bialystok",
+    "staffId": "st-wenta",
+    "doctorId": "wenta",
+    "branchId": "bialystok"
+  },
+  {
+    "days": [
+      {
+        "weekday": 0,
+        "enabled": false,
+        "startTime": "09:00",
+        "endTime": "15:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 1,
+        "enabled": false,
+        "startTime": "09:00",
+        "endTime": "15:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 2,
+        "enabled": true,
+        "startTime": "09:00",
+        "endTime": "15:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 3,
+        "enabled": false,
+        "startTime": "09:00",
+        "endTime": "15:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 4,
+        "enabled": true,
+        "startTime": "09:00",
+        "endTime": "15:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 5,
+        "enabled": false,
+        "startTime": "09:00",
+        "endTime": "15:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 6,
+        "enabled": false,
+        "startTime": "09:00",
+        "endTime": "15:00",
+        "slotMinutes": 20
+      }
+    ],
+    "exceptions": [],
+    "updatedAt": "2026-07-20T20:47:29.328Z",
+    "id": "sch-wenta-hajnowka",
+    "staffId": "st-wenta",
+    "doctorId": "wenta",
+    "branchId": "hajnowka"
+  },
+  {
+    "days": [
+      {
+        "weekday": 0,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "15:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 1,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "15:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 2,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "15:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 3,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "15:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 4,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "15:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 5,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "15:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 6,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "15:00",
+        "slotMinutes": 15
+      }
+    ],
+    "exceptions": [],
+    "updatedAt": "2026-07-20T20:47:29.328Z",
+    "id": "sch-frankowski-bialystok",
+    "staffId": "st-frankowski",
+    "doctorId": "frankowski",
+    "branchId": "bialystok"
+  },
+  {
+    "days": [
+      {
+        "weekday": 0,
+        "enabled": false,
+        "startTime": "10:00",
+        "endTime": "18:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 1,
+        "enabled": true,
+        "startTime": "10:00",
+        "endTime": "18:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 2,
+        "enabled": true,
+        "startTime": "10:00",
+        "endTime": "18:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 3,
+        "enabled": true,
+        "startTime": "10:00",
+        "endTime": "18:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 4,
+        "enabled": false,
+        "startTime": "10:00",
+        "endTime": "18:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 5,
+        "enabled": false,
+        "startTime": "10:00",
+        "endTime": "18:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 6,
+        "enabled": false,
+        "startTime": "10:00",
+        "endTime": "18:00",
+        "slotMinutes": 20
+      }
+    ],
+    "exceptions": [],
+    "updatedAt": "2026-07-20T20:47:29.328Z",
+    "id": "sch-zawadzki-bialystok",
+    "staffId": "st-zawadzki",
+    "doctorId": "zawadzki",
+    "branchId": "bialystok"
+  },
+  {
+    "days": [
+      {
+        "weekday": 0,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 1,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 2,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 3,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 4,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 5,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      },
+      {
+        "weekday": 6,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "14:00",
+        "slotMinutes": 20
+      }
+    ],
+    "exceptions": [],
+    "updatedAt": "2026-07-20T20:47:29.328Z",
+    "id": "sch-zawadzki-hajnowka",
+    "staffId": "st-zawadzki",
+    "doctorId": "zawadzki",
+    "branchId": "hajnowka"
+  },
+  {
+    "days": [
+      {
+        "weekday": 0,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 30
+      },
+      {
+        "weekday": 1,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 30
+      },
+      {
+        "weekday": 2,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 30
+      },
+      {
+        "weekday": 3,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 30
+      },
+      {
+        "weekday": 4,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 30
+      },
+      {
+        "weekday": 5,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 30
+      },
+      {
+        "weekday": 6,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 30
+      }
+    ],
+    "exceptions": [
+      {
+        "id": "ex-t1",
+        "date": "2026-07-27",
+        "type": "dyzur",
+        "note": "Dyżur popołudniowy",
+        "startTime": "16:00",
+        "endTime": "19:00"
+      }
+    ],
+    "updatedAt": "2026-07-20T20:47:29.328Z",
+    "id": "sch-torba-bialystok",
+    "staffId": "st-torba",
+    "doctorId": "torba",
+    "branchId": "bialystok"
+  },
+  {
+    "days": [
+      {
+        "weekday": 0,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "18:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 1,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "18:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 2,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "18:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 3,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "18:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 4,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "18:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 5,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "18:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 6,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "18:00",
+        "slotMinutes": 15
+      }
+    ],
+    "exceptions": [],
+    "updatedAt": "2026-07-20T20:47:29.328Z",
+    "id": "sch-sammoudi-bialystok",
+    "staffId": "st-sammoudi",
+    "doctorId": "sammoudi",
+    "branchId": "bialystok"
+  },
+  {
+    "days": [
+      {
+        "weekday": 0,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 1,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 2,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 3,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 4,
+        "enabled": true,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 5,
+        "enabled": false,
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "slotMinutes": 15
+      },
+      {
+        "weekday": 6,
+        "enabled": true,
+        "startTime": "09:00",
+        "endTime": "13:00",
+        "slotMinutes": 20
+      }
+    ],
+    "exceptions": [],
+    "updatedAt": "2026-07-20T20:47:29.328Z",
+    "id": "sch-sammoudi-hajnowka",
+    "staffId": "st-sammoudi",
+    "doctorId": "sammoudi",
+    "branchId": "hajnowka"
+  }
+]
