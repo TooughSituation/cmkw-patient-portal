@@ -1,6 +1,6 @@
 # Portal Lekarza / CMKW EDM
 
-**Status:** Etap 0–10 + **Etap 11 (Karta wizyty single-page + komunikator personelu)**  
+**Status:** Etap 0–11 + **Etap 12 (Mock e-recepty i e-skierowania P1-ready)**  
 **Prefix:** `/doctor/*`  
 **Role:** `facility` | `doctor` | `admin` | `reception`  
 **Styl:** jasny brand CMKW (`#0849b0`, white / slate-50) — spójny z patient portalem
@@ -23,6 +23,50 @@ npm run dev
 **Demo lekarz + udost.:** `tomas.wenta@cmkw.pl` / `tomaswenta123`  
 **Demo recepcja:** `recepcja@cmkw.pl` / `recepcja123`  
 **Logowanie EDM:** `/doctor/login` · **Pacjent:** `/login`
+
+---
+
+## Etap 12 — e-Recepty i e-Skierowania (mock P1)
+
+**Cel:** dopracowany mock UI jak w prawdziwym systemie — **bez** realnej integracji CeZ/P1.
+
+### Test krok po kroku
+
+1. Login `jan.kiryluk@cmkw.pl` / `jankiryluk123` → kalendarz → wizyta **v-001** (Anna Kowalska)
+2. Ustaw status **W trakcie** (lub **Zakończona**) — dopiero wtedy aktywne przyciski e-dokumentów
+3. Sekcja **Dokumenty medyczne** (chip / dół karty):
+   - Seed: e-recepta `4821-7390-1564`, anulowana, e-skierowanie MRI
+4. **Wystaw e-receptę** → wybierz lek (autocomplete) → dawkowanie, ilość, okres, częstotliwość
+   - Dodaj 2. pozycję · rodzaj: 30-dniowa / **roczna** → Wystaw
+   - Toast z numerem `XXXX-XXXX-XXXX` + kod dostępu 4 cyfry
+5. Podgląd: **Wydrukuj** · **SMS do pacjenta (mock)** · **Edytuj** · **Anuluj** · Kopiuj payload P1
+6. **Wystaw e-skierowanie** → wyszukaj badanie (MRI…) · uzasadnienie · pilne/zwykłe · ośrodek
+7. Karta pacjenta `/doctor/pacjenci/p-001` → zakładka **e-Recepty / e-Skierowania**
+   - Filtry: typ, status, lekarz, data od–do
+8. Reset: Local Storage → usuń `cmkw-doctor-ehealth-v1` → odśwież
+
+### Pliki
+
+| Plik | Rola |
+|------|------|
+| `lib/doctor/ehealth-types.ts` | Typy P1-ready |
+| `lib/doctor/ehealth-client.ts` | Store + numery + `toP1*Payload` |
+| `lib/doctor/seed-ehealth.ts` | Seed 3 e-recept + 3 e-skierowań |
+| `hooks/use-ehealth.ts` | React hook |
+| `components/doctor/e-prescription-dialog.tsx` | Formularz e-recepty |
+| `components/doctor/e-referral-dialog.tsx` | Formularz e-skierowania |
+| `components/doctor/e-document-preview.tsx` | Podgląd / druk / SMS / anuluj |
+| `components/doctor/visit-ehealth-panel.tsx` | Sekcja na karcie wizyty |
+| `components/doctor/patient-ehealth-history.tsx` | Historia na karcie pacjenta |
+
+### Etap 13 — propozycje (przed feedbackiem lekarzy)
+
+1. **Szablony recept** (np. NLPZ + IPP) — 1 klik na popularne zestawy
+2. **Import zaleceń wizyty → e-recepta** (pozycje z listy leków na wizycie)
+3. **Podgląd PDF** (html2canvas / react-pdf) zamiast window.print
+4. **Audyt log** anulowań / wystawień (kto, kiedy)
+5. **Rola recepcji** — tylko odczyt e-dokumentów + ponowny SMS mock
+6. Po feedbacku: realny connector P1 (env, OAuth placówki, kolejka retry)
 
 ---
 

@@ -1,13 +1,47 @@
 # Podsumowanie projektu — CMKW Patient Portal (dla GrokWeb)
 
 **Data aktualizacji:** 2026-07-24  
-**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–11)**  
-**Ostatni etap:** **11 — karta wizyty single-page + komunikator personelu** (feedback lekarza)  
+**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–12)**  
+**Ostatni etap:** **12 — mock e-recepty i e-skierowania (P1-ready UI)**  
 **Konto:** TooughSituation / toough-situation
 
 ---
 
-## 0. Etap 11 (2026-07-24) — feedback lekarza
+## 0. Etap 12 (2026-07-24) — e-Recepty / e-Skierowania (mock P1)
+
+**Cel:** w 100% dopracowany mock jak prawdziwy system — **zero** realnego P1/CeZ/SMS.
+
+### e-Recepta
+- Przycisk w karcie wizyty (status **W trakcie** / **Zakończona**)
+- Formularz: autocomplete leków, wiele pozycji, dawkowanie/ilość/okres/częstotliwość, 30-dniowa / roczna
+- Numer mock `XXXX-XXXX-XXXX` + kod dostępu 4 cyfry
+- Podgląd · druk · SMS mock · edycja · anulowanie (status issued/cancelled)
+- Payload P1: `toP1PrescriptionPayload()` (gotowe pod przyszłe API)
+
+### e-Skierowanie
+- Formularz: kategoria, badanie (wyszukiwarka), uzasadnienie, pilne/zwykłe, ośrodek, ICD
+- Numer `ES-YYYY-######` · podgląd · anulowanie
+
+### Integracja
+- Karta wizyty → sekcja **Dokumenty medyczne**
+- Karta pacjenta → zakładka **e-Recepty / e-Skierowania** + filtry (data/lekarz/status/typ)
+- Seed: 3 e-recepty + 3 e-skierowania (v-001, v-002, v-003)
+- localStorage: `cmkw-doctor-ehealth-v1`
+
+### Kluczowe pliki
+`lib/doctor/ehealth-*` · `hooks/use-ehealth.ts` · `components/doctor/e-*.tsx` · `visit-ehealth-panel` · `patient-ehealth-history`
+
+### Smoke
+1. Login Kiryluk → wizyta v-001 → W trakcie → Wystaw e-receptę / e-skierowanie  
+2. Pacjent p-001 → zakładka e-dokumentów + filtry  
+3. Reset klucza ehealth w Local Storage
+
+### Etap 13 (sugerowany)
+Szablony recept · import leków z wizyty → eRx · PDF · audyt · recepcja read-only · potem real P1
+
+---
+
+## 0b. Etap 11 (2026-07-24) — feedback lekarza
 
 ### Karta wizyty — jeden widok (Lux Med–style)
 

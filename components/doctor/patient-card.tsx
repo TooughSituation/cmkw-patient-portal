@@ -31,6 +31,7 @@ import { PatientGroups } from "@/components/doctor/patient-groups";
 import { VisitStatusBadge } from "@/components/doctor/visit-status-badge";
 import { EmptyState } from "@/components/doctor/empty-state";
 import { DocumentsPanel } from "@/components/doctor/documents-panel";
+import { PatientEHealthHistory } from "@/components/doctor/patient-ehealth-history";
 import { useDoctorPatients } from "@/hooks/use-doctor-patients";
 import { useDoctorVisits } from "@/hooks/use-doctor-visits";
 import {
@@ -172,6 +173,9 @@ export function PatientCard({ patientId }: { patientId: string }) {
             <TabsTrigger value="historia" className="text-sm">
               Historia wizyt
             </TabsTrigger>
+            <TabsTrigger value="erecepty" className="text-sm">
+              e-Recepty / e-Skierowania
+            </TabsTrigger>
             <TabsTrigger value="dane" className="text-sm">
               Dane osobowe
             </TabsTrigger>
@@ -241,6 +245,20 @@ export function PatientCard({ patientId }: { patientId: string }) {
                     </Table>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="erecepty">
+            <Card className="border-slate-200 bg-white shadow-sm ring-slate-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base text-brand-heading">
+                  <Pill className="size-4 text-brand" />
+                  Historia recept i skierowań
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PatientEHealthHistory patientId={patient.id} />
               </CardContent>
             </Card>
           </TabsContent>

@@ -42,7 +42,7 @@ import { PatientGroups } from "@/components/doctor/patient-groups";
 import { PatientNameLink } from "@/components/doctor/patient-name-link";
 import { IcdPicker } from "@/components/doctor/icd-picker";
 import { DrugPicker } from "@/components/doctor/drug-picker";
-import { DocumentsPanel } from "@/components/doctor/documents-panel";
+import { VisitEHealthPanel } from "@/components/doctor/visit-ehealth-panel";
 import { EmptyState } from "@/components/doctor/empty-state";
 import { useDoctorVisits } from "@/hooks/use-doctor-visits";
 import { getDepartmentById } from "@/lib/doctor/departments";
@@ -316,6 +316,8 @@ export function VisitCard({ visitId }: { visitId: string }) {
 
   const dept = getDepartmentById(visit.departmentId);
   const branch = getBranchById(visit.branchId);
+  const canIssueEHealth =
+    visit.status === "in_progress" || visit.status === "completed";
 
   const actions = {
     saving,
@@ -410,8 +412,8 @@ export function VisitCard({ visitId }: { visitId: string }) {
           ["#sec-wywiad", "Wywiad"],
           ["#sec-icd", "ICD-10"],
           ["#sec-leki", "Leki"],
-          ["#sec-skierowania", "Skierowania"],
-          ["#sec-dokumenty", "Dokumenty"],
+          ["#sec-skierowania", "Skierowania (lista)"],
+          ["#sec-dokumenty", "e-Recepty / e-Skierowania"],
           ["#sec-historia", "Historia"],
         ].map(([href, label]) => (
           <a
@@ -723,18 +725,6 @@ export function VisitCard({ visitId }: { visitId: string }) {
           </VisitSection>
 
           <VisitSection
-            id="sec-dokumenty"
-            title="Dokumenty wizyty"
-            icon={<FileText className="size-4" />}
-          >
-            <DocumentsPanel
-              patientId={visit.patientId}
-              visitId={visit.id}
-              scope="visit"
-            />
-          </VisitSection>
-
-          <VisitSection
             id="sec-historia"
             title="Poprzednie wizyty"
             icon={<History className="size-4" />}
@@ -784,6 +774,15 @@ export function VisitCard({ visitId }: { visitId: string }) {
           </VisitSection>
         </div>
       </div>
+
+      {/* Dokumenty medyczne e-P1 (full width) */}
+      <VisitSection
+        id="sec-dokumenty"
+        title="Dokumenty medyczne (e-Recepty / e-Skierowania)"
+        icon={<FileText className="size-4" />}
+      >
+        <VisitEHealthPanel visit={visit} canIssue={canIssueEHealth} />
+      </VisitSection>
 
       {/* Akcje dół (sticky) */}
       <VisitActionBar {...actions} sticky />
