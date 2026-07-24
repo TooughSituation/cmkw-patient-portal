@@ -40,20 +40,26 @@ export function IcdPicker({
   return (
     <div className="space-y-2">
       <div className="relative">
-        <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-slate-400" />
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-brand/60" />
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Szukaj kodu lub opisu ICD-10…"
-          className="h-10 pl-8"
+          placeholder="Szukaj kodu lub opisu ICD-10… (min. 1 znak)"
+          className="h-11 border-slate-200 bg-white pl-10 text-[15px] shadow-sm focus-visible:ring-brand/30"
+          autoComplete="off"
         />
       </div>
+      {q.trim().length >= 1 && results.length === 0 ? (
+        <p className="px-1 text-xs text-muted-foreground">
+          Brak wyników dla „{q.trim()}”.
+        </p>
+      ) : null}
       {results.length > 0 ? (
-        <ul className="divide-y rounded-lg border border-slate-200 bg-white">
+        <ul className="divide-y overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm animate-in fade-in-0 slide-in-from-top-1 duration-200">
           {results.map((c) => (
             <li
               key={c.code}
-              className="flex items-center justify-between gap-2 px-3 py-2 text-sm"
+              className="flex items-center justify-between gap-2 px-3 py-2.5 text-sm transition hover:bg-secondary/60"
             >
               <div className="min-w-0">
                 <span className="font-mono font-semibold text-brand">
@@ -64,8 +70,7 @@ export function IcdPicker({
               <Button
                 type="button"
                 size="sm"
-                variant="outline"
-                className="h-8 shrink-0 gap-1"
+                className="h-8 shrink-0 gap-1 bg-brand text-white hover:bg-brand-deep"
                 onClick={() => {
                   onAdd({
                     code: c.code,

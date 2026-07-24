@@ -58,9 +58,9 @@ export function DrugPicker({
   }
 
   return (
-    <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50/80 p-3">
+    <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/80 p-3 shadow-sm ring-1 ring-slate-100">
       <div className="relative">
-        <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-slate-400" />
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-brand/60" />
         <Input
           value={q}
           onChange={(e) => {
@@ -68,16 +68,22 @@ export function DrugPicker({
             setSelectedId(null);
           }}
           placeholder="Szukaj leku (nazwa / INN)…"
-          className="h-10 bg-white pl-8"
+          className="h-11 border-slate-200 bg-white pl-10 text-[15px] shadow-sm focus-visible:ring-brand/30"
+          autoComplete="off"
         />
       </div>
+      {q.trim().length >= 1 && results.length === 0 && !selectedId ? (
+        <p className="px-1 text-xs text-muted-foreground">
+          Brak leków dla „{q.trim()}”.
+        </p>
+      ) : null}
       {results.length > 0 && !selectedId ? (
-        <ul className="divide-y rounded-lg border border-slate-200 bg-white">
+        <ul className="divide-y overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm animate-in fade-in-0 slide-in-from-top-1 duration-200">
           {results.map((d) => (
             <li key={d.id}>
               <button
                 type="button"
-                className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-secondary"
+                className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition hover:bg-secondary"
                 onClick={() => {
                   setSelectedId(d.id);
                   setQ(d.name);
@@ -85,7 +91,9 @@ export function DrugPicker({
                 }}
               >
                 <span>
-                  <span className="font-medium">{d.name}</span>
+                  <span className="font-medium text-brand-heading">
+                    {d.name}
+                  </span>
                   <span className="ml-2 text-xs text-muted-foreground">
                     {d.inn} · {d.strength}
                   </span>

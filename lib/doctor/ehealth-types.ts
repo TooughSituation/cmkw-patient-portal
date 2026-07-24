@@ -1,6 +1,6 @@
 /**
  * e-Recepta / e-Skierowanie — typy P1-ready (mock).
- * Struktura pod przyszłe API CeZ/P1 bez realnej integracji.
+ * Etap 12–13: formularze, szablony, audyt, payload pod przyszłe API CeZ/P1.
  */
 
 export type EDocumentStatus = "issued" | "cancelled";
@@ -16,22 +16,35 @@ export type EPrescriptionItem = {
   inn: string;
   form: string;
   strength: string;
-  /** Dawkowanie (np. 1 tabl. 2×/d) */
   dosage: string;
-  /** Ilość (np. 2 op. po 20 tabl.) */
   quantity: string;
-  /** Okres stosowania */
   duration: string;
-  /** Częstotliwość (np. co 12 h) */
   frequency: string;
   notes: string;
+};
+
+/** Wpis audytu (wystawienie / edycja / anulowanie / SMS) */
+export type EAuditAction =
+  | "issued"
+  | "updated"
+  | "cancelled"
+  | "sms_sent"
+  | "template_applied";
+
+export type EAuditEntry = {
+  id: string;
+  at: string;
+  action: EAuditAction;
+  actorUserId: string;
+  actorName: string;
+  actorRole: string;
+  summary: string;
 };
 
 export type EPrescription = {
   id: string;
   /** Mock numer e-recepty: XXXX-XXXX-XXXX */
   number: string;
-  /** 4-cyfrowy kod dostępu (mock P1) */
   accessCode: string;
   status: EDocumentStatus;
   kind: EPrescriptionKind;
@@ -48,17 +61,15 @@ export type EPrescription = {
   cancelledAt?: string;
   cancelReason?: string;
   smsSentAt?: string;
-  /** Flaga pod przyszłe API — payload gotowy do wysyłki P1 */
   p1Ready: boolean;
+  auditLog: EAuditEntry[];
   createdAt: string;
   updatedAt: string;
 };
 
 export type EReferral = {
   id: string;
-  /** Mock numer e-skierowania */
   number: string;
-  /** Kod dostępu / PIN mock */
   accessCode: string;
   status: EDocumentStatus;
   visitId: string;
@@ -68,19 +79,30 @@ export type EReferral = {
   doctorId: string;
   doctorName: string;
   doctorPwz: string;
-  /** Kategoria: obrazowanie | lab | konsultacja | zabieg | rehab */
   examCategory: string;
-  /** Rodzaj badania / konsultacji */
   examType: string;
   justification: string;
   urgency: EReferralUrgency;
-  /** Ośrodek docelowy (opcjonalnie) */
   targetFacility: string;
   icdCode: string;
   issuedAt: string;
   cancelledAt?: string;
   cancelReason?: string;
   p1Ready: boolean;
+  auditLog: EAuditEntry[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Szablon recepty (szybkie wstawianie) */
+export type EPrescriptionTemplate = {
+  id: string;
+  name: string;
+  description: string;
+  kind: EPrescriptionKind;
+  items: Omit<EPrescriptionItem, "id">[];
+  generalNotes: string;
+  source: "system" | "user";
   createdAt: string;
   updatedAt: string;
 };
@@ -88,6 +110,7 @@ export type EReferral = {
 export type EHealthStore = {
   prescriptions: EPrescription[];
   referrals: EReferral[];
+  templates: EPrescriptionTemplate[];
 };
 
 export const E_PRESCRIPTION_KIND_LABELS: Record<EPrescriptionKind, string> = {
@@ -105,6 +128,14 @@ export const E_REFERRAL_URGENCY_LABELS: Record<EReferralUrgency, string> = {
   urgent: "Pilne",
 };
 
+export const E_AUDIT_ACTION_LABELS: Record<EAuditAction, string> = {
+  issued: "Wystawiono",
+  updated: "Zaktualizowano",
+  cancelled: "Anulowano",
+  sms_sent: "SMS do pacjenta",
+  template_applied: "Zastosowano szablon",
+};
+
 export const E_REFERRAL_CATEGORIES = [
   "Obrazowanie",
   "Laboratorium",
@@ -114,7 +145,6 @@ export const E_REFERRAL_CATEGORIES = [
   "Inne",
 ] as const;
 
-/** Typowe badania / konsultacje (autocomplete) */
 export const E_REFERRAL_EXAM_TYPES: { category: string; name: string }[] = [
   { category: "Obrazowanie", name: "MRI kolana" },
   { category: "Obrazowanie", name: "MRI barku" },

@@ -48,6 +48,8 @@ export function PatientEHealthHistory({ patientId }: { patientId: string }) {
     annulPrescription,
     annulReferral,
     markSmsSent,
+    canIssue,
+    canSms,
   } = useEHealth();
 
   const [typeFilter, setTypeFilter] = useState<"all" | "rx" | "ref">("all");
@@ -331,8 +333,13 @@ export function PatientEHealthHistory({ patientId }: { patientId: string }) {
         onOpenChange={(v) => {
           if (!v) setPreviewRx(null);
         }}
-        onCancel={(id, reason) => annulPrescription(id, reason)}
-        onSms={(id) => markSmsSent(id)}
+        onCancel={
+          canIssue ? (id, reason) => annulPrescription(id, reason) : undefined
+        }
+        onSms={canSms ? (id) => markSmsSent(id) : undefined}
+        allowEdit={false}
+        allowCancel={canIssue}
+        allowSms={canSms}
       />
       <EReferralPreview
         refDoc={previewRef}
@@ -340,7 +347,11 @@ export function PatientEHealthHistory({ patientId }: { patientId: string }) {
         onOpenChange={(v) => {
           if (!v) setPreviewRef(null);
         }}
-        onCancel={(id, reason) => annulReferral(id, reason)}
+        onCancel={
+          canIssue ? (id, reason) => annulReferral(id, reason) : undefined
+        }
+        allowEdit={false}
+        allowCancel={canIssue}
       />
     </div>
   );

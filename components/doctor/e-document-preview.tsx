@@ -4,8 +4,10 @@ import { format, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
 import {
   AlertTriangle,
+  FileDown,
+  History,
+  Loader2,
   MessageSquare,
-  Printer,
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -20,8 +22,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { EPrescription, EReferral } from "@/lib/doctor/ehealth-types";
+import type {
+  EAuditEntry,
+  EPrescription,
+  EReferral,
+} from "@/lib/doctor/ehealth-types";
 import {
+  E_AUDIT_ACTION_LABELS,
   E_DOCUMENT_STATUS_LABELS,
   E_PRESCRIPTION_KIND_LABELS,
   E_REFERRAL_URGENCY_LABELS,
@@ -30,6 +37,10 @@ import {
   toP1PrescriptionPayload,
   toP1ReferralPayload,
 } from "@/lib/doctor/ehealth-client";
+import {
+  downloadPrescriptionPdf,
+  downloadReferralPdf,
+} from "@/components/doctor/e-document-pdf";
 import { maskPesel } from "@/lib/doctor/types";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -50,6 +61,35 @@ export function StatusBadge({ status }: { status: "issued" | "cancelled" }) {
   );
 }
 
+function AuditTimeline({ log }: { log: EAuditEntry[] }) {
+  if (!log?.length) {
+    return (
+      <p className="text-xs text-muted-foreground">Brak wpisów audytu.</p>
+    );
+  }
+  const sorted = [...log].sort((a, b) => b.at.localeCompare(a.at));
+  return (
+    <ul className="space-y-2 border-l-2 border-brand/20 pl-3">
+      {sorted.map((e) => (
+        <li key={e.id} className="relative text-xs">
+          <span className="absolute -left-[17px] top-1 size-2 rounded-full bg-brand" />
+          <p className="font-medium text-slate-800">
+            {E_AUDIT_ACTION_LABELS[e.action] ?? e.action}
+            <span className="ml-1.5 font-normal text-muted-foreground">
+              {format(parseISO(e.at), "d MMM yyyy HH:mm", { locale: pl })}
+            </span>
+          </p>
+          <p className="text-slate-600">{e.summary}</p>
+          <p className="text-[10px] text-muted-foreground">
+            {e.actorName}
+            {e.actorRole ? ` · ${e.actorRole}` : ""}
+          </p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function EPrescriptionPreview({
   rx,
   open,
@@ -57,6 +97,9 @@ export function EPrescriptionPreview({
   onCancel,
   onSms,
   onEdit,
+  allowEdit = true,
+  allowCancel = true,
+  allowSms = true,
 }: {
   rx: EPrescription | null;
   open: boolean;
@@ -64,15 +107,29 @@ export function EPrescriptionPreview({
   onCancel?: (id: string, reason: string) => void;
   onSms?: (id: string) => void;
   onEdit?: (rx: EPrescription) => void;
+  allowEdit?: boolean;
+  allowCancel?: boolean;
+  allowSms?: boolean;
 }) {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [reason, setReason] = useState("");
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   if (!rx) return null;
 
-  function printDoc() {
-    toast.success("Drukowanie e-recepty (podgląd przeglądarki)");
-    window.print();
+  async function exportPdf() {
+    if (!rx) return;
+    setPdfLoading(true);
+    try {
+      await downloadPrescriptionPdf(rx);
+      toast.success("PDF e-recepty pobrany", {
+        description: `${rx.number}.pdf`,
+      });
+    } catch {
+      toast.error("Nie udało się wygenerować PDF");
+    } finally {
+      setPdfLoading(false);
+    }
   }
 
   function sendSms() {
@@ -220,6 +277,14 @@ export function EPrescriptionPreview({
                 })}
               </p>
             ) : null}
+
+            <div className="border-t border-slate-100 pt-3">
+              <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <History className="size-3.5" />
+                Audyt
+              </p>
+              <AuditTimeline log={rx.auditLog ?? []} />
+            </div>
           </div>
 
           <DialogFooter className="flex-col gap-2 sm:flex-col">
@@ -228,12 +293,17 @@ export function EPrescriptionPreview({
                 type="button"
                 variant="outline"
                 className="h-10 flex-1 gap-1.5"
-                onClick={printDoc}
+                disabled={pdfLoading}
+                onClick={() => void exportPdf()}
               >
-                <Printer className="size-4" />
-                Wydrukuj
+                {pdfLoading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <FileDown className="size-4" />
+                )}
+                Pobierz PDF
               </Button>
-              {rx.status === "issued" ? (
+              {rx.status === "issued" && allowSms && onSms ? (
                 <Button
                   type="button"
                   variant="outline"
@@ -246,7 +316,7 @@ export function EPrescriptionPreview({
               ) : null}
             </div>
             <div className="flex w-full flex-wrap gap-2">
-              {rx.status === "issued" && onEdit ? (
+              {rx.status === "issued" && allowEdit && onEdit ? (
                 <Button
                   type="button"
                   variant="outline"
@@ -259,7 +329,7 @@ export function EPrescriptionPreview({
                   Edytuj
                 </Button>
               ) : null}
-              {rx.status === "issued" && onCancel ? (
+              {rx.status === "issued" && allowCancel && onCancel ? (
                 <Button
                   type="button"
                   variant="outline"
@@ -331,21 +401,36 @@ export function EReferralPreview({
   onOpenChange,
   onCancel,
   onEdit,
+  allowEdit = true,
+  allowCancel = true,
 }: {
   refDoc: EReferral | null;
   open: boolean;
   onOpenChange: (v: boolean) => void;
   onCancel?: (id: string, reason: string) => void;
   onEdit?: (r: EReferral) => void;
+  allowEdit?: boolean;
+  allowCancel?: boolean;
 }) {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [reason, setReason] = useState("");
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   if (!refDoc) return null;
 
-  function printDoc() {
-    toast.success("Drukowanie e-skierowania (podgląd przeglądarki)");
-    window.print();
+  async function exportPdf() {
+    if (!refDoc) return;
+    setPdfLoading(true);
+    try {
+      await downloadReferralPdf(refDoc);
+      toast.success("PDF e-skierowania pobrany", {
+        description: `${refDoc.number}.pdf`,
+      });
+    } catch {
+      toast.error("Nie udało się wygenerować PDF");
+    } finally {
+      setPdfLoading(false);
+    }
   }
 
   function copyP1() {
@@ -434,6 +519,14 @@ export function EReferralPreview({
                 {refDoc.cancelReason ? <p>{refDoc.cancelReason}</p> : null}
               </div>
             ) : null}
+
+            <div className="border-t border-slate-100 pt-3">
+              <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <History className="size-3.5" />
+                Audyt
+              </p>
+              <AuditTimeline log={refDoc.auditLog ?? []} />
+            </div>
           </div>
 
           <DialogFooter className="flex-col gap-2 sm:flex-col">
@@ -442,12 +535,17 @@ export function EReferralPreview({
                 type="button"
                 variant="outline"
                 className="h-10 flex-1 gap-1.5"
-                onClick={printDoc}
+                disabled={pdfLoading}
+                onClick={() => void exportPdf()}
               >
-                <Printer className="size-4" />
-                Wydrukuj
+                {pdfLoading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <FileDown className="size-4" />
+                )}
+                Pobierz PDF
               </Button>
-              {refDoc.status === "issued" && onEdit ? (
+              {refDoc.status === "issued" && allowEdit && onEdit ? (
                 <Button
                   type="button"
                   variant="outline"
@@ -460,7 +558,7 @@ export function EReferralPreview({
                   Edytuj
                 </Button>
               ) : null}
-              {refDoc.status === "issued" && onCancel ? (
+              {refDoc.status === "issued" && allowCancel && onCancel ? (
                 <Button
                   type="button"
                   variant="outline"

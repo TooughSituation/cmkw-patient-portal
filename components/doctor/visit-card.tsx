@@ -138,25 +138,25 @@ function VisitActionBar({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm",
+        "flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm ring-1 ring-slate-100 md:p-3",
         sticky &&
-          "sticky bottom-0 z-20 border-brand/15 bg-white/95 shadow-md backdrop-blur supports-backdrop-filter:bg-white/90"
+          "sticky bottom-0 z-20 border-brand/20 bg-white/95 shadow-lg ring-brand/10 backdrop-blur supports-backdrop-filter:bg-white/90"
       )}
     >
       <Button
-        className="h-10 gap-1.5 bg-brand px-4 text-white hover:bg-brand-deep"
+        className="h-10 gap-1.5 bg-brand px-4 text-white shadow-sm transition hover:bg-brand-deep hover:shadow md:h-11 md:px-5"
         disabled={saving}
         onClick={onSave}
       >
         <Save className="size-4" />
         Zapisz
         {dirty ? (
-          <span className="ml-0.5 size-1.5 rounded-full bg-amber-300" aria-hidden />
+          <span className="ml-0.5 size-1.5 animate-pulse rounded-full bg-amber-300" aria-hidden />
         ) : null}
       </Button>
       <Button
         variant="outline"
-        className="h-10 gap-1.5"
+        className="h-10 gap-1.5 border-sky-200 text-sky-900 hover:bg-sky-50 md:h-11"
         onClick={onInProgress}
       >
         <Play className="size-4" />
@@ -164,22 +164,30 @@ function VisitActionBar({
       </Button>
       <Button
         variant="outline"
-        className="h-10 gap-1.5 border-emerald-300 text-emerald-800 hover:bg-emerald-50"
+        className="h-10 gap-1.5 border-emerald-300 font-medium text-emerald-800 hover:bg-emerald-50 md:h-11"
         onClick={onComplete}
       >
         <CheckCircle2 className="size-4" />
         Zakończ wizytę
       </Button>
-      <Button variant="outline" className="h-10 gap-1.5" onClick={onConfirm}>
+      <Button
+        variant="outline"
+        className="h-10 gap-1.5 md:h-11"
+        onClick={onConfirm}
+      >
         Potwierdź
       </Button>
-      <Button variant="outline" className="h-10 gap-1.5" onClick={onPrint}>
+      <Button
+        variant="outline"
+        className="h-10 gap-1.5 md:h-11"
+        onClick={onPrint}
+      >
         <Printer className="size-4" />
         Drukuj
       </Button>
       <Button
         variant="outline"
-        className="h-10 gap-1.5 text-destructive hover:bg-red-50"
+        className="h-10 gap-1.5 text-destructive hover:bg-red-50 md:h-11"
         onClick={onCancel}
       >
         <XCircle className="size-4" />

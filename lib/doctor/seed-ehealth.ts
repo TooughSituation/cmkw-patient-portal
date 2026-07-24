@@ -1,4 +1,9 @@
-import type { EPrescription, EReferral } from "@/lib/doctor/ehealth-types";
+import type {
+  EAuditEntry,
+  EPrescription,
+  EPrescriptionTemplate,
+  EReferral,
+} from "@/lib/doctor/ehealth-types";
 import { subDays } from "date-fns";
 
 const now = new Date();
@@ -8,9 +13,122 @@ const iso = (daysAgo: number, hour = 10) => {
   return d.toISOString();
 };
 
+function audit(
+  partial: Omit<EAuditEntry, "id"> & { id?: string }
+): EAuditEntry {
+  return {
+    id: partial.id ?? `aud-${crypto.randomUUID?.().slice(0, 8) ?? Math.random().toString(36).slice(2, 10)}`,
+    at: partial.at,
+    action: partial.action,
+    actorUserId: partial.actorUserId,
+    actorName: partial.actorName,
+    actorRole: partial.actorRole,
+    summary: partial.summary,
+  };
+}
+
+/** Seed systemowych szablonów recept */
+export const SEED_E_TEMPLATES: EPrescriptionTemplate[] = [
+  {
+    id: "tpl-nlpz-ipp",
+    name: "NLPZ + IPP",
+    description: "Ketonal Forte + Omeprazol — standard bólu ortopedycznego",
+    kind: "30_days",
+    items: [
+      {
+        drugId: "drug-001",
+        drugName: "Ketonal Forte",
+        inn: "Ketoprofenum",
+        form: "tabletki powlekane",
+        strength: "100 mg",
+        dosage: "1 tabl. 1×/d z posiłkiem",
+        quantity: "1 op. (20 tabl.)",
+        duration: "20 dni",
+        frequency: "1× dziennie rano",
+        notes: "Osłona IPP przy dolegliwościach żołądkowych",
+      },
+      {
+        drugId: "drug-029",
+        drugName: "Omeprazol Sandoz",
+        inn: "Omeprazolum",
+        form: "kapsułki",
+        strength: "20 mg",
+        dosage: "1 kaps. rano na czczo",
+        quantity: "1 op. (28 kaps.)",
+        duration: "28 dni",
+        frequency: "1× dziennie",
+        notes: "",
+      },
+    ],
+    generalNotes: "NLPZ + osłona żołądka. Unikać na pusty żołądek.",
+    source: "system",
+    createdAt: iso(30, 9),
+    updatedAt: iso(30, 9),
+  },
+  {
+    id: "tpl-antybiotyk",
+    name: "Antybiotyk standard",
+    description: "Augmentin — typowy zestaw po zabiegu / infekcja",
+    kind: "30_days",
+    items: [
+      {
+        drugId: "drug-025",
+        drugName: "Augmentin",
+        inn: "Amoxicillinum + Acidum clavulanicum",
+        form: "tabletki",
+        strength: "1 g",
+        dosage: "1 tabl. 2×/d",
+        quantity: "1 op. (14 tabl.)",
+        duration: "7 dni",
+        frequency: "co 12 h",
+        notes: "Pełna kuracja, z posiłkiem",
+      },
+    ],
+    generalNotes: "Kontrola przy wysypce / biegunka. Probiotyk opcjonalnie.",
+    source: "system",
+    createdAt: iso(30, 9),
+    updatedAt: iso(30, 9),
+  },
+  {
+    id: "tpl-wit-d-ca",
+    name: "Witamina D + wapń",
+    description: "Suplementacja w osteopenii / po menopauzie / sport",
+    kind: "annual",
+    items: [
+      {
+        drugId: "drug-016",
+        drugName: "Devikap",
+        inn: "Cholecalciferolum",
+        form: "krople",
+        strength: "20 000 j.m./ml",
+        dosage: "2000 j.m. 1×/d",
+        quantity: "1 but. 10 ml",
+        duration: "do 12 mies. (roczna)",
+        frequency: "1× dziennie",
+        notes: "Kontrola 25-OH D po 3 mies.",
+      },
+      {
+        drugId: "drug-015",
+        drugName: "Calcium + Vit. D3",
+        inn: "Calcium carbonicum + Cholecalciferolum",
+        form: "tabletki",
+        strength: "500 mg + 200 j.m.",
+        dosage: "1 tabl. 1–2×/d",
+        quantity: "2 op. (60 tabl.)",
+        duration: "do 12 mies.",
+        frequency: "1–2× dziennie",
+        notes: "",
+      },
+    ],
+    generalNotes: "Recepta roczna — realizacja częściowa w aptece.",
+    source: "system",
+    createdAt: iso(30, 9),
+    updatedAt: iso(30, 9),
+  },
+];
+
 /**
- * Seed e-recept i e-skierowań powiązanych z wizytami seed (v-001, v-003, …).
- * Numery realistyczne (mock P1) — nie są prawdziwymi dokumentami CeZ.
+ * Seed e-recept i e-skierowań powiązanych z wizytami seed.
  */
 export const SEED_E_PRESCRIPTIONS: EPrescription[] = [
   {
@@ -22,7 +140,7 @@ export const SEED_E_PRESCRIPTIONS: EPrescription[] = [
     visitId: "v-001",
     patientId: "p-001",
     patientName: "Anna Kowalska",
-    patientPesel: "", // uzupełniane w runtime z pacjenta przy wyświetlaniu
+    patientPesel: "",
     doctorId: "kiryluk",
     doctorName: "Dr n. med. Jan Kiryluk",
     doctorPwz: "1234567",
@@ -57,6 +175,26 @@ export const SEED_E_PRESCRIPTIONS: EPrescription[] = [
     generalNotes: "NLPZ + osłona żołądka. Kontrola po MRI.",
     issuedAt: iso(0, 8),
     p1Ready: true,
+    auditLog: [
+      audit({
+        id: "aud-epx001-1",
+        at: iso(0, 8),
+        action: "issued",
+        actorUserId: "user-doctor-kiryluk",
+        actorName: "Jan Kiryluk",
+        actorRole: "admin",
+        summary: "Wystawiono e-receptę (2 pozycje, 30-dniowa)",
+      }),
+      audit({
+        id: "aud-epx001-2",
+        at: iso(0, 8),
+        action: "template_applied",
+        actorUserId: "user-doctor-kiryluk",
+        actorName: "Jan Kiryluk",
+        actorRole: "admin",
+        summary: "Szablon: NLPZ + IPP",
+      }),
+    ],
     createdAt: iso(0, 8),
     updatedAt: iso(0, 8),
   },
@@ -91,6 +229,17 @@ export const SEED_E_PRESCRIPTIONS: EPrescription[] = [
     generalNotes: "Recepta roczna — kontynuacja leczenia miejscowego po urazie barku.",
     issuedAt: iso(2, 9),
     p1Ready: true,
+    auditLog: [
+      audit({
+        id: "aud-epx002-1",
+        at: iso(2, 9),
+        action: "issued",
+        actorUserId: "user-doctor-frankowski",
+        actorName: "Paweł Frankowski",
+        actorRole: "doctor",
+        summary: "Wystawiono e-receptę roczną (1 pozycja)",
+      }),
+    ],
     createdAt: iso(2, 9),
     updatedAt: iso(2, 9),
   },
@@ -127,6 +276,26 @@ export const SEED_E_PRESCRIPTIONS: EPrescription[] = [
     cancelledAt: iso(0, 8),
     cancelReason: "Zmiana leku na Ketonal Forte + IPP",
     p1Ready: false,
+    auditLog: [
+      audit({
+        id: "aud-epx003-1",
+        at: iso(1, 14),
+        action: "issued",
+        actorUserId: "user-doctor-kiryluk",
+        actorName: "Jan Kiryluk",
+        actorRole: "admin",
+        summary: "Wystawiono e-receptę (Aulin)",
+      }),
+      audit({
+        id: "aud-epx003-2",
+        at: iso(0, 8),
+        action: "cancelled",
+        actorUserId: "user-doctor-kiryluk",
+        actorName: "Jan Kiryluk",
+        actorRole: "admin",
+        summary: "Anulowano: Zmiana leku na Ketonal Forte + IPP",
+      }),
+    ],
     createdAt: iso(1, 14),
     updatedAt: iso(0, 8),
   },
@@ -154,6 +323,17 @@ export const SEED_E_REFERRALS: EReferral[] = [
     icdCode: "M17.1",
     issuedAt: iso(0, 8),
     p1Ready: true,
+    auditLog: [
+      audit({
+        id: "aud-eref001-1",
+        at: iso(0, 8),
+        action: "issued",
+        actorUserId: "user-doctor-kiryluk",
+        actorName: "Jan Kiryluk",
+        actorRole: "admin",
+        summary: "Wystawiono e-skierowanie: MRI kolana",
+      }),
+    ],
     createdAt: iso(0, 8),
     updatedAt: iso(0, 8),
   },
@@ -178,6 +358,17 @@ export const SEED_E_REFERRALS: EReferral[] = [
     icdCode: "M75.1",
     issuedAt: iso(2, 9),
     p1Ready: true,
+    auditLog: [
+      audit({
+        id: "aud-eref002-1",
+        at: iso(2, 9),
+        action: "issued",
+        actorUserId: "user-doctor-frankowski",
+        actorName: "Paweł Frankowski",
+        actorRole: "doctor",
+        summary: "Wystawiono e-skierowanie pilne: USG barku",
+      }),
+    ],
     createdAt: iso(2, 9),
     updatedAt: iso(2, 9),
   },
@@ -195,7 +386,8 @@ export const SEED_E_REFERRALS: EReferral[] = [
     doctorPwz: "2345678",
     examCategory: "Rehabilitacja",
     examType: "Fizjoterapia pooperacyjna",
-    justification: "Kontrola po artroskopii — skierowanie anulowane, rehabilitacja w innym ośrodku.",
+    justification:
+      "Kontrola po artroskopii — skierowanie anulowane, rehabilitacja w innym ośrodku.",
     urgency: "normal",
     targetFacility: "Do wyboru przez pacjenta",
     icdCode: "M23.2",
@@ -203,6 +395,26 @@ export const SEED_E_REFERRALS: EReferral[] = [
     cancelledAt: iso(10, 9),
     cancelReason: "Pacjent kontynuuje rehabilitację prywatnie",
     p1Ready: false,
+    auditLog: [
+      audit({
+        id: "aud-eref003-1",
+        at: iso(14, 11),
+        action: "issued",
+        actorUserId: "user-doctor-wenta",
+        actorName: "Tomas Wenta",
+        actorRole: "doctor",
+        summary: "Wystawiono e-skierowanie: fizjoterapia",
+      }),
+      audit({
+        id: "aud-eref003-2",
+        at: iso(10, 9),
+        action: "cancelled",
+        actorUserId: "user-doctor-wenta",
+        actorName: "Tomas Wenta",
+        actorRole: "doctor",
+        summary: "Anulowano: rehabilitacja prywatnie",
+      }),
+    ],
     createdAt: iso(14, 11),
     updatedAt: iso(10, 9),
   },

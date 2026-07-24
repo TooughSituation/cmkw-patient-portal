@@ -1,32 +1,59 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
 import {
   cancelEPrescription,
   cancelEReferral,
+  canIssueEHealthDocuments,
+  canResendEHealthSms,
   createEPrescription,
   createEReferral,
+  deleteTemplate,
   EHEALTH_EVENT,
   EHEALTH_STORAGE_KEY,
   loadEHealthStore,
+  markPrescriptionSms,
   saveEHealthStore,
+  saveTemplate,
   updateEPrescription,
   updateEReferral,
   type CreatePrescriptionInput,
   type CreateReferralInput,
+  type EHealthActor,
 } from "@/lib/doctor/ehealth-client";
 import type {
   EHealthStore,
   EPrescription,
+  EPrescriptionItem,
+  EPrescriptionKind,
+  EPrescriptionTemplate,
   EReferral,
 } from "@/lib/doctor/ehealth-types";
 
 export function useEHealth() {
+  const { data: session } = useSession();
+  const role = session?.user?.role;
+  const actor: EHealthActor = useMemo(
+    () => ({
+      userId: session?.user?.id ?? "unknown",
+      name: session?.user
+        ? `${session.user.firstName} ${session.user.lastName}`
+        : "Personel EDM",
+      role: String(role ?? ""),
+    }),
+    [session, role]
+  );
+
   const [store, setStore] = useState<EHealthStore>({
     prescriptions: [],
     referrals: [],
+    templates: [],
   });
   const [loading, setLoading] = useState(true);
+
+  const canIssue = canIssueEHealthDocuments(role);
+  const canSms = canResendEHealthSms(role);
 
   const reload = useCallback(() => {
     setStore(loadEHealthStore());
@@ -36,7 +63,8 @@ export function useEHealth() {
   useEffect(() => {
     reload();
     function onStorage(e: StorageEvent) {
-      if (e.key === EHEALTH_STORAGE_KEY) reload();
+      if (e.key === EHEALTH_STORAGE_KEY || e.key === "cmkw-doctor-ehealth-v1")
+        reload();
     }
     function onCustom() {
       reload();
@@ -55,31 +83,38 @@ export function useEHealth() {
   }, []);
 
   const issuePrescription = useCallback(
-    (input: CreatePrescriptionInput) => {
+    (
+      input: Omit<CreatePrescriptionInput, "actor"> & {
+        templateName?: string;
+      }
+    ) => {
       const { store: next, prescription } = createEPrescription(
         loadEHealthStore(),
-        input
+        { ...input, actor }
       );
       persist(next);
       return prescription;
     },
-    [persist]
+    [persist, actor]
   );
 
   const editPrescription = useCallback(
     (
       id: string,
-      patch: Parameters<typeof updateEPrescription>[2]
+      patch: Parameters<typeof updateEPrescription>[2],
+      summary = "Zaktualizowano treść e-recepty"
     ) => {
       const { store: next, prescription } = updateEPrescription(
         loadEHealthStore(),
         id,
-        patch
+        patch,
+        actor,
+        summary
       );
       persist(next);
       return prescription;
     },
-    [persist]
+    [persist, actor]
   );
 
   const annulPrescription = useCallback(
@@ -87,46 +122,57 @@ export function useEHealth() {
       const { store: next, prescription } = cancelEPrescription(
         loadEHealthStore(),
         id,
-        reason
+        reason,
+        actor
       );
       persist(next);
       return prescription;
     },
-    [persist]
+    [persist, actor]
   );
 
   const markSmsSent = useCallback(
     (id: string) => {
-      return editPrescription(id, {
-        smsSentAt: new Date().toISOString(),
-      });
+      const { store: next, prescription } = markPrescriptionSms(
+        loadEHealthStore(),
+        id,
+        actor
+      );
+      persist(next);
+      return prescription;
     },
-    [editPrescription]
+    [persist, actor]
   );
 
   const issueReferral = useCallback(
-    (input: CreateReferralInput) => {
-      const { store: next, referral } = createEReferral(
-        loadEHealthStore(),
-        input
-      );
+    (input: Omit<CreateReferralInput, "actor">) => {
+      const { store: next, referral } = createEReferral(loadEHealthStore(), {
+        ...input,
+        actor,
+      });
       persist(next);
       return referral;
     },
-    [persist]
+    [persist, actor]
   );
 
   const editReferral = useCallback(
-    (id: string, patch: Parameters<typeof updateEReferral>[2]) => {
+    (
+      id: string,
+      patch: Parameters<typeof updateEReferral>[2],
+      summary = "Zaktualizowano e-skierowanie"
+    ) => {
       const { store: next, referral } = updateEReferral(
         loadEHealthStore(),
         id,
-        patch
+        patch,
+        actor,
+        summary
       );
       persist(next);
       return referral;
     },
-    [persist]
+    [persist, actor]
   );
 
   const annulReferral = useCallback(
@@ -134,10 +180,37 @@ export function useEHealth() {
       const { store: next, referral } = cancelEReferral(
         loadEHealthStore(),
         id,
-        reason
+        reason,
+        actor
       );
       persist(next);
       return referral;
+    },
+    [persist, actor]
+  );
+
+  const createOrUpdateTemplate = useCallback(
+    (input: {
+      name: string;
+      description?: string;
+      kind: EPrescriptionKind;
+      items: Omit<EPrescriptionItem, "id">[];
+      generalNotes?: string;
+      id?: string;
+    }) => {
+      const { store: next, template } = saveTemplate(
+        loadEHealthStore(),
+        input
+      );
+      persist(next);
+      return template;
+    },
+    [persist]
+  );
+
+  const removeTemplate = useCallback(
+    (id: string) => {
+      persist(deleteTemplate(loadEHealthStore(), id));
     },
     [persist]
   );
@@ -181,6 +254,7 @@ export function useEHealth() {
       activeRx: store.prescriptions.filter((p) => p.status === "issued")
         .length,
       activeRef: store.referrals.filter((r) => r.status === "issued").length,
+      templates: store.templates.length,
     }),
     [store]
   );
@@ -189,6 +263,10 @@ export function useEHealth() {
     loading,
     store,
     stats,
+    actor,
+    canIssue,
+    canSms,
+    templates: store.templates as EPrescriptionTemplate[],
     issuePrescription,
     editPrescription,
     annulPrescription,
@@ -196,6 +274,8 @@ export function useEHealth() {
     issueReferral,
     editReferral,
     annulReferral,
+    createOrUpdateTemplate,
+    removeTemplate,
     prescriptionsForVisit,
     referralsForVisit,
     prescriptionsForPatient,

@@ -1,13 +1,41 @@
 # Podsumowanie projektu — CMKW Patient Portal (dla GrokWeb)
 
 **Data aktualizacji:** 2026-07-24  
-**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–12)**  
-**Ostatni etap:** **12 — mock e-recepty i e-skierowania (P1-ready UI)**  
+**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–13)**  
+**Ostatni etap:** **13 — szablony recept, PDF, audyt, recepcja read-only, poler UX**  
 **Konto:** TooughSituation / toough-situation
 
 ---
 
-## 0. Etap 12 (2026-07-24) — e-Recepty / e-Skierowania (mock P1)
+## 0. Etap 13 (2026-07-24) — dopracowanie e-dokumentów + UX
+
+### e-Recepty / e-Skierowania
+- **Szablony:** NLPZ+IPP, Antybiotyk, Wit. D+Ca (system) + własne user (zapis/usuwanie)
+- **Import leków** z zaleceń wizyty → formularz e-recepty
+- **PDF** (`@react-pdf/renderer`): nagłówek CMKW, dane, pieczątka mock
+- **Audyt** na dokumencie: issued / updated / cancelled / sms_sent / template_applied
+- **Recepcja:** tylko odczyt + ponowny SMS mock (bez wystawiania/edycji)
+- Store: `cmkw-doctor-ehealth-v2` (migracja z v1)
+
+### UX
+- Lepsze autocomplete ICD/leki, action bar wizyty, legenda kalendarza + empty states
+- Spójne empty/loading, delikatne animate-in
+
+### Pliki kluczowe
+`e-prescription-dialog` · `e-document-pdf` · `e-document-preview` · `visit-ehealth-panel`  
+`ehealth-client` (templates, audit, markSms) · `seed-ehealth` (templates + audit)
+
+### Smoke
+1. Kiryluk → v-001 → W trakcie → szablon NLPZ+IPP → PDF → audyt  
+2. Import leków z wizyty · własny szablon  
+3. recepcja@cmkw.pl → read-only + SMS  
+
+### Residual (feedback lekarzy)
+P1 realny · alerty interakcji · realizacja apteczna · offline queue · e-recepta z podpisem
+
+---
+
+## 0b. Etap 12 (2026-07-24) — e-Recepty / e-Skierowania (mock P1)
 
 **Cel:** w 100% dopracowany mock jak prawdziwy system — **zero** realnego P1/CeZ/SMS.
 

@@ -1,6 +1,6 @@
 # Portal Lekarza / CMKW EDM
 
-**Status:** Etap 0–11 + **Etap 12 (Mock e-recepty i e-skierowania P1-ready)**  
+**Status:** Etap 0–12 + **Etap 13 (szablony, PDF, audyt, recepcja, poler UX)**  
 **Prefix:** `/doctor/*`  
 **Role:** `facility` | `doctor` | `admin` | `reception`  
 **Styl:** jasny brand CMKW (`#0849b0`, white / slate-50) — spójny z patient portalem
@@ -23,6 +23,57 @@ npm run dev
 **Demo lekarz + udost.:** `tomas.wenta@cmkw.pl` / `tomaswenta123`  
 **Demo recepcja:** `recepcja@cmkw.pl` / `recepcja123`  
 **Logowanie EDM:** `/doctor/login` · **Pacjent:** `/login`
+
+---
+
+## Etap 13 — szablony / PDF / audyt / recepcja / UX
+
+### A. e-Recepty — test
+
+1. Login `jan.kiryluk@cmkw.pl` / `jankiryluk123` → wizyta **v-001** → status **W trakcie**
+2. **Wystaw e-receptę** → klik szablon **NLPZ + IPP** (1 klik, 2 pozycje)
+3. **Leki z zalecenia wizyty** — import pozycji z sekcji Leki
+4. Zapisz jako szablon własny (pole na dole formularza) · usuń hoverem (mój)
+5. Wystaw → podgląd → **Pobierz PDF** (nagłówek CMKW, pieczątka mock)
+6. **SMS do pacjenta (mock)** · sekcja **Audyt** (kto/kiedy/co)
+7. Anuluj e-receptę z powodem → wpis w audycie
+
+### B. e-Skierowanie + PDF
+
+1. Wystaw e-skierowanie → podgląd → **Pobierz PDF**
+2. Audyt w podglądzie
+
+### C. Recepcja (read-only + SMS)
+
+1. Logout → `recepcja@cmkw.pl` / `recepcja123`
+2. Ta sama wizyta: banner „Tryb recepcji — tylko odczyt”
+3. Brak możliwości wystawienia / edycji / anulowania
+4. Podgląd e-recepty → **SMS do pacjenta** działa (mock + audyt)
+
+### D. UX
+
+1. ICD / leki — wyższe pola, animowane wyniki, puste stany wyszukiwania
+2. Kalendarz — legenda z tooltipami title, empty state z CTA
+3. Pasek akcji wizyty — wyraźniejsze statusy kolorami
+
+### Store
+
+`cmkw-doctor-ehealth-v2` (migracja z v1 + szablony)  
+Reset: usuń klucz w Local Storage.
+
+### Zależność
+
+`@react-pdf/renderer` — PDF e-recepty / e-skierowania
+
+### Residual — do feedbacku lekarzy (nie w Etapie 13)
+
+- Realna integracja P1/CeZ i podpisu kwalifikowanego  
+- Wydruk etykiety / kod kreskowy apteczny  
+- Interakcje lek–lek (alerty)  
+- Historia realizacji w aptece  
+- Multi-oddział na jednej recepcie  
+- Offline / kolejka retry P1  
+- Powiadomienia push zamiast mock SMS  
 
 ---
 

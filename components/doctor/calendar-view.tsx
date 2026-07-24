@@ -631,14 +631,34 @@ export function CalendarView() {
           </div>
         </div>
 
-        <div className="mb-3 flex flex-wrap gap-2 text-[11px]">
-          <Legend color="bg-emerald-100 border-emerald-200" label="Dostępny" />
-          <Legend color="bg-sky-100 border-sky-200" label="Wizyta / zajęty" />
-          <Legend color="bg-amber-100 border-amber-200" label="Urlop / wolne" />
-          <Legend color="bg-slate-100 border-slate-200" label="Poza grafikami" />
-          <Legend color="bg-violet-100 border-violet-200" label="Telepotwierdzone" />
-          <span className="text-muted-foreground">
-            Przeciągnij wizytę · PPM · 2× klik · skróty ?
+        <div className="mb-3 flex flex-wrap items-center gap-2 text-[11px]">
+          <Legend
+            color="bg-emerald-100 border-emerald-200 text-emerald-900"
+            label="Dostępny"
+            title="Slot w grafiku lekarza — wolny"
+          />
+          <Legend
+            color="bg-sky-100 border-sky-200 text-sky-900"
+            label="Wizyta / zajęty"
+            title="Zajęty termin (wizyta w EDM)"
+          />
+          <Legend
+            color="bg-amber-100 border-amber-200 text-amber-900"
+            label="Urlop / wolne"
+            title="Wyjątek w grafiku (urlop, nieobecność)"
+          />
+          <Legend
+            color="bg-slate-100 border-slate-200 text-slate-700"
+            label="Poza grafikami"
+            title="Godzina poza standardowym grafikiem pracy"
+          />
+          <Legend
+            color="bg-violet-100 border-violet-200 text-violet-900"
+            label="Telepotwierdzone"
+            title="Wizyta potwierdzona telefonicznie / SMS"
+          />
+          <span className="rounded-full bg-white px-2 py-0.5 text-muted-foreground ring-1 ring-slate-200">
+            Przeciągnij · PPM · 2× klik · skróty ?
           </span>
         </div>
 
@@ -685,10 +705,10 @@ export function CalendarView() {
                   </CardHeader>
                 </Card>
                 {dayVisits.length === 0 && !activeDrag ? (
-                  <Card className="border-slate-200 bg-white">
+                  <Card className="mb-3 border-dashed border-slate-300 bg-white shadow-none">
                     <EmptyState
                       title="Brak wizyt w tym dniu"
-                      description="Przeciągnij wizytę z innego dnia w widoku tygodnia albo dodaj szybką wizytę (N)."
+                      description="Dodaj szybką wizytę (skrót N), przeciągnij z widoku tygodnia albo wyszukaj wolny termin."
                       actionHref="/doctor/terminy"
                       actionLabel="Szukaj terminów"
                     />
@@ -877,14 +897,27 @@ export function CalendarView() {
   );
 }
 
-function Legend({ color, label }: { color: string; label: string }) {
+function Legend({
+  color,
+  label,
+  title,
+}: {
+  color: string;
+  label: string;
+  title?: string;
+}) {
   return (
     <span
+      title={title ?? label}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded border px-2 py-0.5",
+        "inline-flex cursor-default items-center gap-1.5 rounded-full border px-2.5 py-1 font-medium shadow-sm transition hover:shadow",
         color
       )}
     >
+      <span
+        className="size-2 shrink-0 rounded-full bg-current opacity-70"
+        aria-hidden
+      />
       {label}
     </span>
   );

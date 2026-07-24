@@ -9,6 +9,7 @@ import {
   FilePlus2,
   Pill,
   Send,
+  ShieldAlert,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,6 @@ import {
 } from "@/lib/doctor/ehealth-types";
 import { cn } from "@/lib/utils";
 
-/** PWZ z seed staff — uproszczone mapowanie */
 const DOCTOR_PWZ: Record<string, string> = {
   kiryluk: "1234567",
   wenta: "2345678",
@@ -63,7 +63,15 @@ export function VisitEHealthPanel({
     issueReferral,
     editReferral,
     annulReferral,
+    templates,
+    createOrUpdateTemplate,
+    removeTemplate,
+    canIssue: roleCanIssue,
+    canSms,
   } = useEHealth();
+
+  const allowIssue = canIssue && roleCanIssue;
+  const isReceptionReadOnly = !roleCanIssue;
 
   const rxList = prescriptionsForVisit(visit.id);
   const refList = referralsForVisit(visit.id);
@@ -80,8 +88,16 @@ export function VisitEHealthPanel({
   const defaultIcd = visit.diagnoses[0]?.code ?? "";
 
   function openNewRx() {
+    if (!roleCanIssue) {
+      toast.error("Recepcja ma dostęp tylko do odczytu e-recept", {
+        description: "Możesz ponownie wysłać SMS z podglądu dokumentu.",
+      });
+      return;
+    }
     if (!canIssue) {
-      toast.error("e-Receptę wystawisz przy statusie „W trakcie” lub „Zakończona”");
+      toast.error(
+        "e-Receptę wystawisz przy statusie „W trakcie” lub „Zakończona”"
+      );
       return;
     }
     setEditRx(null);
@@ -89,6 +105,10 @@ export function VisitEHealthPanel({
   }
 
   function openNewRef() {
+    if (!roleCanIssue) {
+      toast.error("Recepcja ma dostęp tylko do odczytu e-skierowań");
+      return;
+    }
     if (!canIssue) {
       toast.error(
         "e-Skierowanie wystawisz przy statusie „W trakcie” lub „Zakończona”"
@@ -101,23 +121,30 @@ export function VisitEHealthPanel({
 
   return (
     <div className="space-y-5" data-tour="visit-ehealth">
-      {/* CTA */}
+      {isReceptionReadOnly ? (
+        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
+          <ShieldAlert className="mt-0.5 size-4 shrink-0" />
+          <div>
+            <p className="font-medium">Tryb recepcji — tylko odczyt</p>
+            <p className="text-xs text-amber-800/90">
+              Możesz przeglądać e-recepty i e-skierowania oraz ponownie wysłać
+              SMS (mock) do pacjenta. Wystawianie i edycja — tylko lekarz.
+            </p>
+          </div>
+        </div>
+      ) : null}
+
       <div className="flex flex-wrap gap-2">
         <Button
           type="button"
           className={cn(
-            "h-11 gap-1.5",
-            canIssue
-              ? "bg-brand text-white hover:bg-brand-deep"
+            "h-11 gap-1.5 transition-all",
+            allowIssue
+              ? "bg-brand text-white shadow-sm hover:bg-brand-deep hover:shadow"
               : "bg-slate-200 text-slate-500"
           )}
-          disabled={!canIssue}
+          disabled={!allowIssue}
           onClick={openNewRx}
-          title={
-            canIssue
-              ? "Wystaw e-receptę"
-              : "Dostępne przy statusie W trakcie / Zakończona"
-          }
         >
           <Pill className="size-4" />
           Wystaw e-receptę
@@ -126,29 +153,27 @@ export function VisitEHealthPanel({
           type="button"
           variant="outline"
           className={cn(
-            "h-11 gap-1.5",
-            canIssue && "border-brand/30 text-brand-deep hover:bg-secondary"
+            "h-11 gap-1.5 transition-all",
+            allowIssue && "border-brand/30 text-brand-deep hover:bg-secondary"
           )}
-          disabled={!canIssue}
+          disabled={!allowIssue}
           onClick={openNewRef}
         >
           <ClipboardPlus className="size-4" />
           Wystaw e-skierowanie
         </Button>
-        {!canIssue ? (
+        {!canIssue && roleCanIssue ? (
           <p className="w-full text-xs text-amber-700">
             Ustaw status wizyty na <strong>W trakcie</strong> lub{" "}
             <strong>Zakończona</strong>, aby wystawiać dokumenty e-zdrowia.
           </p>
         ) : (
           <p className="w-full text-[11px] text-muted-foreground">
-            Mock P1/CeZ — numery i kody generowane lokalnie. Zero realnej
-            integracji.
+            Mock P1/CeZ — PDF, szablony, audyt. Zero realnej integracji.
           </p>
         )}
       </div>
 
-      {/* e-Recepty */}
       <div>
         <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-brand-heading">
           <Pill className="size-4 text-brand" />
@@ -160,19 +185,25 @@ export function VisitEHealthPanel({
           ) : null}
         </h3>
         {loading ? (
-          <p className="text-sm text-muted-foreground">Ładowanie…</p>
+          <p className="animate-pulse text-sm text-muted-foreground">
+            Ładowanie e-recept…
+          </p>
         ) : rxList.length === 0 ? (
           <EmptyState
             title="Brak e-recept na wizycie"
-            description="Wystaw e-receptę przyciskiem powyżej."
+            description={
+              allowIssue
+                ? "Użyj szablonu lub zaimportuj leki z zaleceń wizyty."
+                : "Brak wystawionych e-recept."
+            }
           />
         ) : (
-          <ul className="divide-y rounded-xl border border-slate-200 bg-white">
+          <ul className="divide-y rounded-xl border border-slate-200 bg-white shadow-sm">
             {rxList.map((rx) => (
               <li
                 key={rx.id}
                 className={cn(
-                  "flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center sm:justify-between",
+                  "flex flex-col gap-2 px-3 py-3 transition hover:bg-slate-50/80 sm:flex-row sm:items-center sm:justify-between",
                   rx.status === "cancelled" && "opacity-70"
                 )}
               >
@@ -195,27 +226,27 @@ export function VisitEHealthPanel({
                     })}{" "}
                     · kod {rx.accessCode}
                     {rx.smsSentAt ? " · SMS ✓" : ""}
+                    {rx.auditLog?.length
+                      ? ` · audyt ${rx.auditLog.length}`
+                      : ""}
                   </p>
                 </div>
-                <div className="flex shrink-0 gap-1">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-8 gap-1"
-                    onClick={() => setPreviewRx(rx)}
-                  >
-                    <Eye className="size-3.5" />
-                    Podgląd
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1"
+                  onClick={() => setPreviewRx(rx)}
+                >
+                  <Eye className="size-3.5" />
+                  Podgląd
+                </Button>
               </li>
             ))}
           </ul>
         )}
       </div>
 
-      {/* e-Skierowania */}
       <div>
         <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-brand-heading">
           <Send className="size-4 text-brand" />
@@ -229,15 +260,19 @@ export function VisitEHealthPanel({
         {loading ? null : refList.length === 0 ? (
           <EmptyState
             title="Brak e-skierowań na wizycie"
-            description="Wystaw e-skierowanie przyciskiem powyżej."
+            description={
+              allowIssue
+                ? "Wystaw e-skierowanie przyciskiem powyżej."
+                : "Brak wystawionych e-skierowań."
+            }
           />
         ) : (
-          <ul className="divide-y rounded-xl border border-slate-200 bg-white">
+          <ul className="divide-y rounded-xl border border-slate-200 bg-white shadow-sm">
             {refList.map((r) => (
               <li
                 key={r.id}
                 className={cn(
-                  "flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center sm:justify-between",
+                  "flex flex-col gap-2 px-3 py-3 transition hover:bg-slate-50/80 sm:flex-row sm:items-center sm:justify-between",
                   r.status === "cancelled" && "opacity-70"
                 )}
               >
@@ -282,7 +317,6 @@ export function VisitEHealthPanel({
         )}
       </div>
 
-      {/* Załączniki klasyczne */}
       <div>
         <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-brand-heading">
           <FilePlus2 className="size-4 text-brand" />
@@ -295,18 +329,26 @@ export function VisitEHealthPanel({
         />
       </div>
 
-      {/* Dialogs */}
       <EPrescriptionDialog
         open={rxFormOpen}
         onOpenChange={setRxFormOpen}
         patientName={patientName}
         patientPesel={visit.patientPesel}
         doctorName={visit.doctorName}
-        doctorId={visit.doctorId}
         doctorPwz={doctorPwz}
-        visitId={visit.id}
-        patientId={visit.patientId}
         initial={editRx}
+        visitPrescriptions={visit.prescriptions ?? []}
+        templates={templates}
+        onSaveTemplate={
+          roleCanIssue
+            ? (input) => {
+                createOrUpdateTemplate(input);
+              }
+            : undefined
+        }
+        onDeleteTemplate={
+          roleCanIssue ? (id) => removeTemplate(id) : undefined
+        }
         onSave={(data) => {
           if (editRx) {
             editPrescription(editRx.id, {
@@ -330,6 +372,7 @@ export function VisitEHealthPanel({
               kind: data.kind,
               items: data.items,
               generalNotes: data.generalNotes,
+              templateName: data.templateName,
             });
             toast.success("e-Recepta wystawiona", {
               description: `Nr ${created.number} · kod ${created.accessCode}`,
@@ -381,12 +424,23 @@ export function VisitEHealthPanel({
         onOpenChange={(v) => {
           if (!v) setPreviewRx(null);
         }}
-        onCancel={(id, reason) => annulPrescription(id, reason)}
-        onSms={(id) => markSmsSent(id)}
-        onEdit={(rx) => {
-          setEditRx(rx);
-          setRxFormOpen(true);
-        }}
+        onCancel={
+          roleCanIssue
+            ? (id, reason) => annulPrescription(id, reason)
+            : undefined
+        }
+        onSms={canSms ? (id) => markSmsSent(id) : undefined}
+        onEdit={
+          roleCanIssue
+            ? (rx) => {
+                setEditRx(rx);
+                setRxFormOpen(true);
+              }
+            : undefined
+        }
+        allowEdit={roleCanIssue}
+        allowCancel={roleCanIssue}
+        allowSms={canSms}
       />
 
       <EReferralPreview
@@ -395,11 +449,21 @@ export function VisitEHealthPanel({
         onOpenChange={(v) => {
           if (!v) setPreviewRef(null);
         }}
-        onCancel={(id, reason) => annulReferral(id, reason)}
-        onEdit={(r) => {
-          setEditRef(r);
-          setRefFormOpen(true);
-        }}
+        onCancel={
+          roleCanIssue
+            ? (id, reason) => annulReferral(id, reason)
+            : undefined
+        }
+        onEdit={
+          roleCanIssue
+            ? (r) => {
+                setEditRef(r);
+                setRefFormOpen(true);
+              }
+            : undefined
+        }
+        allowEdit={roleCanIssue}
+        allowCancel={roleCanIssue}
       />
     </div>
   );
