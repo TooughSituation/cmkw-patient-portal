@@ -14,7 +14,7 @@ export const DOCTOR_NAV: DoctorNavItem[] = [
   { href: "/doctor/icd10", label: "ICD-10" },
   { href: "/doctor/kalkulatory", label: "Kalkulatory" },
   { href: "/doctor/przewodnik", label: "Przewodnik" },
-  { href: "/doctor/admin", label: "Admin" },
+  { href: "/doctor/admin", label: "Administracja" },
 ];
 
 /** data-tour id dla pozycji menu */

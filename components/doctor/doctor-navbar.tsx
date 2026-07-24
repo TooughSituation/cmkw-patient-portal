@@ -6,7 +6,6 @@ import { useSession } from "next-auth/react";
 import {
   Bell,
   CalendarSearch,
-  MessageSquare,
   Settings,
   Stethoscope,
 } from "lucide-react";
@@ -23,6 +22,7 @@ import {
 import { LogoutButton } from "@/components/auth/logout-button";
 import { DepartmentSwitcher } from "@/components/doctor/department-switcher";
 import { ViewAsDoctorSwitcher } from "@/components/doctor/view-as-doctor-switcher";
+import { StaffChatNavButton } from "@/components/doctor/staff-chat";
 import { useDoctorData } from "@/components/doctor/doctor-data-provider";
 import { roleLabel } from "@/lib/auth/roles";
 import { toast } from "sonner";
@@ -96,27 +96,20 @@ export function DoctorNavbar() {
             variant="ghost"
             size="icon"
             className="size-9 text-slate-500 hover:bg-secondary hover:text-brand"
-            onClick={() => toast.info("Powiadomienia — wkrótce")}
+            onClick={() => toast.info("Powiadomienia systemowe — wkrótce")}
             aria-label="Powiadomienia"
           >
             <Bell className="size-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-9 text-slate-500 hover:bg-secondary hover:text-brand"
-            onClick={() => toast.info("Wiadomości — wkrótce")}
-            aria-label="Wiadomości"
-          >
-            <MessageSquare className="size-4" />
-          </Button>
+          <StaffChatNavButton />
           {canAccessAdmin ? (
             <Button
               asChild
               variant="ghost"
               size="icon"
               className="size-9 text-slate-500 hover:bg-secondary hover:text-brand"
-              aria-label="Administracja"
+              aria-label="Administracja placówki"
+              title="Administracja (tylko placówka)"
             >
               <Link href="/doctor/admin">
                 <Settings className="size-4" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { format, parseISO } from "date-fns";
@@ -8,21 +8,27 @@ import { pl } from "date-fns/locale";
 import {
   ArrowLeft,
   CheckCircle2,
+  ChevronDown,
+  FileText,
+  History,
   Loader2,
   Phone,
+  Pill,
   Printer,
   Save,
+  Stethoscope,
   Trash2,
   XCircle,
   Play,
+  ClipboardList,
+  NotebookPen,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -50,6 +56,138 @@ import {
   type VisitReferral,
   type VisitStatus,
 } from "@/lib/doctor/types";
+import { cn } from "@/lib/utils";
+
+/** Sekcja karty wizyty — domyślnie otwarta, da się zwinąć (Lux Med–style single page) */
+function VisitSection({
+  id,
+  title,
+  icon,
+  defaultOpen = true,
+  badge,
+  children,
+  className,
+}: {
+  id: string;
+  title: string;
+  icon?: ReactNode;
+  defaultOpen?: boolean;
+  badge?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <Card
+      id={id}
+      className={cn("border-slate-200 bg-white shadow-sm ring-slate-200/80", className)}
+      data-section={id}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center gap-2 px-4 py-3 text-left md:px-5"
+        aria-expanded={open}
+      >
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-secondary text-brand">
+          {icon}
+        </span>
+        <span className="flex min-w-0 flex-1 items-center gap-2">
+          <CardTitle className="text-base font-semibold text-brand-heading">
+            {title}
+          </CardTitle>
+          {badge}
+        </span>
+        <ChevronDown
+          className={cn(
+            "size-4 shrink-0 text-slate-400 transition-transform",
+            open && "rotate-180"
+          )}
+        />
+      </button>
+      {open ? (
+        <CardContent className="space-y-4 border-t border-slate-100 px-4 pb-4 pt-3 md:px-5">
+          {children}
+        </CardContent>
+      ) : null}
+    </Card>
+  );
+}
+
+function VisitActionBar({
+  saving,
+  dirty,
+  onSave,
+  onInProgress,
+  onComplete,
+  onConfirm,
+  onPrint,
+  onCancel,
+  sticky,
+}: {
+  saving: boolean;
+  dirty: boolean;
+  onSave: () => void;
+  onInProgress: () => void;
+  onComplete: () => void;
+  onConfirm: () => void;
+  onPrint: () => void;
+  onCancel: () => void;
+  sticky?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm",
+        sticky &&
+          "sticky bottom-0 z-20 border-brand/15 bg-white/95 shadow-md backdrop-blur supports-backdrop-filter:bg-white/90"
+      )}
+    >
+      <Button
+        className="h-10 gap-1.5 bg-brand px-4 text-white hover:bg-brand-deep"
+        disabled={saving}
+        onClick={onSave}
+      >
+        <Save className="size-4" />
+        Zapisz
+        {dirty ? (
+          <span className="ml-0.5 size-1.5 rounded-full bg-amber-300" aria-hidden />
+        ) : null}
+      </Button>
+      <Button
+        variant="outline"
+        className="h-10 gap-1.5"
+        onClick={onInProgress}
+      >
+        <Play className="size-4" />
+        W trakcie
+      </Button>
+      <Button
+        variant="outline"
+        className="h-10 gap-1.5 border-emerald-300 text-emerald-800 hover:bg-emerald-50"
+        onClick={onComplete}
+      >
+        <CheckCircle2 className="size-4" />
+        Zakończ wizytę
+      </Button>
+      <Button variant="outline" className="h-10 gap-1.5" onClick={onConfirm}>
+        Potwierdź
+      </Button>
+      <Button variant="outline" className="h-10 gap-1.5" onClick={onPrint}>
+        <Printer className="size-4" />
+        Drukuj
+      </Button>
+      <Button
+        variant="outline"
+        className="h-10 gap-1.5 text-destructive hover:bg-red-50"
+        onClick={onCancel}
+      >
+        <XCircle className="size-4" />
+        Anuluj
+      </Button>
+    </div>
+  );
+}
 
 export function VisitCard({ visitId }: { visitId: string }) {
   const router = useRouter();
@@ -78,7 +216,7 @@ export function VisitCard({ visitId }: { visitId: string }) {
     setDirty(false);
   }, [visit]);
 
-  // Autosave medical note (debounce 1.2s)
+  // Autosave (debounce 1.2s)
   useEffect(() => {
     if (!visit || !dirty) return;
     const t = setTimeout(() => {
@@ -179,21 +317,50 @@ export function VisitCard({ visitId }: { visitId: string }) {
   const dept = getDepartmentById(visit.departmentId);
   const branch = getBranchById(visit.branchId);
 
+  const actions = {
+    saving,
+    dirty,
+    onSave: () => {
+      saveNow();
+      toast.success("Wizyta zapisana");
+    },
+    onInProgress: () => setStatus("in_progress", "Wizyta w trakcie"),
+    onComplete: () => setStatus("completed", "Wizyta zakończona"),
+    onConfirm: () => setStatus("confirmed", "Wizyta potwierdzona"),
+    onPrint: () => {
+      toast.success("Drukowanie (podgląd przeglądarki)");
+      window.print();
+    },
+    onCancel: () => setStatus("cancelled", "Wizyta odwołana"),
+  };
+
   return (
-    <div className="p-3 md:p-4 lg:p-5" data-tour="doctor-visit-card">
-      <div className="mb-3">
+    <div
+      className="mx-auto max-w-[1400px] space-y-3 p-3 pb-8 md:p-4 lg:p-5"
+      data-tour="doctor-visit-card"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <Button asChild variant="ghost" size="sm" className="h-8 gap-1 px-2">
           <Link href="/doctor/wizyty">
             <ArrowLeft className="size-3.5" />
             Lista wizyt
           </Link>
         </Button>
+        {dirty ? (
+          <p className="text-xs font-medium text-amber-700">
+            Niezapisane zmiany — autosave za chwilę…
+          </p>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            Jedna karta wizyty · CMKW EDM
+          </p>
+        )}
       </div>
 
-      {/* Header */}
-      <Card className="mb-4 border-slate-200 bg-white shadow-sm ring-slate-200">
+      {/* Nagłówek pacjenta + akcje (góra) */}
+      <Card className="border-slate-200 bg-white shadow-sm ring-1 ring-brand/10">
         <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-start md:justify-between md:p-5">
-          <div>
+          <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-xl font-semibold text-brand-heading">
                 {format(parseISO(visit.date), "d MMMM yyyy", { locale: pl })}
@@ -229,401 +396,360 @@ export function VisitCard({ visitId }: { visitId: string }) {
               <PatientGroups groups={visit.patientGroups} />
             </div>
           </div>
-
-          <div className="flex flex-wrap gap-2">
-            <Button
-              className="h-9 gap-1.5 bg-brand text-white hover:bg-brand-deep"
-              disabled={saving}
-              onClick={() => {
-                saveNow();
-                toast.success("Wizyta zapisana");
-              }}
-            >
-              <Save className="size-4" />
-              Zapisz
-            </Button>
-            <Button
-              variant="outline"
-              className="h-9 gap-1.5"
-              onClick={() =>
-                setStatus("in_progress", "Wizyta w trakcie")
-              }
-            >
-              <Play className="size-4" />
-              W trakcie
-            </Button>
-            <Button
-              variant="outline"
-              className="h-9 gap-1.5 border-emerald-300 text-emerald-800"
-              onClick={() => setStatus("completed", "Wizyta zakończona")}
-            >
-              <CheckCircle2 className="size-4" />
-              Zakończ
-            </Button>
-            <Button
-              variant="outline"
-              className="h-9 gap-1.5"
-              onClick={() =>
-                setStatus("confirmed", "Wizyta potwierdzona")
-              }
-            >
-              Potwierdź
-            </Button>
-            <Button
-              variant="outline"
-              className="h-9 gap-1.5"
-              onClick={() => {
-                toast.success("Drukowanie (podgląd przeglądarki)");
-                window.print();
-              }}
-            >
-              <Printer className="size-4" />
-              Drukuj
-            </Button>
-            <Button
-              variant="outline"
-              className="h-9 gap-1.5 text-destructive"
-              onClick={() => setStatus("cancelled", "Wizyta odwołana")}
-            >
-              <XCircle className="size-4" />
-              Anuluj
-            </Button>
-          </div>
         </CardContent>
       </Card>
 
-      {dirty ? (
-        <p className="mb-2 text-xs text-amber-700">
-          Niezapisane zmiany — autosave za chwilę…
-        </p>
-      ) : null}
+      <VisitActionBar {...actions} />
 
-      <Tabs defaultValue="wywiad" className="min-w-0">
-        <TabsList className="mb-3 h-auto w-full flex-wrap justify-start gap-1 bg-white p-1 shadow-sm ring-1 ring-slate-200">
-          <TabsTrigger value="wywiad">Wywiad / Notatka</TabsTrigger>
-          <TabsTrigger value="rozpoznanie">Rozpoznanie</TabsTrigger>
-          <TabsTrigger value="leki">Zalecenia / Leki</TabsTrigger>
-          <TabsTrigger value="badania">Badania / Skierowania</TabsTrigger>
-          <TabsTrigger value="dokumenty">Dokumenty</TabsTrigger>
-          <TabsTrigger value="historia">Historia</TabsTrigger>
-        </TabsList>
+      {/* Szybki skok do sekcji */}
+      <nav
+        className="flex flex-wrap gap-1.5"
+        aria-label="Sekcje karty wizyty"
+      >
+        {[
+          ["#sec-wywiad", "Wywiad"],
+          ["#sec-icd", "ICD-10"],
+          ["#sec-leki", "Leki"],
+          ["#sec-skierowania", "Skierowania"],
+          ["#sec-dokumenty", "Dokumenty"],
+          ["#sec-historia", "Historia"],
+        ].map(([href, label]) => (
+          <a
+            key={href}
+            href={href}
+            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-brand/30 hover:bg-secondary hover:text-brand"
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
 
-        <TabsContent value="wywiad">
-          <Card className="border-slate-200 bg-white shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base text-brand-heading">
-                Wywiad / notatka lekarska
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Notatka skrótowa (lista)</Label>
-                <Input
-                  className="h-10"
-                  value={note}
-                  onChange={(e) => {
-                    setNote(e.target.value);
-                    markDirty();
-                  }}
-                  placeholder="Krótki opis widoczny na liście wizyt"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Notatka pełna</Label>
-                <Textarea
-                  value={medicalNote}
-                  onChange={(e) => {
-                    setMedicalNote(e.target.value);
-                    markDirty();
-                  }}
-                  rows={14}
-                  className="min-h-[280px] resize-y text-[15px] leading-relaxed"
-                  placeholder="Wywiad, badanie przedmiotowe, plan leczenia…"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="rozpoznanie">
-          <Card className="border-slate-200 bg-white shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base text-brand-heading">
-                Rozpoznanie (ICD-10)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <IcdPicker
-                existingCodes={diagnoses.map((d) => d.code)}
-                onAdd={(d) => {
-                  setDiagnoses((prev) => [...prev, d]);
+      {/* Jeden widok: 2 kolumny na dużym ekranie */}
+      <div className="grid gap-3 lg:grid-cols-5">
+        {/* Kolumna główna — dokumentacja kliniczna */}
+        <div className="space-y-3 lg:col-span-3">
+          <VisitSection
+            id="sec-wywiad"
+            title="Wywiad / notatka lekarska"
+            icon={<NotebookPen className="size-4" />}
+          >
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-slate-600">
+                Notatka skrótowa (lista wizyt)
+              </Label>
+              <Input
+                className="h-11 text-[15px]"
+                value={note}
+                onChange={(e) => {
+                  setNote(e.target.value);
                   markDirty();
-                  toast.success(`Dodano ${d.code}`);
                 }}
+                placeholder="Krótki opis widoczny na liście wizyt"
               />
-              {diagnoses.length === 0 ? (
-                <EmptyState
-                  title="Brak rozpoznań"
-                  description="Wyszukaj i dodaj kod ICD-10."
-                />
-              ) : (
-                <ul className="space-y-2">
-                  {diagnoses.map((d, i) => (
-                    <li
-                      key={`${d.code}-${i}`}
-                      className="rounded-lg border border-slate-200 p-3"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <span className="font-mono font-semibold text-brand">
-                            {d.code}
-                          </span>
-                          <span className="ml-2 text-sm font-medium">
-                            {d.namePl}
-                          </span>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => {
-                            setDiagnoses((prev) =>
-                              prev.filter((_, j) => j !== i)
-                            );
-                            markDirty();
-                          }}
-                        >
-                          <Trash2 className="size-3.5 text-destructive" />
-                        </Button>
-                      </div>
-                      <Input
-                        className="mt-2 h-9"
-                        value={d.description}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setDiagnoses((prev) =>
-                            prev.map((x, j) =>
-                              j === i ? { ...x, description: val } : x
-                            )
-                          );
-                          markDirty();
-                        }}
-                        placeholder="Opis / komentarz do rozpoznania"
-                      />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="leki">
-          <Card className="border-slate-200 bg-white shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base text-brand-heading">
-                Zalecenia / leki
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <DrugPicker
-                onAdd={(p) => {
-                  setPrescriptions((prev) => [...prev, p]);
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-slate-600">
+                Wywiad, badanie, plan leczenia
+              </Label>
+              <Textarea
+                value={medicalNote}
+                onChange={(e) => {
+                  setMedicalNote(e.target.value);
                   markDirty();
-                  toast.success(`Dodano ${p.drugName}`);
                 }}
+                rows={16}
+                className="min-h-[320px] resize-y text-[15px] leading-relaxed md:min-h-[380px] md:text-base"
+                placeholder={
+                  "Wywiad:\n\nBadanie przedmiotowe:\n\nPlan leczenia / zalecenia:"
+                }
               />
-              {prescriptions.length === 0 ? (
-                <EmptyState title="Brak leków na wizycie" />
-              ) : (
-                <div className="overflow-x-auto rounded-lg border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-slate-50/80">
-                        <TableHead>Lek</TableHead>
-                        <TableHead>Dawkowanie</TableHead>
-                        <TableHead>Okres</TableHead>
-                        <TableHead>Uwagi</TableHead>
-                        <TableHead className="w-10" />
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {prescriptions.map((p) => (
-                        <TableRow key={p.id}>
-                          <TableCell>
-                            <div className="font-medium">{p.drugName}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {p.inn}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-sm">{p.dosage}</TableCell>
-                          <TableCell className="text-sm">{p.duration}</TableCell>
-                          <TableCell className="text-sm text-muted-foreground">
-                            {p.notes || "—"}
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => {
-                                setPrescriptions((prev) =>
-                                  prev.filter((x) => x.id !== p.id)
-                                );
-                                markDirty();
-                              }}
-                            >
-                              <Trash2 className="size-3.5 text-destructive" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </VisitSection>
 
-        <TabsContent value="badania">
-          <Card className="border-slate-200 bg-white shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base text-brand-heading">
-                Badania / skierowania
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-2 sm:grid-cols-3">
-                <div className="space-y-1 sm:col-span-2">
-                  <Label className="text-xs">Tytuł</Label>
-                  <Input
-                    className="h-9"
-                    value={refTitle}
-                    onChange={(e) => setRefTitle(e.target.value)}
-                    placeholder="np. MRI kolana P"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Typ</Label>
-                  <Input
-                    className="h-9"
-                    value={refType}
-                    onChange={(e) => setRefType(e.target.value)}
-                    placeholder="Obrazowanie / Lab / …"
-                  />
-                </div>
-                <div className="space-y-1 sm:col-span-3">
-                  <Label className="text-xs">Uwagi</Label>
-                  <Input
-                    className="h-9"
-                    value={refNotes}
-                    onChange={(e) => setRefNotes(e.target.value)}
-                  />
-                </div>
-                <div className="sm:col-span-3">
-                  <Button
-                    type="button"
-                    className="h-9 bg-brand text-white hover:bg-brand-deep"
-                    onClick={() => {
-                      if (!refTitle.trim()) {
-                        toast.error("Podaj tytuł skierowania");
-                        return;
-                      }
-                      setReferrals((prev) => [
-                        ...prev,
-                        {
-                          id: `ref-${crypto.randomUUID().slice(0, 8)}`,
-                          title: refTitle.trim(),
-                          type: refType.trim() || "Inne",
-                          notes: refNotes.trim(),
-                        },
-                      ]);
-                      setRefTitle("");
-                      setRefNotes("");
-                      markDirty();
-                      toast.success("Dodano skierowanie");
-                    }}
+          <VisitSection
+            id="sec-icd"
+            title="Rozpoznanie (ICD-10)"
+            icon={<Stethoscope className="size-4" />}
+            badge={
+              diagnoses.length > 0 ? (
+                <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-semibold text-brand">
+                  {diagnoses.length}
+                </span>
+              ) : null
+            }
+          >
+            <IcdPicker
+              existingCodes={diagnoses.map((d) => d.code)}
+              onAdd={(d) => {
+                setDiagnoses((prev) => [...prev, d]);
+                markDirty();
+                toast.success(`Dodano ${d.code}`);
+              }}
+            />
+            {diagnoses.length === 0 ? (
+              <EmptyState
+                title="Brak rozpoznań"
+                description="Wyszukaj kod lub opis i dodaj ICD-10."
+              />
+            ) : (
+              <ul className="space-y-2">
+                {diagnoses.map((d, i) => (
+                  <li
+                    key={`${d.code}-${i}`}
+                    className="rounded-lg border border-slate-200 bg-slate-50/50 p-3"
                   >
-                    Dodaj pozycję
-                  </Button>
-                </div>
-              </div>
-              {referrals.length === 0 ? (
-                <EmptyState
-                  title="Brak skierowań"
-                  description="Placeholder listy — dodaj pozycje ręcznie."
-                />
-              ) : (
-                <ul className="divide-y rounded-lg border">
-                  {referrals.map((r) => (
-                    <li
-                      key={r.id}
-                      className="flex items-start justify-between gap-2 px-3 py-2.5"
-                    >
+                    <div className="flex items-start justify-between gap-2">
                       <div>
-                        <p className="font-medium">{r.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {r.type}
-                          {r.notes ? ` · ${r.notes}` : ""}
-                        </p>
+                        <span className="font-mono text-base font-semibold text-brand">
+                          {d.code}
+                        </span>
+                        <span className="ml-2 text-sm font-medium text-slate-800">
+                          {d.namePl}
+                        </span>
                       </div>
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon-sm"
                         onClick={() => {
-                          setReferrals((prev) =>
-                            prev.filter((x) => x.id !== r.id)
+                          setDiagnoses((prev) =>
+                            prev.filter((_, j) => j !== i)
                           );
                           markDirty();
                         }}
                       >
                         <Trash2 className="size-3.5 text-destructive" />
                       </Button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+                    </div>
+                    <Input
+                      className="mt-2 h-10 bg-white"
+                      value={d.description}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setDiagnoses((prev) =>
+                          prev.map((x, j) =>
+                            j === i ? { ...x, description: val } : x
+                          )
+                        );
+                        markDirty();
+                      }}
+                      placeholder="Opis / komentarz do rozpoznania"
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </VisitSection>
 
-        <TabsContent value="dokumenty">
-          <Card className="border-slate-200 bg-white shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base text-brand-heading">
-                Dokumenty wizyty
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DocumentsPanel
-                patientId={visit.patientId}
-                visitId={visit.id}
-                scope="visit"
+          <VisitSection
+            id="sec-leki"
+            title="Zalecenia / leki"
+            icon={<Pill className="size-4" />}
+            badge={
+              prescriptions.length > 0 ? (
+                <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-semibold text-brand">
+                  {prescriptions.length}
+                </span>
+              ) : null
+            }
+          >
+            <DrugPicker
+              onAdd={(p) => {
+                setPrescriptions((prev) => [...prev, p]);
+                markDirty();
+                toast.success(`Dodano ${p.drugName}`);
+              }}
+            />
+            {prescriptions.length === 0 ? (
+              <EmptyState
+                title="Brak leków na wizycie"
+                description="Wyszukaj lek i uzupełnij dawkowanie."
               />
-            </CardContent>
-          </Card>
-        </TabsContent>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-slate-200">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-slate-50/80">
+                      <TableHead>Lek</TableHead>
+                      <TableHead>Dawkowanie</TableHead>
+                      <TableHead>Okres</TableHead>
+                      <TableHead>Uwagi</TableHead>
+                      <TableHead className="w-10" />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {prescriptions.map((p) => (
+                      <TableRow key={p.id}>
+                        <TableCell>
+                          <div className="font-medium">{p.drugName}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {p.inn}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm">{p.dosage}</TableCell>
+                        <TableCell className="text-sm">{p.duration}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {p.notes || "—"}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => {
+                              setPrescriptions((prev) =>
+                                prev.filter((x) => x.id !== p.id)
+                              );
+                              markDirty();
+                            }}
+                          >
+                            <Trash2 className="size-3.5 text-destructive" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </VisitSection>
+        </div>
 
-        <TabsContent value="historia">
-          <Card className="border-slate-200 bg-white shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base text-brand-heading">
-                Poprzednie wizyty pacjenta
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              {history.length === 0 ? (
-                <EmptyState title="Brak innych wizyt" />
-              ) : (
+        {/* Kolumna boczna */}
+        <div className="space-y-3 lg:col-span-2">
+          <VisitSection
+            id="sec-skierowania"
+            title="Skierowania / badania"
+            icon={<ClipboardList className="size-4" />}
+            badge={
+              referrals.length > 0 ? (
+                <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-semibold text-brand">
+                  {referrals.length}
+                </span>
+              ) : null
+            }
+          >
+            <div className="grid gap-2">
+              <div className="space-y-1">
+                <Label className="text-xs">Tytuł</Label>
+                <Input
+                  className="h-10"
+                  value={refTitle}
+                  onChange={(e) => setRefTitle(e.target.value)}
+                  placeholder="np. MRI kolana P"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Typ</Label>
+                  <Input
+                    className="h-10"
+                    value={refType}
+                    onChange={(e) => setRefType(e.target.value)}
+                    placeholder="Obrazowanie / Lab"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Uwagi</Label>
+                  <Input
+                    className="h-10"
+                    value={refNotes}
+                    onChange={(e) => setRefNotes(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button
+                type="button"
+                className="h-10 bg-brand text-white hover:bg-brand-deep"
+                onClick={() => {
+                  if (!refTitle.trim()) {
+                    toast.error("Podaj tytuł skierowania");
+                    return;
+                  }
+                  setReferrals((prev) => [
+                    ...prev,
+                    {
+                      id: `ref-${crypto.randomUUID().slice(0, 8)}`,
+                      title: refTitle.trim(),
+                      type: refType.trim() || "Inne",
+                      notes: refNotes.trim(),
+                    },
+                  ]);
+                  setRefTitle("");
+                  setRefNotes("");
+                  markDirty();
+                  toast.success("Dodano skierowanie");
+                }}
+              >
+                Dodaj skierowanie
+              </Button>
+            </div>
+            {referrals.length === 0 ? (
+              <EmptyState
+                title="Brak skierowań"
+                description="Dodaj pozycje ręcznie powyżej."
+              />
+            ) : (
+              <ul className="divide-y rounded-lg border border-slate-200">
+                {referrals.map((r) => (
+                  <li
+                    key={r.id}
+                    className="flex items-start justify-between gap-2 px-3 py-2.5"
+                  >
+                    <div>
+                      <p className="font-medium">{r.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {r.type}
+                        {r.notes ? ` · ${r.notes}` : ""}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => {
+                        setReferrals((prev) =>
+                          prev.filter((x) => x.id !== r.id)
+                        );
+                        markDirty();
+                      }}
+                    >
+                      <Trash2 className="size-3.5 text-destructive" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </VisitSection>
+
+          <VisitSection
+            id="sec-dokumenty"
+            title="Dokumenty wizyty"
+            icon={<FileText className="size-4" />}
+          >
+            <DocumentsPanel
+              patientId={visit.patientId}
+              visitId={visit.id}
+              scope="visit"
+            />
+          </VisitSection>
+
+          <VisitSection
+            id="sec-historia"
+            title="Poprzednie wizyty"
+            icon={<History className="size-4" />}
+            defaultOpen={history.length > 0}
+          >
+            {history.length === 0 ? (
+              <EmptyState title="Brak innych wizyt" />
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-slate-200">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-slate-50/80">
                       <TableHead>Data</TableHead>
                       <TableHead>Lekarz</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Notatka</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -639,29 +765,31 @@ export function VisitCard({ visitId }: { visitId: string }) {
                             })}{" "}
                             {v.time}
                           </Link>
+                          {v.note ? (
+                            <p className="mt-0.5 max-w-[160px] truncate text-xs text-muted-foreground">
+                              {v.note}
+                            </p>
+                          ) : null}
                         </TableCell>
                         <TableCell className="text-sm">{v.doctorName}</TableCell>
                         <TableCell>
                           <VisitStatusBadge status={v.status} />
                         </TableCell>
-                        <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">
-                          {v.note || "—"}
-                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </div>
+            )}
+          </VisitSection>
+        </div>
+      </div>
 
-      <div className="mt-4 flex justify-end">
-        <Button
-          variant="outline"
-          onClick={() => router.push("/doctor")}
-        >
+      {/* Akcje dół (sticky) */}
+      <VisitActionBar {...actions} sticky />
+
+      <div className="flex justify-end pt-1">
+        <Button variant="outline" onClick={() => router.push("/doctor")}>
           Wróć do kalendarza
         </Button>
       </div>

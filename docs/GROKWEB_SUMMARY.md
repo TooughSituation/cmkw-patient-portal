@@ -1,8 +1,46 @@
 # Podsumowanie projektu — CMKW Patient Portal (dla GrokWeb)
 
-**Data aktualizacji:** 2026-07-21  
-**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–9: rola Placówka + izolacja lekarzy)**  
+**Data aktualizacji:** 2026-07-24  
+**Status:** strona publiczna + Portal Pacjenta + **Portal Lekarza EDM (Etap 0–11)**  
+**Ostatni etap:** **11 — karta wizyty single-page + komunikator personelu** (feedback lekarza)  
 **Konto:** TooughSituation / toough-situation
+
+---
+
+## 0. Etap 11 (2026-07-24) — feedback lekarza
+
+### Karta wizyty — jeden widok (Lux Med–style)
+
+- **Bez zakładek** — wywiad, ICD-10, leki, skierowania, dokumenty, historia na **jednej stronie**
+- Sekcje accordion (domyślnie otwarte), chip-nawigacja do sekcji
+- Duże pole wywiadu; łatwe dodawanie ICD i leków (pickery)
+- **Akcje góra + dół (sticky):** Zapisz · W trakcie · Zakończ · Potwierdź · Drukuj · Anuluj
+- Plik: `components/doctor/visit-card.tsx`
+
+### Komunikator personelu (wewnętrzny chat EDM)
+
+- Panel Sheet z topbara (ikona dymka + **badge** nieprzeczytanych)
+- Odbiorca: kanał **Recepcja** lub konkretna osoba (DM)
+- Priorytety: zwykła / **pilne** / **do wiadomości**
+- Historia wiadomości + dźwięk (Web Audio) przy nowej
+- Store: `cmkw-doctor-staff-chat-v1` (localStorage demo)
+- Pliki: `components/doctor/staff-chat.tsx`, `hooks/use-staff-chat.ts`, `lib/doctor/chat-*.ts`
+
+### Admin / brand
+
+- Zakładka **Administracja** tylko rola `facility` (`cmkw@cmkw.pl`) — lekarz **nie widzi**
+- Middleware: `/doctor/admin` → redirect + toast `denied=admin`
+- Jasny brand CMKW (`#0849b0`), logo, badge EDM
+
+### Test smoke (prod)
+
+1. https://cmkw-patient-portal.vercel.app/doctor/login  
+2. `jan.kiryluk@cmkw.pl` / `jankiryluk123` → wizyta z kalendarza → karta single-page  
+3. Ikona wiadomości → chat do Recepcji (pilne)  
+4. Brak menu Administracja; `/doctor/admin` zablokowane  
+5. `cmkw@cmkw.pl` / `cmkw123` → Administracja OK · `recepcja@cmkw.pl` / `recepcja123` → chat  
+
+Szczegóły: `docs/DOCTOR_PORTAL.md` → **Etap 11**.
 
 ---
 
@@ -12,7 +50,7 @@ Aplikacja **Centrum Medycznego Kiryluk i Wenta** (Białystok):
 
 1. **Strona publiczna** — klon wizualny i treściowy [cmkirylukwenta.pl](https://cmkirylukwenta.pl/)  
 2. **Portal pacjenta** — rejestracja, logowanie, umawianie wizyt (mock płatność)  
-3. **Portal Lekarza / CMKW EDM** — kalendarz i lista wizyt (styl MyDr), Etap 0–1
+3. **Portal Lekarza / CMKW EDM** — kalendarz, wizyty, pacjenci, karta wizyty, chat personelu (Etap 0–11)
 
 **Dodatki względem oryginału (celowe):** przycisk **„Rejestracja / Portal Pacjenta”** w navbarze i w hero.
 
@@ -82,26 +120,29 @@ Własne `.git`; parent `akwen-web` ignoruje ten folder.
 | `/doctor/leki` | Baza leków (42 seed, panel szczegółów) |
 | `/doctor/icd10` | ICD-10 (~151 kodów, filtr rozdziałów, kopiuj) |
 | `/doctor/kalkulatory` | 15 kalkulatorów medycznych |
-| `/doctor/wizyty/[id]` | **Karta wizyty EDM** — wywiad, ICD, leki, dokumenty, historia |
+| `/doctor/wizyty/[id]` | **Karta wizyty EDM** — single-page (Etap 11), bez zakładek |
 | `/doctor/terminy` | Wyszukiwarka wolnych terminów + rezerwacja |
-| `/doctor/admin` | Statystyki, placówka, ustawienia, pracownicy, gabinety |
+| `/doctor/admin` | **Tylko facility** — statystyki, placówka, ustawienia, staff |
 | `/doctor/admin/grafiki` | **Grafiki pracy** (tyg. + wyjątki + podgląd) |
+| `/doctor/przewodnik` | Product tour (Etap 10) |
 
 **Styl EDM:** jasny layout CMKW (white navbar, `#0849b0`) — **nie** dark MyDr.
 
 **Oddziały:** Białystok (Szymborskiej 2/U4) · Hajnówka · Wszystkie — filtr globalny w topbarze.  
 **Grafiki:** doctor×branch, sloty z grafiku − zajęte wizyty; Kiryluk Pn/Śr/Pt 9–14.  
 **Kalendarz:** Dzień | Tydzień | Miesiąc + filtr lekarza + legenda dostępności.  
-**Etap 4 statusy:** Zaplanowana → Potwierdzona → Telepotwierdzona → W trakcie → Zakończona / Odwołana.
+**Etap 4 statusy:** Zaplanowana → Potwierdzona → Telepotwierdzona → W trakcie → Zakończona / Odwołana.  
+**Etap 11:** karta single-page + komunikator personelu (badge, dźwięk, pilne/FYI).
 
 **Middleware:**
 
 - `/portal/*` → sesja wymagana; staff → redirect `/doctor`
-- `/doctor/*` → sesja + rola `doctor` \| `admin` \| `reception`
-- niezalogowany na `/doctor` → `/login?callbackUrl=…`
+- `/doctor/*` → sesja + rola `doctor` \| `admin` \| `reception` \| `facility`
+- `/doctor/admin/*` → tylko `facility`
+- niezalogowany na `/doctor` → `/doctor/login?callbackUrl=…`
 - pacjent na `/doctor` → `/portal`
 
-Role w JWT: `patient` | `doctor` | `admin` | `reception`.  
+Role w JWT: `patient` | `doctor` | `admin` | `reception` | `facility`.  
 Dokumentacja EDM: `docs/DOCTOR_PORTAL.md`.
 
 ### Navbar (jak oryginał + CTA)
@@ -140,12 +181,17 @@ Na `/doctor/*` marketingowy header/footer jest ukryty (`AppChrome`).
 - **Seed personelu** przy starcie (jeśli brak w store)  
 - Env: `AUTH_SECRET` (prod/preview/dev), `AUTH_URL` (prod)
 
-### Konta demo (Etap 7)
+### Konta demo
 
-**Lekarz (EDM):** `/doctor/login` — `jan.kiryluk@cmkw.pl` / `jankiryluk123`  
-**Pacjent:** `/login` — `jan.kowalski@email.pl` / `jankowalski123`  
+| Rola | Login | Hasło | Uwagi |
+|------|-------|-------|--------|
+| Placówka | `cmkw@cmkw.pl` | `cmkw123` | pełny EDM + Administracja |
+| Lekarz | `jan.kiryluk@cmkw.pl` | `jankiryluk123` | **bez** Admin |
+| Lekarz + udost. | `tomas.wenta@cmkw.pl` | `tomaswenta123` | widzi Kiryluka |
+| Recepcja | `recepcja@cmkw.pl` | `recepcja123` | chat + multi-lekarz |
+| Pacjent | `jan.kowalski@email.pl` | `jankowalski123` | `/login` |
 
-Pozostali lekarze: `imie.nazwisko@cmkw.pl` / `imienazwisko123` (lista w `lib/demo-accounts.ts`).
+Pozostali lekarze: `imie.nazwisko@cmkw.pl` / `imienazwisko123` (`lib/demo-accounts.ts`).
 
 ---
 
@@ -162,12 +208,12 @@ Pozostali lekarze: `imie.nazwisko@cmkw.pl` / `imienazwisko123` (lista w `lib/dem
 
 ### UI (brand CMKW — jasny)
 
-- Biały top navbar + logo, badge EDM, oddział, powiadomienia, avatar  
-- Zakładki: Kalendarz | Wizyty | **Pacjenci** | Baza leków* | Kalkulatory* | ICD-10* | Inne*  
-- Prawy sidebar (jasny) z avatarami lekarzy (xl+)  
+- Biały top navbar + logo, badge EDM, oddział, **chat personelu** (badge), avatar  
+- Zakładki: Kalendarz | Terminy | Wizyty | Pacjenci | Leki | ICD-10 | Kalkulatory | Przewodnik | Administracja\*  
+- Prawy sidebar awatarów **tylko facility/reception** (izolacja lekarza)  
 - Toasty (sonner), loading + empty states  
 
-\* placeholdery → Etap 3
+\* Administracja tylko `facility`
 
 ### Kalendarz / Wizyty
 

@@ -1,6 +1,6 @@
 # Portal Lekarza / CMKW EDM
 
-**Status:** Etap 0–9 + **Etap 10 (Przewodnik / Product Tour)**  
+**Status:** Etap 0–10 + **Etap 11 (Karta wizyty single-page + komunikator personelu)**  
 **Prefix:** `/doctor/*`  
 **Role:** `facility` | `doctor` | `admin` | `reception`  
 **Styl:** jasny brand CMKW (`#0849b0`, white / slate-50) — spójny z patient portalem
@@ -18,10 +18,60 @@ npm run dev
 - EDM: http://localhost:3000/doctor  
 - Pacjenci: http://localhost:3000/doctor/pacjenci  
 
-**Demo placówka:** `cmkw@cmkw.pl` / `cmkw123` (facility — pełny widok)  
-**Demo admin:** `jan.kiryluk@cmkw.pl` / `jankiryluk123`  
-**Demo lekarz + udost.:** `tomas.wenta@cmkw.pl` / `tomaswenta123` (widzi też Kiryluka)  
+**Demo placówka:** `cmkw@cmkw.pl` / `cmkw123` (facility — pełny widok + Administracja)  
+**Demo lekarz (Kiryluk):** `jan.kiryluk@cmkw.pl` / `jankiryluk123` — **bez** Administracji  
+**Demo lekarz + udost.:** `tomas.wenta@cmkw.pl` / `tomaswenta123`  
+**Demo recepcja:** `recepcja@cmkw.pl` / `recepcja123`  
 **Logowanie EDM:** `/doctor/login` · **Pacjent:** `/login`
+
+---
+
+## Etap 11 — testowanie (priorytet lekarza)
+
+### A. Uproszczona karta wizyty (jeden widok)
+
+1. Login `jan.kiryluk@cmkw.pl` / `jankiryluk123` → `/doctor`
+2. Klik godzinę wizyty (np. 08:00) → `/doctor/wizyty/v-001`
+3. **Brak zakładek** — cała karta na jednej stronie (jak Lux Med):
+   - wywiad (duże pole tekstowe),
+   - ICD-10 (picker + lista),
+   - leki (picker + tabela),
+   - skierowania, dokumenty, historia (prawa kolumna na desktopie)
+4. Pasek akcji **góra i dół**: Zapisz · W trakcie · Zakończ wizytę · Potwierdź · Drukuj · Anuluj
+5. Dolny pasek jest **sticky** — wygodny przy długim wywiadzie
+6. Chip-nawigacja (Wywiad / ICD / Leki…) przewija do sekcji; sekcje da się zwinąć (accordion)
+7. Autosave notatki (~1,2 s) + ręczny **Zapisz**
+
+**Komponent:** `components/doctor/visit-card.tsx`
+
+### B. Komunikator personelu
+
+1. W topbarze EDM klik ikonę **wiadomości** (dymek) — badge z liczbą nieprzeczytanych
+2. Panel boczny: lista rozmów (kanał **Recepcja** + osoby) + historia
+3. Wybierz **Recepcja** → napisz wiadomość, priorytet **Pilne** lub **Do wiadomości**
+4. **Ctrl+Enter** wysyła; toast potwierdza
+5. Otwórz drugą przeglądarkę / tryb incognito: login `recepcja@cmkw.pl` / `recepcja123`
+6. Badge + **dźwięk** przy nowej wiadomości (Web Audio beep)
+7. Oznaczanie przeczytania — po otwarciu wątku badge spada
+
+**Komponenty:** `components/doctor/staff-chat.tsx`, `hooks/use-staff-chat.ts`  
+**Store:** `lib/doctor/chat-client.ts` · localStorage `cmkw-doctor-staff-chat-v1`  
+**Reset:** DevTools → Local Storage → usuń klucz → odśwież
+
+### C. Lekarz bez Administracji + brand
+
+1. Login Kiryluk / Wenta → w menu **nie ma** zakładki „Administracja”, brak ikony Settings
+2. Ręczne wejście `/doctor/admin` → redirect na `/doctor?denied=admin` + toast
+3. Login `cmkw@cmkw.pl` → widać **Administracja** (stats, grafiki, sharing…)
+4. Navbar: logo CMKW, badge **EDM**, kolory brand (nie navy MyDr)
+
+### Konta do szybkiego smoke
+
+| Rola | E-mail | Hasło | Admin UI | Chat |
+|------|--------|-------|----------|------|
+| Placówka | cmkw@cmkw.pl | cmkw123 | tak | tak |
+| Lekarz | jan.kiryluk@cmkw.pl | jankiryluk123 | **nie** | tak |
+| Recepcja | recepcja@cmkw.pl | recepcja123 | nie | tak |
 
 ---
 
